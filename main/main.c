@@ -9,7 +9,7 @@
 #include "../components/ra01s/ra01s.h"
 #include "../components/st7789/st7789.h"
 #include "../components/st7789/fontx.h"
-
+#include "esp_spiffs.h"
 static const char *TAG = "ChirpyMain";
 
 // EU frequency and TX power settings for LoRa.
@@ -38,13 +38,32 @@ static const char *TAG = "ChirpyMain";
 #define COLOR_WHITE 0xFFFF
 
 TFT_t tft;
-extern FontxFile fontx; // For lcdDrawString
-
+FontxFile fx16G[2];
 // GPIO configuration for the user button.
 #define BUTTON_GPIO         GPIO_NUM_0  //the en button
 #define DEBOUNCE_DELAY_MS   50
 
 
+esp_err_t mountSPIFFS(const char *base_path, const char *partition_label, int max_files)
+{
+    esp_vfs_spiffs_conf_t conf = {
+        .base_path = base_path,
+        .partition_label = partition_label,
+        .max_files = max_files,
+        .format_if_mount_failed = true
+    };
+    esp_err_t ret = esp_vfs_spiffs_register(&conf);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to mount SPIFFS (%s)", esp_err_to_name(ret));
+    } else {
+        size_t total = 0, used = 0;
+        ret = esp_spiffs_info(partition_label, &total, &used);
+        if (ret == ESP_OK) {
+            ESP_LOGI(TAG, "SPIFFS Partition [%s] mounted: total %d, used %d", partition_label, total, used);
+        }
+    }
+    return ret;
+}
 
 void display_init(void)
 {
@@ -65,7 +84,7 @@ void display_print(const char *msg)
 {
     // clear the screen and print the message.
     lcdFillScreen(&tft, COLOR_BLACK);
-    lcdDrawString(&tft, &fontx, 10, 100, (uint8_t *)msg, COLOR_WHITE); //TODO: adjust coords but it should be ok for now
+    lcdDrawString(&tft, fx16G, 10, 100, (uint8_t *)msg, COLOR_WHITE);//TODO: adjust coords but it should be ok for now
 }
 
 
@@ -111,7 +130,10 @@ void send_lora_message(void)
 void app_main(void)
 {
     ESP_LOGW(TAG, "main start");
+    ESP_LOGI(TAG, "Mounting SPIFFS for fonts");
+    ESP_ERROR_CHECK(mountSPIFFS("/fonts", "storage", 7));
 
+    InitFontx(fx16G, "/fonts/ILGH16XB.FNT", ""); //example font from repo
     // button GPIO init
     gpio_config_t btn_conf = {
         .pin_bit_mask = (1ULL << BUTTON_GPIO),
