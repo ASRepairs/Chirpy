@@ -1,55 +1,162 @@
-//
-// Created by user on 3/11/2025.
-//
-/*
- * SPDX-FileCopyrightText: 2010-2022 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: CC0-1.0
- */
-
 #include <stdio.h>
-#include <inttypes.h>
-#include "sdkconfig.h"
+#include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_chip_info.h"
-#include "esp_flash.h"
-#include "esp_system.h"
+#include "driver/gpio.h"
+#include "esp_log.h"
+
+//RA01S LoRa  and lcd st7789 driver libs
+#include "../components/ra01s/ra01s.h"
+#include "../components/st7789/st7789.h"
+#include "../components/st7789/fontx.h"
+
+static const char *TAG = "ChirpyMain";
+
+// EU frequency and TX power settings for LoRa.
+#define LORA_FREQUENCY 868000000  // 868 MHz for eu
+#define LORA_TX_POWER  14         //(range -3 to +22 dBm)
+
+// LoRa modulation parameters (placeholders for now, TODO: to adjust later)
+#define LORA_SPREADING_FACTOR 7
+#define LORA_BANDWIDTH        0x08
+#define LORA_CODING_RATE      1      //4/5 coded rate might be represented as 1
+#define LORA_PREAMBLE_LENGTH  8
+#define LORA_PAYLOAD_LENGTH   0      // 0 = variable length packet
+#define LORA_CRC_ON           true
+#define LORA_INVERT_IQ        false
+
+// lcd configuration
+#define PIN_MOSI    23
+#define PIN_SCLK    18
+#define PIN_CS      5
+#define PIN_DC      16
+#define PIN_RESET   17
+#define PIN_BL      4
+#define DISP_WIDTH  240
+#define DISP_HEIGHT 240
+#define COLOR_BLACK 0x0000
+#define COLOR_WHITE 0xFFFF
+
+TFT_t tft;
+extern FontxFile fontx; // For lcdDrawString
+
+// GPIO configuration for the user button.
+#define BUTTON_GPIO         GPIO_NUM_0  //the en button
+#define DEBOUNCE_DELAY_MS   50
+
+
+
+void display_init(void)
+{
+    spi_master_init(&tft, PIN_MOSI, PIN_SCLK, PIN_CS, PIN_DC, PIN_RESET, PIN_BL);
+    // Initialize display with width, height, and offsets (here offsets are 0)
+    lcdInit(&tft, DISP_WIDTH, DISP_HEIGHT, 0, 0);
+    // clear display with a black screen
+    lcdFillScreen(&tft, COLOR_BLACK);
+}
+
+void display_clear(void)
+{
+    //just fill the screen with black color
+    lcdFillScreen(&tft, COLOR_BLACK);
+}
+
+void display_print(const char *msg)
+{
+    // clear the screen and print the message.
+    lcdFillScreen(&tft, COLOR_BLACK);
+    lcdDrawString(&tft, &fontx, 10, 100, (uint8_t *)msg, COLOR_WHITE); //TODO: adjust coords but it should be ok for now
+}
+
+
+// Task to poll for LoRa messages (since RA01S does not use callbacks)
+void lora_receive_task(void *arg)
+{
+    uint8_t rxBuffer[256];
+    while (1) {
+        // poll for a received packet.
+        uint8_t rxLen = LoRaReceive(rxBuffer, sizeof(rxBuffer));
+        if (rxLen > 0) {
+            // Null-terminate
+            if (rxLen < sizeof(rxBuffer)) {
+                rxBuffer[rxLen] = '\0';
+            } else {
+                rxBuffer[sizeof(rxBuffer)-1] = '\0';
+            }
+            ESP_LOGI(TAG, "Received: %s", rxBuffer);
+            display_clear();
+            display_print("Message Received");
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
+
+// Function to send a LoRa message and update the display.
+void send_lora_message(void)
+{
+    const char *msg = "Hello from board";
+    ESP_LOGI(TAG, "Sending message: %s", msg);
+
+    // Send the message in synchronous mode.
+    bool success = LoRaSend((uint8_t *)msg, strlen(msg), SX126x_TXMODE_SYNC);
+    if (success) {
+        display_clear();
+        display_print("Message Sent");
+    } else {
+        display_clear();
+        display_print("Send Failed");
+    }
+}
 
 void app_main(void)
 {
-    printf("Hello world!\n");
+    ESP_LOGW(TAG, "main start");
 
-    /* Print chip information */
-    esp_chip_info_t chip_info;
-    uint32_t flash_size;
-    esp_chip_info(&chip_info);
-    printf("This is %s chip with %d CPU core(s), %s%s%s%s, ",
-           CONFIG_IDF_TARGET,
-           chip_info.cores,
-           (chip_info.features & CHIP_FEATURE_WIFI_BGN) ? "WiFi/" : "",
-           (chip_info.features & CHIP_FEATURE_BT) ? "BT" : "",
-           (chip_info.features & CHIP_FEATURE_BLE) ? "BLE" : "",
-           (chip_info.features & CHIP_FEATURE_IEEE802154) ? ", 802.15.4 (Zigbee/Thread)" : "");
+    // button GPIO init
+    gpio_config_t btn_conf = {
+        .pin_bit_mask = (1ULL << BUTTON_GPIO),
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = GPIO_PULLUP_ENABLE, //TODO: check on hardware if needed
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+    gpio_config(&btn_conf);
 
-    unsigned major_rev = chip_info.revision / 100;
-    unsigned minor_rev = chip_info.revision % 100;
-    printf("silicon revision v%d.%d, ", major_rev, minor_rev);
-    if(esp_flash_get_size(NULL, &flash_size) != ESP_OK) {
-        printf("Get flash size failed");
+    // init the display.
+    display_init();
+    display_clear();
+    display_print("Welcome!!!!!");
+
+    // init the LORA driver.
+    LoRaInit();
+    if (LoRaBegin(LORA_FREQUENCY, LORA_TX_POWER, 0.0, true) != ERR_NONE) {
+        ESP_LOGE(TAG, "LoRaBegin failed");
+        display_clear();
+        display_print("LoRa Init Failed");
         return;
     }
 
-    printf("%" PRIu32 "MB %s flash\n", flash_size / (uint32_t)(1024 * 1024),
-           (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
+    // modulation parameters config
+    LoRaConfig(LORA_SPREADING_FACTOR, LORA_BANDWIDTH, LORA_CODING_RATE,
+               LORA_PREAMBLE_LENGTH, LORA_PAYLOAD_LENGTH, LORA_CRC_ON, LORA_INVERT_IQ);
 
-    printf("Minimum free heap size: %" PRIu32 " bytes\n", esp_get_minimum_free_heap_size());
+    // making LoRa to receive continuously.
+    SetRx(0xFFFFFF);
 
-    for (int i = 10; i >= 0; i--) {
-        printf("Restarting in %d seconds...\n", i);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    // task to poll for incoming LoRa messages.
+    xTaskCreate(lora_receive_task, "lora_receive_task", 4096, NULL, 5, NULL);
+
+    // Main loop poll for the button press to trigger a message send.
+    while (1) {
+
+        if (gpio_get_level(BUTTON_GPIO) == 0) {
+            vTaskDelay(pdMS_TO_TICKS(DEBOUNCE_DELAY_MS));
+            if (gpio_get_level(BUTTON_GPIO) == 0) {
+                send_lora_message();
+                while (gpio_get_level(BUTTON_GPIO) == 0) {
+                    vTaskDelay(pdMS_TO_TICKS(10));
+                }
+            }
+        }
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
-    printf("Restarting now.\n");
-    fflush(stdout);
-    esp_restart();
 }
