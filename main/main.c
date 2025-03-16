@@ -26,12 +26,12 @@ static const char *TAG = "ChirpyMain";
 #define LORA_INVERT_IQ        false
 
 // lcd configuration
-#define PIN_MOSI    23
+#define PIN_MOSI    19
 #define PIN_SCLK    18
 #define PIN_CS      5
-#define PIN_DC      16
-#define PIN_RESET   17
-#define PIN_BL      4
+#define PIN_DC      27
+#define PIN_BL      12
+
 #define DISP_WIDTH  240
 #define DISP_HEIGHT 240
 #define COLOR_BLACK 0x0000
