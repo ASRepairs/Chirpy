@@ -32,10 +32,13 @@ static const char *TAG = "ChirpyMain";
 #define PIN_DC      27
 #define PIN_BL      12
 
+#define PIN_RESET   17
+
 #define DISP_WIDTH  240
 #define DISP_HEIGHT 240
 #define COLOR_BLACK 0x0000
 #define COLOR_WHITE 0xFFFF
+
 
 TFT_t tft;
 FontxFile fx16G[2];
