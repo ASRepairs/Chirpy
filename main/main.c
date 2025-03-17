@@ -137,9 +137,7 @@ void display_print(const char *msg)
 #define BUTTON_GPIO         GPIO_NUM_0  // the EN button
 #define DEBOUNCE_DELAY_MS   50
 
-//-------------------------------------------------------------------
-// Task to poll for LoRa messages (polling version as in your code)
-//-------------------------------------------------------------------
+
 void lora_receive_task(void *arg)
 {
     uint8_t rxBuffer[256];
