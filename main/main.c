@@ -25,17 +25,6 @@ static const char *TAG = "ChirpyMain";
 #define LORA_CRC_ON           true
 #define LORA_INVERT_IQ        false
 
-// lcd configuration
-#define PIN_MOSI    19
-#define PIN_SCLK    18
-#define PIN_CS      5
-#define PIN_DC      27
-#define PIN_BL      12
-
-#define PIN_RESET   17
-
-#define DISP_WIDTH  240
-#define DISP_HEIGHT 240
 #define COLOR_BLACK 0x0000
 #define COLOR_WHITE 0xFFFF
 
@@ -43,7 +32,7 @@ static const char *TAG = "ChirpyMain";
 TFT_t tft;
 FontxFile fx16G[2];
 // GPIO configuration for the user button.
-#define BUTTON_GPIO         GPIO_NUM_0  //the en button //GPIO_NUM_36 for the watch button
+#define BUTTON_GPIO         GPIO_NUM_36  //the watch button
 #define DEBOUNCE_DELAY_MS   50
 
 
@@ -70,9 +59,9 @@ esp_err_t mountSPIFFS(const char *base_path, const char *partition_label, int ma
 
 void display_init(void)
 {
-    spi_master_init(&tft, PIN_MOSI, PIN_SCLK, PIN_CS, PIN_DC, PIN_RESET, PIN_BL);
+    spi_master_init(&tft, CONFIG_ST7789_MOSI_GPIO, CONFIG_ST7789_SCLK_GPIO, CONFIG_ST7789_CS_GPIO, CONFIG_ST7789_DC_GPIO, CONFIG_ST7789_RESET_GPIO, CONFIG_BL_GPIO);
     // Initialize display with width, height, and offsets (here offsets are 0)
-    lcdInit(&tft, DISP_WIDTH, DISP_HEIGHT, 0, 0);
+    lcdInit(&tft, CONFIG_WIDTH, CONFIG_HEIGHT, CONFIG_OFFSETX, CONFIG_OFFSETY);
     // clear display with a black screen
     lcdFillScreen(&tft, COLOR_BLACK);
 }

@@ -38,7 +38,7 @@ menu "ST7789 Configuration"
 		help
 			When your TFT have offset(Y), set it.
 
-	config MOSI_GPIO
+	config ST7789_MOSI_GPIO
 		int "MOSI GPIO number"
 		range 0 GPIO_RANGE_MAX
 		default 23 if IDF_TARGET_ESP32
@@ -50,7 +50,7 @@ menu "ST7789 Configuration"
 			On the ESP32, GPIOs 35-39 are input-only so cannot be used as outputs.
 			On the ESP32-S2, GPIO 46 is input-only so cannot be used as outputs.
 
-	config SCLK_GPIO
+	config ST7789_SCLK_GPIO
 		int "SCLK GPIO number"
 		range 0 GPIO_RANGE_MAX
 		default 18 if IDF_TARGET_ESP32
@@ -62,7 +62,7 @@ menu "ST7789 Configuration"
 			On the ESP32, GPIOs 35-39 are input-only so cannot be used as outputs.
 			On the ESP32-S2, GPIO 46 is input-only so cannot be used as outputs.
 
-	config CS_GPIO
+	config ST7789_CS_GPIO
 		int "CS GPIO number"
 		range -1 GPIO_RANGE_MAX
 		default -1
@@ -73,7 +73,7 @@ menu "ST7789 Configuration"
 			On the ESP32, GPIOs 35-39 are input-only so cannot be used as outputs.
 			On the ESP32-S2, GPIO 46 is input-only so cannot be used as outputs.
 
-	config DC_GPIO
+	config ST7789_DC_GPIO
 		int "DC GPIO number"
 		range 0 GPIO_RANGE_MAX
 		default 27 if IDF_TARGET_ESP32
@@ -85,9 +85,9 @@ menu "ST7789 Configuration"
 			On the ESP32, GPIOs 35-39 are input-only so cannot be used as outputs.
 			On the ESP32-S2, GPIO 46 is input-only so cannot be used as outputs.
 
-	config RESET_GPIO
+	config ST7789_RESET_GPIO
 		int "RESET GPIO number"
-		range 0 GPIO_RANGE_MAX
+		range -1 GPIO_RANGE_MAX
 		default 33 if IDF_TARGET_ESP32
 		default 38 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3 || IDF_TARGET_ESP32P4
 		default  3 # C3 and others
