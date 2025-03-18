@@ -22,8 +22,17 @@
 #endif
 
 
-#include "../components/ra01s/ra01s.h"
+// Uncomment one of these to choose the LoRa chip.
+//#define LORA_SX126x    //  SX126x-based API on the watch
+#define LORA_SX1276    //  SX1276-based API on dev board
 
+#ifdef LORA_SX126x
+#include "../components/ra01s/ra01s.h"
+#endif
+
+#ifdef LORA_SX1276
+#include "../components/lora/include/lora.h"  // The SX1276 API header
+#endif
 
 static const char *TAG = "ChirpyMain";
 
@@ -137,26 +146,31 @@ void display_print(const char *msg)
 #define BUTTON_GPIO         GPIO_NUM_0  // the EN button
 #define DEBOUNCE_DELAY_MS   50
 
-//-------------------------------------------------------------------
-// Task to poll for LoRa messages (polling version as in your code)
-//-------------------------------------------------------------------
+// Receive task: uses different API calls based on the chip.
 void lora_receive_task(void *arg)
 {
     uint8_t rxBuffer[256];
     while (1) {
-        // poll for a received packet.
+#ifdef LORA_SX126x
         uint8_t rxLen = LoRaReceive(rxBuffer, sizeof(rxBuffer));
         if (rxLen > 0) {
-            // Null-terminate
-            if (rxLen < sizeof(rxBuffer)) {
+            if (rxLen < sizeof(rxBuffer))
                 rxBuffer[rxLen] = '\0';
-            } else {
+            else
                 rxBuffer[sizeof(rxBuffer)-1] = '\0';
-            }
-            ESP_LOGI(TAG, "Received: %s", rxBuffer);
+            ESP_LOGI(TAG, "Received (SX126x): %s", rxBuffer);
             display_clear();
             display_print("Message Received");
         }
+#elif defined(LORA_SX1276)
+        lora_receive();  // Set chip into receive mode
+        if (lora_received()) {
+            int rxLen = lora_receive_packet(rxBuffer, sizeof(rxBuffer));
+            ESP_LOGI(TAG, "Received (SX1276): %.*s", rxLen, rxBuffer);
+            display_clear();
+            display_print("Message Received");
+        }
+#endif
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
@@ -167,7 +181,8 @@ void send_lora_message(void)
     const char *msg = "Hello from board";
     ESP_LOGI(TAG, "Sending message: %s", msg);
 
-    // Send the message in synchronous mode.
+#ifdef LORA_SX126x
+    // Synchronous send using SX126x API.
     bool success = LoRaSend((uint8_t *)msg, strlen(msg), SX126x_TXMODE_SYNC);
     if (success) {
         display_clear();
@@ -176,6 +191,14 @@ void send_lora_message(void)
         display_clear();
         display_print("Send Failed");
     }
+#elif defined(LORA_SX1276)
+    // Send using the SX1276 API.
+    int send_len = strlen(msg);
+    lora_send_packet((uint8_t *)msg, send_len);
+    // (Optionally, you could check packet loss or status here)
+    display_clear();
+    display_print("Message Sent");
+#endif
 }
 
 void app_main(void)
@@ -203,7 +226,7 @@ void app_main(void)
     display_clear();
     display_print("Welcome!!!!!");
 
-    // init the LORA driver.
+#ifdef LORA_SX126x
     LoRaInit();
     if (LoRaBegin(LORA_FREQUENCY, LORA_TX_POWER, 0.0, true) != ERR_NONE) {
         ESP_LOGE(TAG, "LoRaBegin failed");
@@ -220,6 +243,23 @@ void app_main(void)
 
     // making LoRa to receive continuously.
     SetRx(0xFFFFFF);
+#elif defined(LORA_SX1276)
+    if (lora_init() == 0) {
+        ESP_LOGE(TAG, "SX1276 not recognized");
+        display_clear();
+        display_print("LoRa Init Failed");
+        return;
+    }
+    // Set frequency – you can adjust these as needed or use configuration macros.
+    lora_set_frequency(LORA_FREQUENCY);
+    lora_enable_crc();
+    lora_set_coding_rate(LORA_CODING_RATE);
+    ESP_LOGI(TAG, "coding_rate=%d", LORA_CODING_RATE);
+    lora_set_bandwidth(LORA_BANDWIDTH);
+    ESP_LOGI(TAG, "bandwidth=%d", LORA_BANDWIDTH);
+    lora_set_spreading_factor(LORA_SPREADING_FACTOR);
+    ESP_LOGI(TAG, "spreading_factor=%d", LORA_SPREADING_FACTOR);
+#endif
 
     // task to poll for incoming LoRa messages.
     xTaskCreate(lora_receive_task, "lora_receive_task", 4096, NULL, 5, NULL);
