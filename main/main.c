@@ -62,9 +62,9 @@ esp_err_t mountSPIFFS(const char *base_path, const char *partition_label, int ma
 // ST7789 display configuration and global variables
 #define PIN_MOSI    23
 #define PIN_SCLK    18
-#define PIN_CS      5
-#define PIN_DC      16
-#define PIN_RESET   17
+#define PIN_CS      16
+#define PIN_DC      22
+#define PIN_RESET   19
 #define PIN_BL      4
 #define DISP_WIDTH  240
 #define DISP_HEIGHT 240
