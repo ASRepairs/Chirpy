@@ -256,7 +256,7 @@ bool FT6X36::readData(void)
     i2c_master_write_byte(cmd, (FT6X36_ADDR<<1), ACK_CHECK_EN);
     i2c_master_write_byte(cmd, 0, ACK_CHECK_EN);
     i2c_master_stop(cmd);
-    ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_RATE_MS);
+    ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
     if (ret != ESP_OK) {
         return ret;
@@ -267,7 +267,7 @@ bool FT6X36::readData(void)
     i2c_master_write_byte(cmd, (FT6X36_ADDR<<1)|1, ACK_CHECK_EN);
     i2c_master_read(cmd, data, data_size,  I2C_MASTER_LAST_NACK);
     i2c_master_stop(cmd);
-    ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_RATE_MS);
+    ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
 
 	if (CONFIG_FT6X36_DEBUG) {
@@ -330,7 +330,7 @@ void FT6X36::writeRegister8(uint8_t reg, uint8_t value)
 	i2c_master_write_byte(cmd, reg , ACK_CHECK_EN);
 	i2c_master_write_byte(cmd, value , ACK_CHECK_EN);
 	i2c_master_stop(cmd);
-    i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_RATE_MS);
+    i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
 }
 
@@ -346,7 +346,7 @@ uint8_t FT6X36::readRegister8(uint8_t reg, uint8_t *data_buf)
 
     i2c_master_read_byte(cmd, data_buf, I2C_MASTER_NACK);
     i2c_master_stop(cmd);
-    esp_err_t ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_RATE_MS);
+    esp_err_t ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 1000 / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
 
 	
