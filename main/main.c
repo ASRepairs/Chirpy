@@ -32,7 +32,7 @@ static const char *TAG = "ChirpyMain";
 TFT_t tft;
 FontxFile fx16G[2];
 // GPIO configuration for the user button.
-#define BUTTON_GPIO         GPIO_NUM_36  //the watch button
+#define BUTTON_GPIO         GPIO_NUM_0  //the watch button
 #define DEBOUNCE_DELAY_MS   50
 
 
@@ -130,7 +130,6 @@ void app_main(void)
     gpio_config_t btn_conf = {
         .pin_bit_mask = (1ULL << BUTTON_GPIO),
         .mode = GPIO_MODE_INPUT,
-        .pull_up_en = GPIO_PULLUP_ENABLE, //TODO: check on hardware if needed
         .intr_type = GPIO_INTR_DISABLE,
     };
     gpio_config(&btn_conf);
