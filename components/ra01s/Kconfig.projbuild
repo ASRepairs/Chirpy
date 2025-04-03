@@ -144,18 +144,18 @@ menu "SX126X Configuration"
 		help
 			Pin Number to be used as the RXEN signal.
 
-	choice SPI_HOST
+	choice SPI_HOST_SX126X
 		prompt "SPI peripheral that controls this bus"
-		default SPI2_HOST
+		default SPI2_HOST_SX126X
 		help
 			Select SPI peripheral that controls this bus.
-		config SPI2_HOST
-			bool "SPI2_HOST"
+		config SPI2_HOST_SX126X
+			bool "SPI2_HOST_SX126X"
 			help
 				Use SPI2_HOST. This is also called HSPI_HOST.
-		config SPI3_HOST
+		config SPI3_HOST_SX126X
 			depends on IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
-			bool "SPI3_HOST"
+			bool "SPI3_HOST_SX126X"
 			help
 				USE SPI3_HOST. This is also called VSPI_HOST
 	endchoice
