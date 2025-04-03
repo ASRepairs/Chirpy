@@ -24,9 +24,10 @@ static const char *TAG = "ChirpyMain";
 #define LORA_PAYLOAD_LENGTH   0      // 0 = variable length packet
 #define LORA_CRC_ON           true
 #define LORA_INVERT_IQ        false
-
+#define TCXO_VOLTAGE 3.3
 #define COLOR_BLACK 0x0000
 #define COLOR_WHITE 0xFFFF
+#define USE_LDO_LORA true
 
 
 TFT_t tft;
@@ -141,7 +142,8 @@ void app_main(void)
 
     // init the LORA driver.
     LoRaInit();
-    if (LoRaBegin(LORA_FREQUENCY, LORA_TX_POWER, 0.0, true) != ERR_NONE) {
+    LoRaDebugPrint(true);
+    if (LoRaBegin(LORA_FREQUENCY, LORA_TX_POWER, TCXO_VOLTAGE, USE_LDO_LORA) != ERR_NONE) {
         ESP_LOGE(TAG, "LoRaBegin failed");
         display_clear();
         display_print("LoRa Init Failed");
