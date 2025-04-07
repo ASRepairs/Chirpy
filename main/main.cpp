@@ -126,18 +126,18 @@ extern "C" void app_main(void) {
 
     // RadioLib HAL
     EspHal* hal = new EspHal(
-        CONFIG_SX126X_SCLK_GPIO,  // SCK
-        CONFIG_SX126X_MISO_GPIO,  // MISO
-        CONFIG_SX126X_MOSI_GPIO   // MOSI
+        3,  // SCK
+        4,  // MISO
+        1   // MOSI
     );
 
     // RadioLib module with  pin mapping
     Module* lora_module = new Module(
         hal,
-        CONFIG_SX126X_NSS_GPIO,   // NSS
+        5,   // NSS
         9,                        // DIO1 (IO9)
-        CONFIG_SX126X_RST_GPIO,   // RST
-        CONFIG_SX126X_BUSY_GPIO   // BUSY
+        8,   // RST
+        7   // BUSY
     );
     radio = SX1262(lora_module);
 
