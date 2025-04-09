@@ -1,105 +1,136 @@
-/*
-   RadioLib SX126x Transmit Example
-
-   This example transmits packets using SX1262 LoRa watch module.
-   Each packet contains up to 256 bytes of data, in the form of:
-    - Arduino String
-    - null-terminated char array (C-string)
-    - arbitrary binary data (byte array)
-
-   Other modules from SX126x family can also be used.
-
-   For default module settings, see the wiki page
-   https://github.com/jgromes/RadioLib/wiki/Default-configuration#sx126x---lora-modem
-
-   For full API reference, see the GitHub Pages
-   https://jgromes.github.io/RadioLib/
-*/
-
 #include <LilyGoLib.h>
 #include <LV_Helper.h>
+#include "esp_log.h"
 
+#define LORA_FREQUENCY        868.0f
+#define TASK_STACK_SIZE       4096
+#define TX_INTERVAL_MS        3000
+#define UI_REFRESH_MS         10
+#define RX_CHECK_INTERVAL_MS  50
+
+static const char* TAG = "LoRaApp";
+
+// global vars
 SX1262 radio = newModule();
+lv_obj_t* label1 = nullptr;
+volatile bool receivedFlag = false;
 
-uint32_t interval = 0;
-lv_obj_t *label1;
-
-void setup()
-{
-    Serial.begin(115200);
-
-    watch.begin();
-
-    beginLvglHelper();
-
-    // initialize SX1262 with default settings
-    Serial.print(F("[SX1262] Initializing ... "));
-    int state = radio.begin();
-    if (state == RADIOLIB_ERR_NONE) {
-        Serial.println(F("success!"));
-    } else {
-        Serial.print(F("failed, code "));
-        Serial.println(state);
-        while (true);
-    }
-
-    // set carrier frequency to 868.0 MHz
-    if (radio.setFrequency(868.0) == RADIOLIB_ERR_INVALID_FREQUENCY) {
-        Serial.println(F("Selected frequency is invalid for this module!"));
-        while (true);
-    }
-
-    label1 = lv_label_create(lv_scr_act());
-    lv_label_set_recolor(label1, true);    /*Enable re-coloring by commands in the text*/
-    lv_label_set_text(label1, "SX126x_Transmit");
-    lv_obj_center(label1);
+// ───────────────────────────── ISR ─────────────────────────────
+ICACHE_RAM_ATTR void onLoraPacketReceived() {
+    receivedFlag = true;
 }
 
-void loop()
-{
-    if (millis() > interval) {
-        interval = millis() + 1000;
-        Serial.print(F("[SX1262] Transmitting packet ... "));
+// ──────────────────────── LoRa Transmission ────────────────────────
+esp_err_t sendLoraMessage(String& msg) {
+    radio.standby();
 
-        // you can transmit C-string or Arduino string up to
-        // 256 characters long
-        // NOTE: transmit() is a blocking method!
-        //       See example SX126x_Transmit_Interrupt for details
-        //       on non-blocking transmission method.
-        int state = radio.transmit("Hello World!");
+    ESP_LOGI(TAG, "[SX1262] Transmitting: %s", msg.c_str());
 
-        // you can also transmit byte array up to 256 bytes long
-        /*
-          byte byteArr[] = {0x01, 0x23, 0x45, 0x56, 0x78, 0xAB, 0xCD, 0xEF};
-          int state = radio.transmit(byteArr, 8);
-        */
+    int state = radio.transmit(msg);
 
+    if (state == RADIOLIB_ERR_NONE) {
+        lv_label_set_text_fmt(label1, "TX Success\nDatarate: %.1f bps", radio.getDataRate());
+        ESP_LOGI(TAG, "[SX1262] Transmission successful.");
+        vTaskDelay(pdMS_TO_TICKS(RX_CHECK_INTERVAL_MS));
+        state = radio.startReceive();
         if (state == RADIOLIB_ERR_NONE) {
-            // the packet was successfully transmitted
-            Serial.println(F("success!"));
-
-            // print measured data rate
-            Serial.print(F("[SX1262] Datarate:\t"));
-            Serial.print(radio.getDataRate());
-            Serial.println(F(" bps"));
-
-            lv_label_set_text_fmt(label1, "[%u]Transmit PASS\nDatarate:%.2f bps", millis() / 1000, radio.getDataRate());
-
-        } else if (state == RADIOLIB_ERR_PACKET_TOO_LONG) {
-            // the supplied packet was longer than 256 bytes
-            Serial.println(F("too long!"));
-
-        } else if (state == RADIOLIB_ERR_TX_TIMEOUT) {
-            // timeout occured while transmitting packet
-            Serial.println(F("timeout!"));
-
-        } else {
-            lv_label_set_text_fmt(label1, "Transmit failed,code:%d", state);
-            // some other error occurred
-            Serial.print(F("failed, code "));
-            Serial.println(state);
+            ESP_LOGI(TAG, "[SX1262] Listening...");
+            return ESP_OK;
         }
+
+        ESP_LOGE(TAG, "[SX1262] Failed to enter RX mode, code: %d", state);
+    } else {
+        lv_label_set_text_fmt(label1, "TX Failed\nError: %d", state);
+        ESP_LOGE(TAG, "[SX1262] Transmission failed, code: %d", state);
     }
 
-    lv_task_handler();
+    return ESP_FAIL;
+}
+
+// ──────────────────────── LoRa Reception ────────────────────────
+void displayReceivedMessage() {
+    String receivedMsg;
+    int state = radio.readData(receivedMsg);
+
+    if (state == RADIOLIB_ERR_NONE) {
+        ESP_LOGI(TAG, "[SX1262] Received message: %s", receivedMsg.c_str());
+        lv_label_set_text_fmt(label1,
+            "RX Success\nMessage: %s\nRSSI: %d dBm",
+            receivedMsg.c_str(), radio.getRSSI());
+    } else {
+        ESP_LOGE(TAG, "[SX1262] Failed to read message, code: %d", state);
+        lv_label_set_text_fmt(label1,
+            "RX Failed\nError: %d", state);
+    }
+
+    radio.startReceive();  // go back to RX mode after sending so we can receive the next messages
+}
+
+// ───────────────────────────── Tasks ─────────────────────────────
+void TaskLoraSender(void* pvParameters) {
+    while (true) {
+        String msg = "hello xd";
+        sendLoraMessage(msg);
+        vTaskDelay(pdMS_TO_TICKS(TX_INTERVAL_MS));
+    }
+}
+
+void TaskLoraReceiver(void* pvParameters) {
+    while (true) {
+        if (receivedFlag) {
+            receivedFlag = false;
+            displayReceivedMessage();
+        }
+        vTaskDelay(pdMS_TO_TICKS(RX_CHECK_INTERVAL_MS));
+    }
+}
+
+void TaskLvglUpdate(void* pvParameters) {
+    while (true) {
+        lv_timer_handler();
+        vTaskDelay(pdMS_TO_TICKS(UI_REFRESH_MS));
+    }
+}
+
+// ───────────────────────────── Setup ─────────────────────────────
+void setup() {
+    watch.begin();
+    beginLvglHelper();
+
+    ESP_LOGI(TAG, "[SX1262] Initializing...");
+    int state = radio.begin();
+    if (state != RADIOLIB_ERR_NONE) {
+        ESP_LOGE(TAG, "Initialization failed, code: %d", state);
+        while (true);
+    }
+    ESP_LOGI(TAG, "[SX1262] Initialization successful");
+
+    if (radio.setFrequency(LORA_FREQUENCY) == RADIOLIB_ERR_INVALID_FREQUENCY) {
+        ESP_LOGE(TAG, "[SX1262] Invalid frequency: %.1f MHz", LORA_FREQUENCY);
+        while (true);
+    }
+
+    radio.setDio1Action(onLoraPacketReceived);
+
+    ESP_LOGI(TAG, "[SX1262] Starting RX mode...");
+    state = radio.startReceive(); //default we start receiving
+    if (state != RADIOLIB_ERR_NONE) {
+        ESP_LOGE(TAG, "Failed to start receive mode, code: %d", state);
+        while (true);
+    }
+
+    //UI stuff
+    label1 = lv_label_create(lv_scr_act());
+    lv_label_set_recolor(label1, true);
+    lv_label_set_text(label1, "Waiting for incoming transmission...");
+    lv_obj_center(label1);
+
+    //FreeRTOS tasks
+    xTaskCreatePinnedToCore(TaskLoraSender, "TaskLoraSender", TASK_STACK_SIZE, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(TaskLoraReceiver, "TaskLoraReceiver", TASK_STACK_SIZE, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskLvglUpdate, "TaskLvglUpdate", TASK_STACK_SIZE, NULL, 1, NULL, 1);
+}
+
+void loop() {
+
 }
