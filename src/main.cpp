@@ -8,25 +8,29 @@
 #define UI_REFRESH_MS         10
 #define RX_CHECK_INTERVAL_MS  50
 
-static const char* TAG = "LoRaApp";
+static const char* TAG = "ChirpyMain";
 
 // global vars
 SX1262 radio = newModule();
 lv_obj_t* label1 = nullptr;
 volatile bool receivedFlag = false;
-
+volatile bool isTransmitting = false;
 // ───────────────────────────── ISR ─────────────────────────────
+
 ICACHE_RAM_ATTR void onLoraPacketReceived() {
-    receivedFlag = true;
+    if (!isTransmitting) {
+        receivedFlag = true;
+    }
 }
 
 // ──────────────────────── LoRa Transmission ────────────────────────
 esp_err_t sendLoraMessage(String& msg) {
+    isTransmitting = true; // signal that TX is in progress
     radio.standby();
 
     ESP_LOGI(TAG, "[SX1262] Transmitting: %s", msg.c_str());
-
     int state = radio.transmit(msg);
+    isTransmitting = false;
 
     if (state == RADIOLIB_ERR_NONE) {
         lv_label_set_text_fmt(label1, "TX Success\nDatarate: %.1f bps", radio.getDataRate());
@@ -35,6 +39,8 @@ esp_err_t sendLoraMessage(String& msg) {
         state = radio.startReceive();
         if (state == RADIOLIB_ERR_NONE) {
             ESP_LOGI(TAG, "[SX1262] Listening...");
+            vTaskDelay(pdMS_TO_TICKS(1000));
+            lv_label_set_text(label1, "Waiting for incoming transmission...");
             return ESP_OK;
         }
 
@@ -62,8 +68,9 @@ void displayReceivedMessage() {
         lv_label_set_text_fmt(label1,
             "RX Failed\nError: %d", state);
     }
-
-    radio.startReceive();  // go back to RX mode after sending so we can receive the next messages
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    lv_label_set_text(label1, "Waiting for incoming transmission...");
+    //radio.startReceive();  // go back to RX mode after sending so we can receive the next messages
 }
 
 // ───────────────────────────── Tasks ─────────────────────────────
@@ -81,7 +88,7 @@ void TaskLoraReceiver(void* pvParameters) {
             receivedFlag = false;
             displayReceivedMessage();
         }
-        vTaskDelay(pdMS_TO_TICKS(RX_CHECK_INTERVAL_MS));
+        //vTaskDelay(pdMS_TO_TICKS(RX_CHECK_INTERVAL_MS));
     }
 }
 
@@ -94,9 +101,10 @@ void TaskLvglUpdate(void* pvParameters) {
 
 // ───────────────────────────── Setup ─────────────────────────────
 void setup() {
+    Serial.begin(115200);
+    esp_log_level_set("*", ESP_LOG_VERBOSE);
     watch.begin();
     beginLvglHelper();
-
     ESP_LOGI(TAG, "[SX1262] Initializing...");
     int state = radio.begin();
     if (state != RADIOLIB_ERR_NONE) {
