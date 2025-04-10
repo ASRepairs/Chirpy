@@ -41,7 +41,7 @@ esp_err_t sendLoraMessage(String& msg) {
         if (state == RADIOLIB_ERR_NONE) {
             ESP_LOGI(TAG, "[SX1262] Listening...");
             vTaskDelay(pdMS_TO_TICKS(1000));
-            lv_label_set_text(label1, "Waiting for incoming transmission...");
+            lv_label_set_text(label1, "Waiting for message...");
             return ESP_OK;
         }
 
@@ -69,8 +69,8 @@ void displayReceivedMessage() {
         lv_label_set_text_fmt(label1,
             "RX Failed\nError: %d", state);
     }
-    vTaskDelay(pdMS_TO_TICKS(1000));
-    lv_label_set_text(label1, "Waiting for incoming transmission...");
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    lv_label_set_text(label1, "Waiting for message...");
     //radio.startReceive();  // go back to RX mode after sending so we can receive the next messages
 }
 
@@ -151,7 +151,7 @@ void setup() {
     //UI stuff
     label1 = lv_label_create(lv_scr_act());
     lv_label_set_recolor(label1, true);
-    lv_label_set_text(label1, "Waiting for incoming transmission...");
+    lv_label_set_text(label1, "Waiting for message...");
     lv_obj_center(label1);
 
     //FreeRTOS tasks
