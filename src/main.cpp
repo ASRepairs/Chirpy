@@ -15,6 +15,7 @@ SX1262 radio = newModule();
 lv_obj_t* label1 = nullptr;
 volatile bool receivedFlag = false;
 volatile bool isTransmitting = false;
+bool isPmuIRQ = false;
 // ───────────────────────────── ISR ─────────────────────────────
 
 ICACHE_RAM_ATTR void onLoraPacketReceived() {
@@ -98,6 +99,23 @@ void TaskLvglUpdate(void* pvParameters) {
         vTaskDelay(pdMS_TO_TICKS(UI_REFRESH_MS));
     }
 }
+void TaskCheckShortButtonPressed(void* pvParameters)
+{
+    while (true)
+    {
+        if (isPmuIRQ) {
+            isPmuIRQ = false;
+            watch.readPMU();
+            if (watch.isPekeyShortPressIrq()) {
+                ESP_LOGI(TAG, "[SX1262] Pekey short-press");
+                String msg = "button pressed";
+                sendLoraMessage(msg);
+            }
+            watch.clearPMU();
+        }
+        vTaskDelay(pdMS_TO_TICKS(20));
+    }
+}
 
 // ───────────────────────────── Setup ─────────────────────────────
 void setup() {
@@ -105,6 +123,9 @@ void setup() {
     esp_log_level_set("*", ESP_LOG_VERBOSE);
     watch.begin();
     beginLvglHelper();
+    watch.attachPMU([]() {
+    isPmuIRQ = true;
+    });
     ESP_LOGI(TAG, "[SX1262] Initializing...");
     int state = radio.begin();
     if (state != RADIOLIB_ERR_NONE) {
@@ -134,9 +155,10 @@ void setup() {
     lv_obj_center(label1);
 
     //FreeRTOS tasks
-    xTaskCreatePinnedToCore(TaskLoraSender, "TaskLoraSender", TASK_STACK_SIZE, NULL, 1, NULL, 0);
+    //xTaskCreatePinnedToCore(TaskLoraSender, "TaskLoraSender", TASK_STACK_SIZE, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(TaskLoraReceiver, "TaskLoraReceiver", TASK_STACK_SIZE, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(TaskLvglUpdate, "TaskLvglUpdate", TASK_STACK_SIZE, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskCheckShortButtonPressed, "TaskCheckShortButtonPressed",TASK_STACK_SIZE, NULL, 1, NULL, 0);
 }
 
 void loop() {
