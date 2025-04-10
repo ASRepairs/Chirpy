@@ -170,8 +170,6 @@ void loop() {
 #else
         if (indev->proc.state == LV_INDEV_STATE_PRESSED) {
 #endif
-            lv_indev_get_point(indev, &point);
-            lv_label_set_text_fmt(label1, "\n X:%d Y:%d", point.x, point.y);
             String msg = "screen touched";
             sendLoraMessage(msg);
         }

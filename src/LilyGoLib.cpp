@@ -129,7 +129,7 @@ bool LilyGoLib::begin(Stream *stream)
 
     if (bootDisplay) {
         fillScreen(TFT_BLACK);
-        drawString("Hello T-Watch", 120, 120);
+        drawString("Chirpy starting..", 120, 120);
         setBrightness(50);
     }
 
