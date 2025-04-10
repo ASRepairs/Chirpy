@@ -162,5 +162,18 @@ void setup() {
 }
 
 void loop() {
-
+    lv_point_t point;
+    lv_indev_t *indev = lv_indev_get_next(NULL);
+    if (indev) {
+#if LV_VERSION_CHECK(9,0,0)
+        if (lv_indev_get_state(indev) == LV_INDEV_STATE_PRESSED) {
+#else
+        if (indev->proc.state == LV_INDEV_STATE_PRESSED) {
+#endif
+            lv_indev_get_point(indev, &point);
+            lv_label_set_text_fmt(label1, "\n X:%d Y:%d", point.x, point.y);
+            String msg = "screen touched";
+            sendLoraMessage(msg);
+        }
+        }
 }
