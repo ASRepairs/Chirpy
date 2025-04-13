@@ -1,6 +1,7 @@
 #include <LilyGoLib.h>
 #include <LV_Helper.h>
 #include "esp_log.h"
+#include "encryption.h"
 
 #define LORA_FREQUENCY        868.0f
 #define TASK_STACK_SIZE       4096
@@ -16,6 +17,8 @@ lv_obj_t* label1 = nullptr;
 volatile bool receivedFlag = false;
 volatile bool isTransmitting = false;
 bool isPmuIRQ = false;
+static String currentGroup = "gr1";
+
 // ───────────────────────────── ISR ─────────────────────────────
 
 ICACHE_RAM_ATTR void onLoraPacketReceived() {
@@ -26,11 +29,31 @@ ICACHE_RAM_ATTR void onLoraPacketReceived() {
 
 // ──────────────────────── LoRa Transmission ────────────────────────
 esp_err_t sendLoraMessage(String& msg) {
+    const uint8_t* plaintext = reinterpret_cast<const uint8_t*>(msg.c_str());
+    size_t plainLen = msg.length();
+    const unsigned char* chosenKey = getKeyForGroup(currentGroup);
+    static uint8_t cipherBuf[1024];  // adjustable maximum
+    size_t cipherLen = sizeof(cipherBuf);
+
+    //Encrypt
+    if (!encryptAES256(plaintext, plainLen,
+                               chosenKey, 32,
+                               cipherBuf, cipherLen)) {
+        ESP_LOGE(TAG, "[SX1262] Encryption failed. Not sending.");
+        return ESP_FAIL;
+    }
+
+    //Convert raw cipher to a String TODO: deal with null
+    String encrypted;
+    encrypted.reserve(cipherLen);
+    for (size_t i = 0; i < cipherLen; i++) {
+        encrypted += (char)cipherBuf[i];
+    }
     isTransmitting = true; // signal that TX is in progress
     radio.standby();
 
-    ESP_LOGI(TAG, "[SX1262] Transmitting: %s", msg.c_str());
-    int state = radio.transmit(msg);
+    ESP_LOGI(TAG, "[SX1262] Transmitting encrypted text: %s", encrypted.c_str());
+    int state = radio.transmit(encrypted); // Send encrypted text
     isTransmitting = false;
 
     if (state == RADIOLIB_ERR_NONE) {
@@ -60,10 +83,33 @@ void displayReceivedMessage() {
     int state = radio.readData(receivedMsg);
 
     if (state == RADIOLIB_ERR_NONE) {
-        ESP_LOGI(TAG, "[SX1262] Received message: %s", receivedMsg.c_str());
+        const uint8_t* cipherData = reinterpret_cast<const uint8_t*>(receivedMsg.c_str());
+        size_t cipherLen = receivedMsg.length();
+        //decrypt
+        const unsigned char* chosenKey = getKeyForGroup(currentGroup);
+        static uint8_t plainBuf[1024];
+        size_t plainLen = sizeof(plainBuf);
+        if (!decryptAES256(cipherData, cipherLen,
+                                   chosenKey, 32,
+                                   plainBuf, plainLen)) {
+            ESP_LOGW(TAG, "[SX1262] Decryption failed - discarding message (possibly wrong group)");
+            lv_label_set_text_fmt(label1, "Discarding message\n(decryption failed)");
+            return;  // we discard if it fails
+        }
+
+        //Convert plaintext to a String (assuming it's ASCII)
+        String decrypted;
+        decrypted.reserve(plainLen);
+        for (size_t i=0; i<plainLen; i++) {
+            decrypted += (char)plainBuf[i];
+        }
+
+        ESP_LOGI(TAG, "[SX1262] Received raw cipher, len=%d", (int)cipherLen);
+        ESP_LOGI(TAG, "[SX1262] Decrypted message (group=%s): %s", currentGroup.c_str(), decrypted.c_str());
+
         lv_label_set_text_fmt(label1,
             "RX Success\nMessage: %s\nRSSI: %d dBm",
-            receivedMsg.c_str(), radio.getRSSI());
+            decrypted.c_str(), radio.getRSSI());
     } else {
         ESP_LOGE(TAG, "[SX1262] Failed to read message, code: %d", state);
         lv_label_set_text_fmt(label1,
