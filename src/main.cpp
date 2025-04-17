@@ -2,6 +2,7 @@
 #include <LV_Helper.h>
 #include "esp_log.h"
 #include "UI/custom/custom.h"
+#include "UI/generated/gui_guider.h"
 
 #define LORA_FREQUENCY        868.0f
 #define TASK_STACK_SIZE       4096
@@ -10,7 +11,6 @@
 #define RX_CHECK_INTERVAL_MS  50
 
 static const char* TAG = "ChirpyMain";
-
 // global vars
 SX1262 radio = newModule();
 lv_obj_t* label1 = nullptr;
@@ -151,7 +151,7 @@ void setup() {
     }
 
     //UI stuff replace with actual ui stuff
-
+    custom_init(&guider_ui);
     //FreeRTOS tasks
     //xTaskCreatePinnedToCore(TaskLoraSender, "TaskLoraSender", TASK_STACK_SIZE, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(TaskLoraReceiver, "TaskLoraReceiver", TASK_STACK_SIZE, NULL, 1, NULL, 1);
@@ -160,16 +160,5 @@ void setup() {
 }
 
 void loop() {
-    lv_point_t point;
-    lv_indev_t *indev = lv_indev_get_next(NULL);
-    if (indev) {
-#if LV_VERSION_CHECK(9,0,0)
-        if (lv_indev_get_state(indev) == LV_INDEV_STATE_PRESSED) {
-#else
-        if (indev->proc.state == LV_INDEV_STATE_PRESSED) {
-#endif
-            String msg = "screen touched";
-            sendLoraMessage(msg);
-        }
-        }
+
 }

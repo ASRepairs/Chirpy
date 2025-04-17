@@ -37,6 +37,6 @@
 
 void custom_init(lv_ui *ui)
 {
-    /* Add your codes here */
+    setup_ui(ui);
 }
 
