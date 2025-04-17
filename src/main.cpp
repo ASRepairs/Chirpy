@@ -152,12 +152,6 @@ void setup() {
 
     //UI stuff replace with actual ui stuff
 
-
-    // label1 = lv_label_create(lv_scr_act());
-    // lv_label_set_recolor(label1, true);
-    // lv_label_set_text(label1, "Waiting for message...");
-    // lv_obj_center(label1);
-    custom_init(&guider_ui);
     //FreeRTOS tasks
     //xTaskCreatePinnedToCore(TaskLoraSender, "TaskLoraSender", TASK_STACK_SIZE, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(TaskLoraReceiver, "TaskLoraReceiver", TASK_STACK_SIZE, NULL, 1, NULL, 1);
