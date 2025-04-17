@@ -1,6 +1,7 @@
 #include <LilyGoLib.h>
 #include <LV_Helper.h>
 #include "esp_log.h"
+#include "UI/custom/custom.h"
 
 #define LORA_FREQUENCY        868.0f
 #define TASK_STACK_SIZE       4096
@@ -34,6 +35,7 @@ esp_err_t sendLoraMessage(String& msg) {
     isTransmitting = false;
 
     if (state == RADIOLIB_ERR_NONE) {
+        //replace with some nice gui to show successful send
         lv_label_set_text_fmt(label1, "TX Success\nDatarate: %.1f bps", radio.getDataRate());
         ESP_LOGI(TAG, "[SX1262] Transmission successful.");
         vTaskDelay(pdMS_TO_TICKS(RX_CHECK_INTERVAL_MS));
@@ -41,12 +43,13 @@ esp_err_t sendLoraMessage(String& msg) {
         if (state == RADIOLIB_ERR_NONE) {
             ESP_LOGI(TAG, "[SX1262] Listening...");
             vTaskDelay(pdMS_TO_TICKS(1000));
-            lv_label_set_text(label1, "Waiting for message...");
+            //lv_label_set_text(label1, "Waiting for message...");
             return ESP_OK;
         }
 
         ESP_LOGE(TAG, "[SX1262] Failed to enter RX mode, code: %d", state);
     } else {
+        //replace with some nice gui to show failed send
         lv_label_set_text_fmt(label1, "TX Failed\nError: %d", state);
         ESP_LOGE(TAG, "[SX1262] Transmission failed, code: %d", state);
     }
@@ -61,16 +64,15 @@ void displayReceivedMessage() {
 
     if (state == RADIOLIB_ERR_NONE) {
         ESP_LOGI(TAG, "[SX1262] Received message: %s", receivedMsg.c_str());
-        lv_label_set_text_fmt(label1,
-            "RX Success\nMessage: %s\nRSSI: %d dBm",
-            receivedMsg.c_str(), radio.getRSSI());
+        //replace with some nice gui to show the message/emoji
+        // lv_label_set_text_fmt(label1, "RX Success\nMessage: %s\nRSSI: %d dBm", receivedMsg.c_str(), radio.getRSSI());
     } else {
         ESP_LOGE(TAG, "[SX1262] Failed to read message, code: %d", state);
-        lv_label_set_text_fmt(label1,
-            "RX Failed\nError: %d", state);
+        //lv_label_set_text_fmt(label1, "RX Failed\nError: %d", state);
     }
     vTaskDelay(pdMS_TO_TICKS(5000));
-    lv_label_set_text(label1, "Waiting for message...");
+    //after accepting, return to normal gui or something
+    //lv_label_set_text(label1, "Waiting for message...");
     //radio.startReceive();  // go back to RX mode after sending so we can receive the next messages
 }
 
@@ -148,11 +150,7 @@ void setup() {
         while (true);
     }
 
-    //UI stuff
-    label1 = lv_label_create(lv_scr_act());
-    lv_label_set_recolor(label1, true);
-    lv_label_set_text(label1, "Waiting for message...");
-    lv_obj_center(label1);
+    //UI stuff replace with actual ui stuff
 
     //FreeRTOS tasks
     //xTaskCreatePinnedToCore(TaskLoraSender, "TaskLoraSender", TASK_STACK_SIZE, NULL, 1, NULL, 0);
