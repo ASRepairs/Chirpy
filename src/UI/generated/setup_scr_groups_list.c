@@ -280,22 +280,6 @@ void setup_scr_groups_list(lv_ui *ui)
     lv_obj_set_style_radius(ui->groups_list_img_top_grey_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_clip_corner(ui->groups_list_img_top_grey_bar, true, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    //Write codes groups_list_img_close
-    ui->groups_list_img_close = lv_img_create(ui->groups_list);
-    lv_img_set_src(ui->groups_list_img_close, &_close_icon_alpha_20x20);
-    lv_img_set_pivot(ui->groups_list_img_close, 50,50);
-    lv_img_set_angle(ui->groups_list_img_close, 0);
-    lv_obj_set_pos(ui->groups_list_img_close, 17, 18);
-    lv_obj_set_size(ui->groups_list_img_close, 20, 20);
-    lv_obj_add_flag(ui->groups_list_img_close, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_flag(ui->groups_list_img_close, LV_OBJ_FLAG_FLOATING);
-
-    //Write style for groups_list_img_close, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_img_recolor_opa(ui->groups_list_img_close, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_img_opa(ui->groups_list_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->groups_list_img_close, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_clip_corner(ui->groups_list_img_close, true, LV_PART_MAIN|LV_STATE_DEFAULT);
-
     //Write codes groups_list_label_groups_bar
     ui->groups_list_label_groups_bar = lv_label_create(ui->groups_list);
     lv_label_set_text(ui->groups_list_label_groups_bar, "Groups");
@@ -319,6 +303,23 @@ void setup_scr_groups_list(lv_ui *ui)
     lv_obj_set_style_pad_bottom(ui->groups_list_label_groups_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->groups_list_label_groups_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->groups_list_label_groups_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes groups_list_img_close
+    ui->groups_list_img_close = lv_img_create(ui->groups_list);
+    lv_img_set_src(ui->groups_list_img_close, &_x_thin_alpha_40x40);
+    lv_img_set_pivot(ui->groups_list_img_close, 50,50);
+    lv_img_set_angle(ui->groups_list_img_close, 0);
+    lv_obj_set_pos(ui->groups_list_img_close, 10, 8);
+    lv_obj_set_size(ui->groups_list_img_close, 40, 40);
+    lv_obj_add_flag(ui->groups_list_img_close, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(ui->groups_list_img_close, LV_OBJ_FLAG_FLOATING);
+
+    //Write style for groups_list_img_close, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->groups_list_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor(ui->groups_list_img_close, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->groups_list_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->groups_list_img_close, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->groups_list_img_close, true, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //The custom code of groups_list.
 

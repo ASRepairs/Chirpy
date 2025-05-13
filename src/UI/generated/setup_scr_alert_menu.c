@@ -12,7 +12,7 @@
 #include "gui_guider.h"
 #include "events_init.h"
 #include "widgets_init.h"
-#include "UI/custom/custom.h"
+#include "custom.h"
 
 
 
@@ -39,10 +39,10 @@ void setup_scr_alert_menu(lv_ui *ui)
     lv_obj_add_flag(ui->alert_menu_img_top_grey_bar, LV_OBJ_FLAG_FLOATING);
 
     //Write style for alert_menu_img_top_grey_bar, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_img_recolor_opa(ui->alert_menu_img_top_grey_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_img_opa(ui->alert_menu_img_top_grey_bar, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->alert_menu_img_top_grey_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_clip_corner(ui->alert_menu_img_top_grey_bar, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor_opa(ui->alert_menu_img_top_grey_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->alert_menu_img_top_grey_bar, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes alert_menu_label_alert_bar
     ui->alert_menu_label_alert_bar = lv_label_create(ui->alert_menu);
@@ -53,8 +53,8 @@ void setup_scr_alert_menu(lv_ui *ui)
     lv_obj_add_flag(ui->alert_menu_label_alert_bar, LV_OBJ_FLAG_FLOATING);
 
     //Write style for alert_menu_label_alert_bar, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->alert_menu_label_alert_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->alert_menu_label_alert_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->alert_menu_label_alert_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->alert_menu_label_alert_bar, lv_color_hex(0xF61414), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->alert_menu_label_alert_bar, &lv_font_montserratMedium_21, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->alert_menu_label_alert_bar, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -68,22 +68,6 @@ void setup_scr_alert_menu(lv_ui *ui)
     lv_obj_set_style_pad_left(ui->alert_menu_label_alert_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->alert_menu_label_alert_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    //Write codes alert_menu_img_close
-    ui->alert_menu_img_close = lv_img_create(ui->alert_menu);
-    lv_img_set_src(ui->alert_menu_img_close, &_close_icon_alpha_20x20);
-    lv_img_set_pivot(ui->alert_menu_img_close, 50,50);
-    lv_img_set_angle(ui->alert_menu_img_close, 0);
-    lv_obj_set_pos(ui->alert_menu_img_close, 17, 18);
-    lv_obj_set_size(ui->alert_menu_img_close, 20, 20);
-    lv_obj_add_flag(ui->alert_menu_img_close, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_flag(ui->alert_menu_img_close, LV_OBJ_FLAG_FLOATING);
-
-    //Write style for alert_menu_img_close, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_img_recolor_opa(ui->alert_menu_img_close, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_img_opa(ui->alert_menu_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->alert_menu_img_close, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_clip_corner(ui->alert_menu_img_close, true, LV_PART_MAIN|LV_STATE_DEFAULT);
-
     //Write codes alert_menu_alert_button_descrition
     ui->alert_menu_alert_button_descrition = lv_label_create(ui->alert_menu);
     lv_label_set_text(ui->alert_menu_alert_button_descrition, "Touch to send an alert in case of danger");
@@ -92,20 +76,20 @@ void setup_scr_alert_menu(lv_ui *ui)
     lv_obj_set_size(ui->alert_menu_alert_button_descrition, 218, 36);
 
     //Write style for alert_menu_alert_button_descrition, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->alert_menu_alert_button_descrition, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->alert_menu_alert_button_descrition, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->alert_menu_alert_button_descrition, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->alert_menu_alert_button_descrition, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_top(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_right(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_bottom(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->alert_menu_alert_button_descrition, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write codes alert_menu_alert_button
     ui->alert_menu_alert_button = lv_imgbtn_create(ui->alert_menu);
@@ -124,12 +108,12 @@ void setup_scr_alert_menu(lv_ui *ui)
     lv_obj_add_flag(ui->alert_menu_alert_button, LV_OBJ_FLAG_CLICKABLE);
 
     //Write style for alert_menu_alert_button, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_radius(ui->alert_menu_alert_button, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->alert_menu_alert_button, true, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->alert_menu_alert_button, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->alert_menu_alert_button, &lv_font_montserratMedium_12, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->alert_menu_alert_button, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->alert_menu_alert_button, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->alert_menu_alert_button, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_clip_corner(ui->alert_menu_alert_button, true, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->alert_menu_alert_button, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write style for alert_menu_alert_button, Part: LV_PART_MAIN, State: LV_STATE_PRESSED.
@@ -151,6 +135,23 @@ void setup_scr_alert_menu(lv_ui *ui)
     //Write style for alert_menu_alert_button, Part: LV_PART_MAIN, State: LV_IMGBTN_STATE_RELEASED.
     lv_obj_set_style_img_recolor_opa(ui->alert_menu_alert_button, 0, LV_PART_MAIN|LV_IMGBTN_STATE_RELEASED);
     lv_obj_set_style_img_opa(ui->alert_menu_alert_button, 255, LV_PART_MAIN|LV_IMGBTN_STATE_RELEASED);
+
+    //Write codes alert_menu_img_close
+    ui->alert_menu_img_close = lv_img_create(ui->alert_menu);
+    lv_img_set_src(ui->alert_menu_img_close, &_x_thin_alpha_40x40);
+    lv_img_set_pivot(ui->alert_menu_img_close, 50,50);
+    lv_img_set_angle(ui->alert_menu_img_close, 0);
+    lv_obj_set_pos(ui->alert_menu_img_close, 10, 8);
+    lv_obj_set_size(ui->alert_menu_img_close, 40, 40);
+    lv_obj_add_flag(ui->alert_menu_img_close, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(ui->alert_menu_img_close, LV_OBJ_FLAG_FLOATING);
+
+    //Write style for alert_menu_img_close, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->alert_menu_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor(ui->alert_menu_img_close, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->alert_menu_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->alert_menu_img_close, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->alert_menu_img_close, true, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //The custom code of alert_menu.
 

@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-#include "UI/generated/gui_guider.h"
+#include "gui_guider.h"
 
 void custom_init(lv_ui *ui);
 
