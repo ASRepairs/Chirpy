@@ -15,7 +15,9 @@
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "gg_external_data.h"
 #endif
+
 lv_ui guider_ui;
+
 void ui_init_style(lv_style_t * style)
 {
     if (style->prop_cnt > 1)
@@ -78,8 +80,7 @@ void init_scr_del_flag(lv_ui *ui)
     ui->home_digital_del = true;
     ui->home_menu_messages_del = true;
     ui->messages_list_del = true;
-    ui->messages_convo_screen_del = true;
-    ui->messages_emotes_send_del = true;
+    ui->messages_emoji_send_v2_del = true;
     ui->home_menu_alert_del = true;
     ui->alert_menu_del = true;
     ui->home_menu_groups_del = true;

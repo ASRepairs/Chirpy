@@ -151,6 +151,7 @@ void setup() {
     }
 
     //UI stuff replace with actual ui stuff
+    setup_ui(&guider_ui); // Initialize the UI
     custom_init(&guider_ui);
     //FreeRTOS tasks
     //xTaskCreatePinnedToCore(TaskLoraSender, "TaskLoraSender", TASK_STACK_SIZE, NULL, 1, NULL, 0);
@@ -160,5 +161,6 @@ void setup() {
 }
 
 void loop() {
-
+    lv_task_handler(); // Handle LVGL tasks
+    delay(5);
 }

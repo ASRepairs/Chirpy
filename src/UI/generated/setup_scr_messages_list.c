@@ -163,7 +163,7 @@ void setup_scr_messages_list(lv_ui *ui)
     lv_img_set_src(ui->messages_list_img_contact_bar_Jake, &_message_list_rectangle_alpha_200x50);
     lv_img_set_pivot(ui->messages_list_img_contact_bar_Jake, 50,50);
     lv_img_set_angle(ui->messages_list_img_contact_bar_Jake, 0);
-    lv_obj_set_pos(ui->messages_list_img_contact_bar_Jake, -2, 53);
+    lv_obj_set_pos(ui->messages_list_img_contact_bar_Jake, -1, 53);
     lv_obj_set_size(ui->messages_list_img_contact_bar_Jake, 200, 50);
 
     //Write style for messages_list_img_contact_bar_Jake, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -307,16 +307,17 @@ void setup_scr_messages_list(lv_ui *ui)
 
     //Write codes messages_list_img_close
     ui->messages_list_img_close = lv_img_create(ui->messages_list);
-    lv_img_set_src(ui->messages_list_img_close, &_close_icon_alpha_20x20);
+    lv_img_set_src(ui->messages_list_img_close, &_x_thin_alpha_40x40);
     lv_img_set_pivot(ui->messages_list_img_close, 50,50);
     lv_img_set_angle(ui->messages_list_img_close, 0);
-    lv_obj_set_pos(ui->messages_list_img_close, 17, 17);
-    lv_obj_set_size(ui->messages_list_img_close, 20, 20);
+    lv_obj_set_pos(ui->messages_list_img_close, 10, 8);
+    lv_obj_set_size(ui->messages_list_img_close, 40, 40);
     lv_obj_add_flag(ui->messages_list_img_close, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_add_flag(ui->messages_list_img_close, LV_OBJ_FLAG_FLOATING);
 
     //Write style for messages_list_img_close, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_img_recolor_opa(ui->messages_list_img_close, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor_opa(ui->messages_list_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor(ui->messages_list_img_close, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_img_opa(ui->messages_list_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->messages_list_img_close, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_clip_corner(ui->messages_list_img_close, true, LV_PART_MAIN|LV_STATE_DEFAULT);

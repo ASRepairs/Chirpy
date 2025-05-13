@@ -45,21 +45,21 @@ void setup_scr_home_menu_messages(lv_ui *ui)
     lv_obj_add_flag(ui->home_menu_messages_messages_menu_button, LV_OBJ_FLAG_CLICKABLE);
 
     //Write style for home_menu_messages_messages_menu_button, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_radius(ui->home_menu_messages_messages_menu_button, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_menu_messages_messages_menu_button, true, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->home_menu_messages_messages_menu_button, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->home_menu_messages_messages_menu_button, &lv_font_montserratMedium_12, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->home_menu_messages_messages_menu_button, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->home_menu_messages_messages_menu_button, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->home_menu_messages_messages_menu_button, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_clip_corner(ui->home_menu_messages_messages_menu_button, true, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->home_menu_messages_messages_menu_button, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //Write style for home_menu_messages_messages_menu_button, Part: LV_PART_MAIN, State: LV_STATE_PRESSED.
-    lv_obj_set_style_img_recolor_opa(ui->home_menu_messages_messages_menu_button, 0, LV_PART_MAIN|LV_STATE_PRESSED);
-    lv_obj_set_style_img_opa(ui->home_menu_messages_messages_menu_button, 255, LV_PART_MAIN|LV_STATE_PRESSED);
     lv_obj_set_style_text_color(ui->home_menu_messages_messages_menu_button, lv_color_hex(0xFF33FF), LV_PART_MAIN|LV_STATE_PRESSED);
     lv_obj_set_style_text_font(ui->home_menu_messages_messages_menu_button, &lv_font_montserratMedium_12, LV_PART_MAIN|LV_STATE_PRESSED);
     lv_obj_set_style_text_opa(ui->home_menu_messages_messages_menu_button, 255, LV_PART_MAIN|LV_STATE_PRESSED);
     lv_obj_set_style_shadow_width(ui->home_menu_messages_messages_menu_button, 0, LV_PART_MAIN|LV_STATE_PRESSED);
+    lv_obj_set_style_img_recolor_opa(ui->home_menu_messages_messages_menu_button, 0, LV_PART_MAIN|LV_STATE_PRESSED);
+    lv_obj_set_style_img_opa(ui->home_menu_messages_messages_menu_button, 255, LV_PART_MAIN|LV_STATE_PRESSED);
 
     //Write style for home_menu_messages_messages_menu_button, Part: LV_PART_MAIN, State: LV_STATE_CHECKED.
     lv_obj_set_style_img_recolor_opa(ui->home_menu_messages_messages_menu_button, 0, LV_PART_MAIN|LV_STATE_CHECKED);
@@ -81,8 +81,8 @@ void setup_scr_home_menu_messages(lv_ui *ui)
     lv_obj_set_size(ui->home_menu_messages_label_messages, 100, 32);
 
     //Write style for home_menu_messages_label_messages, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->home_menu_messages_label_messages, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->home_menu_messages_label_messages, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->home_menu_messages_label_messages, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->home_menu_messages_label_messages, lv_color_hex(0x09AF2E), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui->home_menu_messages_label_messages, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->home_menu_messages_label_messages, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
