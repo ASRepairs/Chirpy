@@ -3,6 +3,7 @@
 #include "esp_log.h"
 #include "UI/custom/custom.h"
 #include "UI/generated/gui_guider.h"
+#include "common.h" // Added by Kacper (KSCB)
 
 #define LORA_FREQUENCY        868.0f
 #define TASK_STACK_SIZE       4096
@@ -10,7 +11,7 @@
 #define UI_REFRESH_MS         10
 #define RX_CHECK_INTERVAL_MS  50
 
-static const char* TAG = "ChirpyMain";
+static const char* TAG = "MAIN";
 // global vars
 SX1262 radio = newModule();
 lv_obj_t* label1 = nullptr;
@@ -117,6 +118,13 @@ void TaskCheckShortButtonPressed(void* pvParameters)
         }
         vTaskDelay(pdMS_TO_TICKS(20));
     }
+}
+
+
+// ─────────── Common functions definition (common.h) ──────────────
+
+void common_sendMessage(int msgid) {
+    ESP_LOGI(TAG, "[common_sendMessage] mesgid: %d", msgid);
 }
 
 // ───────────────────────────── Setup ─────────────────────────────

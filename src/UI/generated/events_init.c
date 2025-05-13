@@ -15,6 +15,8 @@
 #include "freemaster_client.h"
 #endif
 
+#include "../../common.h" // Added by Kacper (KSCB)
+
 
 static void home_digital_event_handler (lv_event_t *e)
 {
@@ -339,7 +341,7 @@ static void alert_menu_alert_button_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-
+        common_sendMessage(8);
         break;
     }
     default:
