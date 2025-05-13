@@ -123,8 +123,30 @@ void TaskCheckShortButtonPressed(void* pvParameters)
 
 // ─────────── Common functions definition (common.h) ──────────────
 
-void common_sendMessage(int msgid) {
-    ESP_LOGI(TAG, "[common_sendMessage] mesgid: %d", msgid);
+void common_sendMessage(int msg_id) {
+    String msg_str = "";
+    switch (msg_id)
+    {
+    case ALERT:
+        msg_str = "ALERT";
+        break;
+    case THUMB_UP:
+        msg_str = "THUMBS_UP";
+        break;
+    case WAVE:
+        msg_str = "WAVE";
+        break;
+    case HEART:
+        msg_str = "HEART";
+        break;
+    case PARTY:
+        msg_str = "PARTY";
+        break;
+    default:
+        msg_str = "UNKNOWN";
+        break;
+    }
+    ESP_LOGI(TAG, "msg_id: %d, msg_str: %s", msg_id, msg_str);
 }
 
 // ───────────────────────────── Setup ─────────────────────────────

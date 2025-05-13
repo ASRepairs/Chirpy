@@ -9,15 +9,15 @@
 extern "C" {
 #endif
 
-void common_sendMessage(int msgid); // declare as C-compatible if compiled as C++
+void common_sendMessage(int msg_id); // declare as C-compatible if compiled as C++
 
 enum common_emoji{
-    THUMB_UP,
-    WAVE,
-    HEART,
-    PARTY,
-    ALERT
-};
+    ALERT = 0,
+    THUMB_UP = 1,
+    WAVE = 2,
+    HEART = 3,
+    PARTY = 4
+} common_emoji;
 
 #ifdef __cplusplus
 }

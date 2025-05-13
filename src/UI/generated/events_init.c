@@ -341,7 +341,8 @@ static void alert_menu_alert_button_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        common_sendMessage(8);
+        common_emoji = ALERT;
+        common_sendMessage(common_emoji);
         break;
     }
     default:
