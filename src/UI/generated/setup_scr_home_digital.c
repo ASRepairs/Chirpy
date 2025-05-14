@@ -21,7 +21,7 @@ void setup_scr_home_digital(lv_ui *ui)
     //Write codes home_digital
     ui->home_digital = lv_obj_create(NULL);
     lv_obj_set_size(ui->home_digital, 240, 240);
-    lv_obj_set_scrollbar_mode(ui->home_digital, LV_SCROLLBAR_MODE_ON);
+    lv_obj_set_scrollbar_mode(ui->home_digital, LV_SCROLLBAR_MODE_OFF);
     lv_obj_add_flag(ui->home_digital, LV_OBJ_FLAG_SCROLLABLE);
 
     //Write style for home_digital, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.

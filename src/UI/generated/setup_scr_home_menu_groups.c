@@ -96,6 +96,36 @@ void setup_scr_home_menu_groups(lv_ui *ui)
     lv_obj_set_style_pad_left(ui->home_menu_groups_label_groups, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->home_menu_groups_label_groups, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+    //Write codes home_menu_groups_img_1
+    ui->home_menu_groups_img_1 = lv_img_create(ui->home_menu_groups);
+    lv_obj_add_flag(ui->home_menu_groups_img_1, LV_OBJ_FLAG_CLICKABLE);
+    lv_img_set_src(ui->home_menu_groups_img_1, &_three_dot_icon1321_alpha_50x50);
+    lv_img_set_pivot(ui->home_menu_groups_img_1, 50,50);
+    lv_img_set_angle(ui->home_menu_groups_img_1, 0);
+    lv_obj_set_pos(ui->home_menu_groups_img_1, 190, 95);
+    lv_obj_set_size(ui->home_menu_groups_img_1, 50, 50);
+
+    //Write style for home_menu_groups_img_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->home_menu_groups_img_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->home_menu_groups_img_1, 100, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_menu_groups_img_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_menu_groups_img_1, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes home_menu_groups_img_2
+    ui->home_menu_groups_img_2 = lv_img_create(ui->home_menu_groups);
+    lv_obj_add_flag(ui->home_menu_groups_img_2, LV_OBJ_FLAG_CLICKABLE);
+    lv_img_set_src(ui->home_menu_groups_img_2, &_three_dot_icon13214214214_alpha_49x17);
+    lv_img_set_pivot(ui->home_menu_groups_img_2, 50,50);
+    lv_img_set_angle(ui->home_menu_groups_img_2, 0);
+    lv_obj_set_pos(ui->home_menu_groups_img_2, 190, 129);
+    lv_obj_set_size(ui->home_menu_groups_img_2, 49, 17);
+
+    //Write style for home_menu_groups_img_2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->home_menu_groups_img_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->home_menu_groups_img_2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_menu_groups_img_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_menu_groups_img_2, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+
     //The custom code of home_menu_groups.
 
 
