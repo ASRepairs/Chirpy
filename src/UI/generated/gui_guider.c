@@ -16,8 +16,6 @@
 #include "gg_external_data.h"
 #endif
 
-lv_ui guider_ui;
-
 void ui_init_style(lv_style_t * style)
 {
     if (style->prop_cnt > 1)
@@ -79,11 +77,16 @@ void init_scr_del_flag(lv_ui *ui)
 
     ui->home_digital_del = true;
     ui->home_menu_messages_del = true;
-    ui->messages_list_del = true;
-    ui->messages_emoji_send_v2_del = true;
     ui->home_menu_alert_del = true;
-    ui->alert_menu_del = true;
     ui->home_menu_groups_del = true;
+    ui->messages_emoji_send_v2_del = true;
+    ui->messages_send_successful_del = true;
+    ui->messages_send_failed_del = true;
+    ui->message_received_like_del = true;
+    ui->message_received_wave_del = true;
+    ui->message_received_heart_del = true;
+    ui->message_received_party_del = true;
+    ui->alert_menu_del = true;
     ui->groups_list_del = true;
     ui->groups_contacts_del = true;
 }
@@ -92,8 +95,8 @@ void setup_ui(lv_ui *ui)
 {
     init_scr_del_flag(ui);
     init_keyboard(ui);
-    setup_scr_home_digital(ui);
-    lv_scr_load(ui->home_digital);
+    setup_scr_home_menu_alert(ui);
+    lv_scr_load(ui->home_menu_alert);
 }
 
 void init_keyboard(lv_ui *ui)

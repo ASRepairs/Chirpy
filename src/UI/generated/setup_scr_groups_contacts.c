@@ -30,14 +30,14 @@ void setup_scr_groups_contacts(lv_ui *ui)
 
     //Write codes groups_contacts_cont_1
     ui->groups_contacts_cont_1 = lv_obj_create(ui->groups_contacts);
-    lv_obj_set_pos(ui->groups_contacts_cont_1, 20, 65);
-    lv_obj_set_size(ui->groups_contacts_cont_1, 201, 215);
+    lv_obj_set_pos(ui->groups_contacts_cont_1, 20, 62);
+    lv_obj_set_size(ui->groups_contacts_cont_1, 205, 218);
     lv_obj_set_scrollbar_mode(ui->groups_contacts_cont_1, LV_SCROLLBAR_MODE_ON);
     lv_obj_add_flag(ui->groups_contacts_cont_1, LV_OBJ_FLAG_SCROLLABLE);
 
     //Write style for groups_contacts_cont_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->groups_contacts_cont_1, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui->groups_contacts_cont_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui->groups_contacts_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(ui->groups_contacts_cont_1, lv_color_hex(0x2195f6), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_side(ui->groups_contacts_cont_1, LV_BORDER_SIDE_FULL, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->groups_contacts_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -54,7 +54,7 @@ void setup_scr_groups_contacts(lv_ui *ui)
     lv_img_set_src(ui->groups_contacts_img_contact_bar_4, &_message_list_rectangle_alpha_200x50);
     lv_img_set_pivot(ui->groups_contacts_img_contact_bar_4, 50,50);
     lv_img_set_angle(ui->groups_contacts_img_contact_bar_4, 0);
-    lv_obj_set_pos(ui->groups_contacts_img_contact_bar_4, -2, 161);
+    lv_obj_set_pos(ui->groups_contacts_img_contact_bar_4, 0, 162);
     lv_obj_set_size(ui->groups_contacts_img_contact_bar_4, 200, 50);
 
     //Write style for groups_contacts_img_contact_bar_4, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -108,7 +108,7 @@ void setup_scr_groups_contacts(lv_ui *ui)
     lv_img_set_src(ui->groups_contacts_img_contact_bar_3, &_message_list_rectangle_alpha_200x50);
     lv_img_set_pivot(ui->groups_contacts_img_contact_bar_3, 50,50);
     lv_img_set_angle(ui->groups_contacts_img_contact_bar_3, 0);
-    lv_obj_set_pos(ui->groups_contacts_img_contact_bar_3, -2, 107);
+    lv_obj_set_pos(ui->groups_contacts_img_contact_bar_3, 0, 108);
     lv_obj_set_size(ui->groups_contacts_img_contact_bar_3, 200, 50);
 
     //Write style for groups_contacts_img_contact_bar_3, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -137,7 +137,7 @@ void setup_scr_groups_contacts(lv_ui *ui)
     ui->groups_contacts_label_name_3 = lv_label_create(ui->groups_contacts_cont_1);
     lv_label_set_text(ui->groups_contacts_label_name_3, "Jake");
     lv_label_set_long_mode(ui->groups_contacts_label_name_3, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->groups_contacts_label_name_3, 55, 123);
+    lv_obj_set_pos(ui->groups_contacts_label_name_3, 55, 124);
     lv_obj_set_size(ui->groups_contacts_label_name_3, 116, 18);
 
     //Write style for groups_contacts_label_name_3, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -162,7 +162,7 @@ void setup_scr_groups_contacts(lv_ui *ui)
     lv_img_set_src(ui->groups_contacts_img_contact_bar_2, &_message_list_rectangle_alpha_200x50);
     lv_img_set_pivot(ui->groups_contacts_img_contact_bar_2, 50,50);
     lv_img_set_angle(ui->groups_contacts_img_contact_bar_2, 0);
-    lv_obj_set_pos(ui->groups_contacts_img_contact_bar_2, -2, 53);
+    lv_obj_set_pos(ui->groups_contacts_img_contact_bar_2, 0, 53);
     lv_obj_set_size(ui->groups_contacts_img_contact_bar_2, 200, 50);
 
     //Write style for groups_contacts_img_contact_bar_2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -177,7 +177,7 @@ void setup_scr_groups_contacts(lv_ui *ui)
     lv_img_set_src(ui->groups_contacts_img_pfp_2, &_img_avatar_3_alpha_30x30);
     lv_img_set_pivot(ui->groups_contacts_img_pfp_2, 50,50);
     lv_img_set_angle(ui->groups_contacts_img_pfp_2, 0);
-    lv_obj_set_pos(ui->groups_contacts_img_pfp_2, 11, 64);
+    lv_obj_set_pos(ui->groups_contacts_img_pfp_2, 11, 63);
     lv_obj_set_size(ui->groups_contacts_img_pfp_2, 30, 30);
 
     //Write style for groups_contacts_img_pfp_2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -191,7 +191,7 @@ void setup_scr_groups_contacts(lv_ui *ui)
     ui->groups_contacts_label_name_2 = lv_label_create(ui->groups_contacts_cont_1);
     lv_label_set_text(ui->groups_contacts_label_name_2, "Cornelia");
     lv_label_set_long_mode(ui->groups_contacts_label_name_2, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->groups_contacts_label_name_2, 55, 69);
+    lv_obj_set_pos(ui->groups_contacts_label_name_2, 55, 68);
     lv_obj_set_size(ui->groups_contacts_label_name_2, 116, 20);
 
     //Write style for groups_contacts_label_name_2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -216,7 +216,7 @@ void setup_scr_groups_contacts(lv_ui *ui)
     lv_img_set_src(ui->groups_contacts_img_contact_bar_1, &_message_list_rectangle_alpha_200x50);
     lv_img_set_pivot(ui->groups_contacts_img_contact_bar_1, 50,50);
     lv_img_set_angle(ui->groups_contacts_img_contact_bar_1, 0);
-    lv_obj_set_pos(ui->groups_contacts_img_contact_bar_1, -2, -1);
+    lv_obj_set_pos(ui->groups_contacts_img_contact_bar_1, 0, -1);
     lv_obj_set_size(ui->groups_contacts_img_contact_bar_1, 200, 50);
 
     //Write style for groups_contacts_img_contact_bar_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -245,7 +245,7 @@ void setup_scr_groups_contacts(lv_ui *ui)
     ui->groups_contacts_label_name_1 = lv_label_create(ui->groups_contacts_cont_1);
     lv_label_set_text(ui->groups_contacts_label_name_1, "Adrian");
     lv_label_set_long_mode(ui->groups_contacts_label_name_1, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->groups_contacts_label_name_1, 55, 15);
+    lv_obj_set_pos(ui->groups_contacts_label_name_1, 55, 14);
     lv_obj_set_size(ui->groups_contacts_label_name_1, 116, 20);
 
     //Write style for groups_contacts_label_name_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.

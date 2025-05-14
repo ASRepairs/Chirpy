@@ -68,6 +68,23 @@ void setup_scr_messages_emoji_send_v2(lv_ui *ui)
     lv_obj_set_style_pad_left(ui->messages_emoji_send_v2_label_messages_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->messages_emoji_send_v2_label_messages_bar, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+    //Write codes messages_emoji_send_v2_img_close
+    ui->messages_emoji_send_v2_img_close = lv_img_create(ui->messages_emoji_send_v2);
+    lv_img_set_src(ui->messages_emoji_send_v2_img_close, &_x_thin_alpha_40x40);
+    lv_img_set_pivot(ui->messages_emoji_send_v2_img_close, 50,50);
+    lv_img_set_angle(ui->messages_emoji_send_v2_img_close, 0);
+    lv_obj_set_pos(ui->messages_emoji_send_v2_img_close, 10, 8);
+    lv_obj_set_size(ui->messages_emoji_send_v2_img_close, 40, 40);
+    lv_obj_add_flag(ui->messages_emoji_send_v2_img_close, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_add_flag(ui->messages_emoji_send_v2_img_close, LV_OBJ_FLAG_FLOATING);
+
+    //Write style for messages_emoji_send_v2_img_close, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->messages_emoji_send_v2_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor(ui->messages_emoji_send_v2_img_close, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->messages_emoji_send_v2_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->messages_emoji_send_v2_img_close, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->messages_emoji_send_v2_img_close, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+
     //Write codes messages_emoji_send_v2_cont_1
     ui->messages_emoji_send_v2_cont_1 = lv_obj_create(ui->messages_emoji_send_v2);
     lv_obj_set_pos(ui->messages_emoji_send_v2_cont_1, 20, 55);
@@ -76,7 +93,7 @@ void setup_scr_messages_emoji_send_v2(lv_ui *ui)
 
     //Write style for messages_emoji_send_v2_cont_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->messages_emoji_send_v2_cont_1, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui->messages_emoji_send_v2_cont_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui->messages_emoji_send_v2_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(ui->messages_emoji_send_v2_cont_1, lv_color_hex(0x2195f6), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_side(ui->messages_emoji_send_v2_cont_1, LV_BORDER_SIDE_FULL, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->messages_emoji_send_v2_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -93,7 +110,7 @@ void setup_scr_messages_emoji_send_v2(lv_ui *ui)
     lv_img_set_src(ui->messages_emoji_send_v2_emoji_party, &_emoji_4_alpha_80x80);
     lv_img_set_pivot(ui->messages_emoji_send_v2_emoji_party, 50,50);
     lv_img_set_angle(ui->messages_emoji_send_v2_emoji_party, 0);
-    lv_obj_set_pos(ui->messages_emoji_send_v2_emoji_party, 103, 93);
+    lv_obj_set_pos(ui->messages_emoji_send_v2_emoji_party, 103, 92);
     lv_obj_set_size(ui->messages_emoji_send_v2_emoji_party, 80, 80);
 
     //Write style for messages_emoji_send_v2_emoji_party, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -146,23 +163,6 @@ void setup_scr_messages_emoji_send_v2(lv_ui *ui)
     lv_obj_set_style_img_opa(ui->messages_emoji_send_v2_emoji_like, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->messages_emoji_send_v2_emoji_like, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_clip_corner(ui->messages_emoji_send_v2_emoji_like, true, LV_PART_MAIN|LV_STATE_DEFAULT);
-
-    //Write codes messages_emoji_send_v2_img_close
-    ui->messages_emoji_send_v2_img_close = lv_img_create(ui->messages_emoji_send_v2);
-    lv_img_set_src(ui->messages_emoji_send_v2_img_close, &_x_thin_alpha_40x40);
-    lv_img_set_pivot(ui->messages_emoji_send_v2_img_close, 50,50);
-    lv_img_set_angle(ui->messages_emoji_send_v2_img_close, 0);
-    lv_obj_set_pos(ui->messages_emoji_send_v2_img_close, 10, 8);
-    lv_obj_set_size(ui->messages_emoji_send_v2_img_close, 40, 40);
-    lv_obj_add_flag(ui->messages_emoji_send_v2_img_close, LV_OBJ_FLAG_CLICKABLE);
-    lv_obj_add_flag(ui->messages_emoji_send_v2_img_close, LV_OBJ_FLAG_FLOATING);
-
-    //Write style for messages_emoji_send_v2_img_close, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_img_recolor_opa(ui->messages_emoji_send_v2_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_img_recolor(ui->messages_emoji_send_v2_img_close, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_img_opa(ui->messages_emoji_send_v2_img_close, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->messages_emoji_send_v2_img_close, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_clip_corner(ui->messages_emoji_send_v2_img_close, true, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //The custom code of messages_emoji_send_v2.
 
