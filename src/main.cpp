@@ -28,7 +28,7 @@ ICACHE_RAM_ATTR void onLoraPacketReceived() {
 
 // ──────────────────────── LoRa Transmission ────────────────────────
 esp_err_t sendLoraMessage(String& msg) {
-    isTransmitting = true; // signal that TX is in progress
+    isTransmitting = true; // signal flag that TX is in progress
     radio.standby();
 
     ESP_LOGI(TAG, "[SX1262] Transmitting: %s", msg.c_str());
@@ -37,7 +37,7 @@ esp_err_t sendLoraMessage(String& msg) {
 
     if (state == RADIOLIB_ERR_NONE) {
         //replace with some nice gui to show successful send
-        lv_label_set_text_fmt(label1, "TX Success\nDatarate: %.1f bps", radio.getDataRate());
+        //lv_label_set_text_fmt(label1, "TX Success\nDatarate: %.1f bps", radio.getDataRate());
         ESP_LOGI(TAG, "[SX1262] Transmission successful.");
         vTaskDelay(pdMS_TO_TICKS(RX_CHECK_INTERVAL_MS));
         state = radio.startReceive();
@@ -51,7 +51,7 @@ esp_err_t sendLoraMessage(String& msg) {
         ESP_LOGE(TAG, "[SX1262] Failed to enter RX mode, code: %d", state);
     } else {
         //replace with some nice gui to show failed send
-        lv_label_set_text_fmt(label1, "TX Failed\nError: %d", state);
+        //lv_label_set_text_fmt(label1, "TX Failed\nError: %d", state);
         ESP_LOGE(TAG, "[SX1262] Transmission failed, code: %d", state);
     }
 
@@ -80,7 +80,7 @@ void displayReceivedMessage() {
 // ───────────────────────────── Tasks ─────────────────────────────
 void TaskLoraSender(void* pvParameters) {
     while (true) {
-        String msg = "hello xd";
+        String msg = "Task: periodic send";
         sendLoraMessage(msg);
         vTaskDelay(pdMS_TO_TICKS(TX_INTERVAL_MS));
     }
@@ -92,7 +92,7 @@ void TaskLoraReceiver(void* pvParameters) {
             receivedFlag = false;
             displayReceivedMessage();
         }
-        //vTaskDelay(pdMS_TO_TICKS(RX_CHECK_INTERVAL_MS));
+        vTaskDelay(pdMS_TO_TICKS(RX_CHECK_INTERVAL_MS));
     }
 }
 
@@ -147,6 +147,7 @@ void common_sendMessage(int msg_id) {
         break;
     }
     ESP_LOGI(TAG, "msg_id: %d, msg_str: %s", msg_id, msg_str);
+    sendLoraMessage(msg_str);
 }
 
 // ───────────────────────────── Setup ─────────────────────────────
@@ -156,7 +157,7 @@ void setup() {
     watch.begin();
     beginLvglHelper();
     watch.attachPMU([]() {
-    isPmuIRQ = true;
+        isPmuIRQ = true;
     });
     ESP_LOGI(TAG, "[SX1262] Initializing...");
     int state = radio.begin();
