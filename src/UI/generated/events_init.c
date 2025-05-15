@@ -216,8 +216,14 @@ static void messages_emoji_send_v2_emoji_party_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-
-        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_emoji = PARTY;
+        int status = common_sendMessage(common_emoji);
+        if(status == 0){
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+            //ui_load_scr_animation(&guider_ui, &guider_ui.alert_menu, guider_ui.alert_menu_del, &guider_ui.home_menu_alert_del, setup_scr_alert_menu, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, true);
+            break;
+        } 
+        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_failed, guider_ui.messages_send_failed_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_failed, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
         break;
     }
     default:
@@ -231,8 +237,14 @@ static void messages_emoji_send_v2_emoji_heart_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-
-        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_emoji = HEART;
+        int status = common_sendMessage(common_emoji);
+        if(status == 0){
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+            //ui_load_scr_animation(&guider_ui, &guider_ui.alert_menu, guider_ui.alert_menu_del, &guider_ui.home_menu_alert_del, setup_scr_alert_menu, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, true);
+            break;
+        } 
+        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_failed, guider_ui.messages_send_failed_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_failed, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
         break;
     }
     default:
@@ -246,8 +258,14 @@ static void messages_emoji_send_v2_emoji_wave_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-
-        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_emoji = WAVE;
+        int status = common_sendMessage(common_emoji);
+        if(status == 0){
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+            //ui_load_scr_animation(&guider_ui, &guider_ui.alert_menu, guider_ui.alert_menu_del, &guider_ui.home_menu_alert_del, setup_scr_alert_menu, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, true);
+            break;
+        } 
+        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_failed, guider_ui.messages_send_failed_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_failed, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
         break;
     }
     default:
@@ -261,8 +279,14 @@ static void messages_emoji_send_v2_emoji_like_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-
-        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_emoji = THUMB_UP;
+        int status = common_sendMessage(common_emoji);
+        if(status == 0){
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+            //ui_load_scr_animation(&guider_ui, &guider_ui.alert_menu, guider_ui.alert_menu_del, &guider_ui.home_menu_alert_del, setup_scr_alert_menu, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, true);
+            break;
+        } 
+        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_failed, guider_ui.messages_send_failed_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_failed, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
         break;
     }
     default:
@@ -285,7 +309,10 @@ static void messages_send_successful_img_close_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.messages_emoji_send_v2, guider_ui.messages_emoji_send_v2_del, &guider_ui.messages_send_successful_del, setup_scr_messages_emoji_send_v2, LV_SCR_LOAD_ANIM_OVER_RIGHT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.messages_emoji_send_v2, guider_ui.messages_emoji_send_v2_del, &guider_ui.messages_send_successful_del, setup_scr_messages_emoji_send_v2, LV_SCR_LOAD_ANIM_OVER_RIGHT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.home_menu_alert, guider_ui.home_menu_alert_del, &guider_ui.alert_menu_del, setup_scr_home_menu_alert, LV_SCR_LOAD_ANIM_OVER_RIGHT, 200, 200, false, true);
+        // Closing "Message Send Succesful" goes to "main menu / messages"
+        ui_load_scr_animation(&guider_ui, &guider_ui.home_menu_messages, guider_ui.home_menu_messages_del, &guider_ui.messages_send_successful_del, setup_scr_home_menu_messages, LV_SCR_LOAD_ANIM_OVER_RIGHT, 200, 200, false, true);
         break;
     }
     default:
@@ -304,7 +331,10 @@ static void messages_send_failed_img_close_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.messages_emoji_send_v2, guider_ui.messages_emoji_send_v2_del, &guider_ui.messages_send_failed_del, setup_scr_messages_emoji_send_v2, LV_SCR_LOAD_ANIM_OVER_RIGHT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.messages_emoji_send_v2, guider_ui.messages_emoji_send_v2_del, &guider_ui.messages_send_failed_del, setup_scr_messages_emoji_send_v2, LV_SCR_LOAD_ANIM_OVER_RIGHT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.home_menu_messages, guider_ui.home_menu_messages_del, &guider_ui.messages_send_failed_del, setup_scr_home_menu_alert, LV_SCR_LOAD_ANIM_OVER_RIGHT, 200, 200, false, true);
+        // Closing "Message Send Failed" goes to "main menu / messages"
+        ui_load_scr_animation(&guider_ui, &guider_ui.home_menu_messages, guider_ui.home_menu_messages_del, &guider_ui.messages_send_successful_del, setup_scr_home_menu_messages, LV_SCR_LOAD_ANIM_OVER_RIGHT, 200, 200, false, true);
         break;
     }
     default:
@@ -401,7 +431,13 @@ static void alert_menu_alert_button_event_handler (lv_event_t *e)
     {
 
         common_emoji = ALERT;
-        common_sendMessage(common_emoji);
+        int status = common_sendMessage(common_emoji);
+        if(status == 0){
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+            //ui_load_scr_animation(&guider_ui, &guider_ui.alert_menu, guider_ui.alert_menu_del, &guider_ui.home_menu_alert_del, setup_scr_alert_menu, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, true);
+            break;
+        } 
+        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_failed, guider_ui.messages_send_failed_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_failed, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
         break;
     }
     default:

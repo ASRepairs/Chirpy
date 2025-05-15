@@ -102,8 +102,8 @@ void TaskLvglUpdate(void* pvParameters) {
         vTaskDelay(pdMS_TO_TICKS(UI_REFRESH_MS));
     }
 }
-void TaskCheckShortButtonPressed(void* pvParameters)
-{
+
+void TaskCheckShortButtonPressed(void* pvParameters){
     while (true)
     {
         if (isPmuIRQ) {
@@ -111,8 +111,12 @@ void TaskCheckShortButtonPressed(void* pvParameters)
             watch.readPMU();
             if (watch.isPekeyShortPressIrq()) {
                 ESP_LOGI(TAG, "[SX1262] Pekey short-press");
-                String msg = "button pressed";
-                sendLoraMessage(msg);
+                //String msg = "button pressed";
+                //sendLoraMessage(msg);
+                // Pekey button as "lock screen"
+                //ui_load_scr_animation(&guider_ui, &guider_ui.home_digital, guider_ui.home_digital_del, &guider_ui.message_received_heart_del, setup_scr_home_digital, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+                ui_load_scr_animation(&guider_ui, &guider_ui.message_received_heart, guider_ui.message_received_heart_del, &guider_ui.message_received_heart_del, setup_scr_message_received_heart, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+
             }
             watch.clearPMU();
         }
@@ -120,11 +124,20 @@ void TaskCheckShortButtonPressed(void* pvParameters)
     }
 }
 
+void TaskShowRecievedFrame(void* pvParameters) {
+    while (true) {
+        ESP_LOGI(TAG, "TEST 1");
+        ui_load_scr_animation(&guider_ui, &guider_ui.home_digital, guider_ui.home_digital_del, &guider_ui.message_received_heart_del, setup_scr_home_digital, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+        ESP_LOGI(TAG, "TEST 2");
+
+        vTaskDelay(pdMS_TO_TICKS(10000));
+    }
+}
 
 // ─────────── Common functions definition (common.h) ──────────────
 
-void common_sendMessage(int msg_id) {
-    String msg_str = "";
+int common_sendMessage(int msg_id) {
+    String msg_str;
     switch (msg_id)
     {
     case ALERT:
@@ -141,13 +154,14 @@ void common_sendMessage(int msg_id) {
         break;
     case PARTY:
         msg_str = "PARTY";
-        break;
+        return 1;
     default:
         msg_str = "UNKNOWN";
         break;
     }
     ESP_LOGI(TAG, "msg_id: %d, msg_str: %s", msg_id, msg_str);
-    sendLoraMessage(msg_str);
+    int status = sendLoraMessage(msg_str);
+    return status;
 }
 
 // ───────────────────────────── Setup ─────────────────────────────
@@ -189,6 +203,7 @@ void setup() {
     xTaskCreatePinnedToCore(TaskLoraReceiver, "TaskLoraReceiver", TASK_STACK_SIZE, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(TaskLvglUpdate, "TaskLvglUpdate", TASK_STACK_SIZE, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(TaskCheckShortButtonPressed, "TaskCheckShortButtonPressed",TASK_STACK_SIZE, NULL, 1, NULL, 0);
+    //xTaskCreatePinnedToCore(TaskShowRecievedFrame, "TaskShowRecievedFrame",TASK_STACK_SIZE, NULL, 1, NULL, 0);
 }
 
 void loop() {

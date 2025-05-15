@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-void common_sendMessage(int msg_id); // declare as C-compatible if compiled as C++
+int common_sendMessage(int msg_id); // declare as C-compatible if compiled as C++
 
 enum common_emoji{
     ALERT = 0,
