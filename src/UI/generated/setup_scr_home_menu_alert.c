@@ -126,6 +126,21 @@ void setup_scr_home_menu_alert(lv_ui *ui)
     lv_obj_set_style_radius(ui->home_menu_alert_img_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_clip_corner(ui->home_menu_alert_img_2, true, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+    //Write codes home_menu_alert_img_3
+    ui->home_menu_alert_img_3 = lv_img_create(ui->home_menu_alert);
+    lv_obj_add_flag(ui->home_menu_alert_img_3, LV_OBJ_FLAG_CLICKABLE);
+    lv_img_set_src(ui->home_menu_alert_img_3, &_three_dot_icon13214214214_alpha_49x17);
+    lv_img_set_pivot(ui->home_menu_alert_img_3, 50,50);
+    lv_img_set_angle(ui->home_menu_alert_img_3, 0);
+    lv_obj_set_pos(ui->home_menu_alert_img_3, 190, 80);
+    lv_obj_set_size(ui->home_menu_alert_img_3, 49, 17);
+
+    //Write style for home_menu_alert_img_3, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->home_menu_alert_img_3, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->home_menu_alert_img_3, 100, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_menu_alert_img_3, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_menu_alert_img_3, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+
     //The custom code of home_menu_alert.
 
 
