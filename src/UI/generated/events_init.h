@@ -19,17 +19,18 @@ extern "C" {
 void events_init(lv_ui *ui);
 
 void events_init_home_digital(lv_ui *ui);
-void events_init_home_menu_messages(lv_ui *ui);
-void events_init_home_menu_alert(lv_ui *ui);
-void events_init_home_menu_groups(lv_ui *ui);
+void events_init_digital_settings(lv_ui *ui);
+void events_init_home_messages(lv_ui *ui);
 void events_init_messages_emoji_send_v2(lv_ui *ui);
-void events_init_messages_send_successful(lv_ui *ui);
-void events_init_messages_send_failed(lv_ui *ui);
 void events_init_message_received_like(lv_ui *ui);
 void events_init_message_received_wave(lv_ui *ui);
 void events_init_message_received_heart(lv_ui *ui);
 void events_init_message_received_party(lv_ui *ui);
+void events_init_messages_send_failed(lv_ui *ui);
+void events_init_messages_send_successful(lv_ui *ui);
+void events_init_home_menu_alert(lv_ui *ui);
 void events_init_alert_menu(lv_ui *ui);
+void events_init_home_menu_groups(lv_ui *ui);
 void events_init_groups_list(lv_ui *ui);
 void events_init_groups_contacts(lv_ui *ui);
 

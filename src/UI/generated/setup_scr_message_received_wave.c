@@ -123,6 +123,21 @@ void setup_scr_message_received_wave(lv_ui *ui)
     lv_obj_set_style_radius(ui->message_received_wave_emoji_wave, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_clip_corner(ui->message_received_wave_emoji_wave, true, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+    //Write codes message_received_wave_img_1
+    ui->message_received_wave_img_1 = lv_img_create(ui->message_received_wave);
+    lv_obj_add_flag(ui->message_received_wave_img_1, LV_OBJ_FLAG_CLICKABLE);
+    lv_img_set_src(ui->message_received_wave_img_1, &_dog_emoji_alpha_30x30);
+    lv_img_set_pivot(ui->message_received_wave_img_1, 50,50);
+    lv_img_set_angle(ui->message_received_wave_img_1, 0);
+    lv_obj_set_pos(ui->message_received_wave_img_1, 141, 96);
+    lv_obj_set_size(ui->message_received_wave_img_1, 30, 30);
+
+    //Write style for message_received_wave_img_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->message_received_wave_img_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->message_received_wave_img_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->message_received_wave_img_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->message_received_wave_img_1, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+
     //The custom code of message_received_wave.
 
 
