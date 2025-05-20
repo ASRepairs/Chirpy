@@ -20,7 +20,8 @@ enum common_emoji{
     PARTY = 4
 } common_emoji;
 
-int common_current_group;  // todo: move that variable to flash memory
+int common_current_group;  // TODO: move that variable to flash memory
+int common_current_user;  // TODO: move that variable to flash memory
 
 void common_change_group(int gr_id);
 

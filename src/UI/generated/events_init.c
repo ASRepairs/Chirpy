@@ -159,9 +159,12 @@ static void messages_emoji_send_v2_emoji_party_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-
-        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
-        break;
+        int status = common_sendMessage(PARTY);
+        if(!status) {
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        } else {
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_failed, guider_ui.messages_send_failed_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_failed, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        }
     }
     default:
         break;
@@ -174,8 +177,12 @@ static void messages_emoji_send_v2_emoji_heart_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-
-        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        int status = common_sendMessage(HEART);
+        if(!status) {
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        } else {
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_failed, guider_ui.messages_send_failed_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_failed, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        }
         break;
     }
     default:
@@ -189,9 +196,12 @@ static void messages_emoji_send_v2_emoji_wave_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-
-        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
-        break;
+        int status = common_sendMessage(WAVE);
+        if(!status) {
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        } else {
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_failed, guider_ui.messages_send_failed_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_failed, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        }
     }
     default:
         break;
@@ -204,9 +214,12 @@ static void messages_emoji_send_v2_emoji_like_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-
-        ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
-        break;
+        int status = common_sendMessage(THUMB_UP);
+        if(!status) {
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_successful, guider_ui.messages_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        } else {
+            ui_load_scr_animation(&guider_ui, &guider_ui.messages_send_failed, guider_ui.messages_send_failed_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_messages_send_failed, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        }
     }
     default:
         break;
@@ -392,8 +405,12 @@ static void alert_menu_alert_button_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-
-        break;
+        int status = common_sendMessage(ALERT);
+        if(!status) {
+            ui_load_scr_animation(&guider_ui, &guider_ui.alert_send_successful, guider_ui.alert_send_successful_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_alert_send_successful, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        } else {
+            ui_load_scr_animation(&guider_ui, &guider_ui.alert_send_failed, guider_ui.alert_send_failed_del, &guider_ui.messages_emoji_send_v2_del, setup_scr_alert_send_failed, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        }
     }
     default:
         break;

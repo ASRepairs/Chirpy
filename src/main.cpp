@@ -69,11 +69,16 @@ void displayReceivedMessage() {
         String group_str = receivedMsg.substring(0, index_1_delim);
         ESP_LOGI(TAG, "[SX1262] Group ID: %s", group_str.c_str());
         int gr_id = atoi(group_str.c_str());
-        if((gr_id == common_current_group) || (gr_id == 0) ) {
+        if((gr_id == common_current_group) || (gr_id == 0) || (common_current_group == 0)) {
             String msg_str = receivedMsg.substring(index_1_delim+1);
             ESP_LOGI(TAG, "[SX1262] Message STR: %s", msg_str.c_str());
             int msg_id = atoi(msg_str.c_str());
             common_displayMessageUI(msg_id);
+            watch.setWaveform(0, 15);  // play effect
+            watch.setWaveform(1, 0);  // end waveform
+            watch.setWaveform(3, 15);  // play effect
+            watch.setWaveform(4, 0);  // end waveform
+            watch.run();
         }
         //replace with some nice gui to show the message/emoji
         // lv_label_set_text_fmt(label1, "RX Success\nMessage: %s\nRSSI: %d dBm", receivedMsg.c_str(), radio.getRSSI());
@@ -125,8 +130,13 @@ void TaskCheckShortButtonPressed(void* pvParameters){
                 //String msg = "button pressed";
                 //sendLoraMessage(msg);
                 // Pekey button as "lock screen"
-                //ui_load_scr_animation(&guider_ui, &guider_ui.home_digital, guider_ui.home_digital_del, &guider_ui.message_received_heart_del, setup_scr_home_digital, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
-                ui_load_scr_animation(&guider_ui, &guider_ui.message_received_heart, guider_ui.message_received_heart_del, &guider_ui.message_received_heart_del, setup_scr_message_received_heart, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+                
+                ui_load_scr_animation(&guider_ui, &guider_ui.home_digital, guider_ui.home_digital_del, &guider_ui.message_received_heart_del, setup_scr_home_digital, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+                //ui_load_scr_animation(&guider_ui, &guider_ui.message_received_heart, guider_ui.message_received_heart_del, &guider_ui.message_received_heart_del, setup_scr_message_received_heart, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+                watch.setWaveform(0, 1);  // play effect
+                watch.setWaveform(1, 0);  // end waveform
+                watch.run();
+                ESP_LOGI(TAG, "[FFat] freeBytes: %d", FFat.freeBytes());
 
             }
             watch.clearPMU();
@@ -138,6 +148,7 @@ void TaskCheckShortButtonPressed(void* pvParameters){
 
 // ─────────── Common functions definition (common.h) ──────────────
 
+// TODO: Make it nicer
 void common_change_group(int gr_id){
     ESP_LOGI(TAG, "Group id changed from %d to %d", common_current_group, gr_id);
     if(common_current_group != 0){
@@ -223,49 +234,29 @@ int common_sendMessage(int msg_id) {
     } else {
         msg_str = String(common_current_group) + ";" + String(msg_id);
     }
-    //switch (msg_id)
-    // {
-    // case ALERT:
-    //     msg_str += "ALERT";
-    //     break;
-    // case THUMB_UP:
-    //     msg_str += "THUMBS_UP";
-    //     break;
-    // case WAVE:
-    //     msg_str += "WAVE";
-    //     break;
-    // case HEART:
-    //     msg_str += "HEART";
-    //     break;
-    // case PARTY:
-    //     msg_str += "PARTY";
-    //     break;
-    // default:
-    //     msg_str += "UNKNOWN";
-    //     break;
-    // }
     ESP_LOGI(TAG, "gr_id: %d msg_id: %d, msg_str: %s", common_current_group, msg_id, msg_str);
     int status = sendLoraMessage(msg_str);
     return status;
 }
 
+// TODO: Make it nicer
 void common_displayMessageUI(int msg_id) {
     switch (msg_id)
     {
     case ALERT:
-        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_like, guider_ui.message_received_like_del, &guider_ui.message_received_like_del, setup_scr_message_received_like, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+        ui_load_scr_animation(&guider_ui, &guider_ui.alert_received, guider_ui.alert_received_del, &guider_ui.alert_received_del, setup_scr_alert_received, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
         break;
     case THUMB_UP:
         ui_load_scr_animation(&guider_ui, &guider_ui.message_received_like, guider_ui.message_received_like_del, &guider_ui.message_received_like_del, setup_scr_message_received_like, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
         break;
     case WAVE:
-        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_wave, guider_ui.message_received_wave_del, &guider_ui.message_received_like_del, setup_scr_message_received_wave, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_wave, guider_ui.message_received_wave_del, &guider_ui.message_received_wave_del, setup_scr_message_received_wave, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
         break;
     case HEART:
-        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_heart, guider_ui.message_received_heart_del, &guider_ui.message_received_like_del, setup_scr_message_received_heart, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_heart, guider_ui.message_received_heart_del, &guider_ui.message_received_heart_del, setup_scr_message_received_heart, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
         break;
     case PARTY:
-        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_party, guider_ui.message_received_party_del, &guider_ui.message_received_like_del, setup_scr_message_received_party, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_party, guider_ui.message_received_party_del, &guider_ui.message_received_party_del, setup_scr_message_received_party, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
         break;
     default:
         ESP_LOGI(TAG, "msg_id: %d", msg_id);
