@@ -32,7 +32,7 @@ void setup_scr_home_digital(lv_ui *ui)
 
     //Write codes home_digital_label_week
     ui->home_digital_label_week = lv_label_create(ui->home_digital);
-    lv_label_set_text(ui->home_digital_label_week, "WED");
+    lv_label_set_text(ui->home_digital_label_week, "TUE");
     lv_label_set_long_mode(ui->home_digital_label_week, LV_LABEL_LONG_WRAP);
     lv_obj_set_pos(ui->home_digital_label_week, 99, 142);
     lv_obj_set_size(ui->home_digital_label_week, 41, 15);
@@ -55,7 +55,7 @@ void setup_scr_home_digital(lv_ui *ui)
 
     //Write codes home_digital_label_date
     ui->home_digital_label_date = lv_label_create(ui->home_digital);
-    lv_label_set_text(ui->home_digital_label_date, "05/15");
+    lv_label_set_text(ui->home_digital_label_date, "05/20");
     lv_label_set_long_mode(ui->home_digital_label_date, LV_LABEL_LONG_WRAP);
     lv_obj_set_pos(ui->home_digital_label_date, 97, 126);
     lv_obj_set_size(ui->home_digital_label_date, 45, 12);
@@ -78,7 +78,7 @@ void setup_scr_home_digital(lv_ui *ui)
 
     //Write codes home_digital_label_time
     ui->home_digital_label_time = lv_label_create(ui->home_digital);
-    lv_label_set_text(ui->home_digital_label_time, "05:25");
+    lv_label_set_text(ui->home_digital_label_time, "18:30");
     lv_label_set_long_mode(ui->home_digital_label_time, LV_LABEL_LONG_WRAP);
     lv_obj_set_pos(ui->home_digital_label_time, 55, 65);
     lv_obj_set_size(ui->home_digital_label_time, 130, 45);
