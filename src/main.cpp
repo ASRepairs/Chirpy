@@ -65,13 +65,24 @@ void displayReceivedMessage() {
 
     if (state == RADIOLIB_ERR_NONE) {
         ESP_LOGI(TAG, "[SX1262] Received message: %s", receivedMsg.c_str());
+        int index_1_delim = receivedMsg.indexOf(';');
+        String group_str = receivedMsg.substring(0, index_1_delim);
+        ESP_LOGI(TAG, "[SX1262] Group ID: %s", group_str.c_str());
+        int gr_id = atoi(group_str.c_str());
+        if((gr_id == common_current_group) || (gr_id == 0) ) {
+            String msg_str = receivedMsg.substring(index_1_delim+1);
+            ESP_LOGI(TAG, "[SX1262] Message STR: %s", msg_str.c_str());
+            int msg_id = atoi(msg_str.c_str());
+            common_displayMessageUI(msg_id);
+        }
         //replace with some nice gui to show the message/emoji
         // lv_label_set_text_fmt(label1, "RX Success\nMessage: %s\nRSSI: %d dBm", receivedMsg.c_str(), radio.getRSSI());
+        
     } else {
         ESP_LOGE(TAG, "[SX1262] Failed to read message, code: %d", state);
         //lv_label_set_text_fmt(label1, "RX Failed\nError: %d", state);
     }
-    vTaskDelay(pdMS_TO_TICKS(5000));
+    vTaskDelay(pdMS_TO_TICKS(1000));
     //after accepting, return to normal gui or something
     //lv_label_set_text(label1, "Waiting for message...");
     //radio.startReceive();  // go back to RX mode after sending so we can receive the next messages
@@ -110,7 +121,7 @@ void TaskCheckShortButtonPressed(void* pvParameters){
             isPmuIRQ = false;
             watch.readPMU();
             if (watch.isPekeyShortPressIrq()) {
-                ESP_LOGI(TAG, "[SX1262] Pekey short-press");
+                ESP_LOGI(TAG, "[watch] Pekey short-press");
                 //String msg = "button pressed";
                 //sendLoraMessage(msg);
                 // Pekey button as "lock screen"
@@ -124,48 +135,149 @@ void TaskCheckShortButtonPressed(void* pvParameters){
     }
 }
 
-void TaskShowRecievedFrame(void* pvParameters) {
-    while (true) {
-        ESP_LOGI(TAG, "TEST 1");
-        ui_load_scr_animation(&guider_ui, &guider_ui.home_digital, guider_ui.home_digital_del, &guider_ui.message_received_heart_del, setup_scr_home_digital, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
-        ESP_LOGI(TAG, "TEST 2");
-
-        vTaskDelay(pdMS_TO_TICKS(10000));
-    }
-}
 
 // ─────────── Common functions definition (common.h) ──────────────
 
-int common_sendMessage(int msg_id) {
-    String msg_str;
-    switch (msg_id)
+void common_change_group(int gr_id){
+    ESP_LOGI(TAG, "Group id changed from %d to %d", common_current_group, gr_id);
+    if(common_current_group != 0){
+        switch (common_current_group)
+        {
+        case 1:
+            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_1, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+            break;
+        case 2:
+            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_2, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+            break;
+        case 3:
+            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_3, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+            break;
+        case 4:
+            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_4, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+            break;
+        case 5:
+            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_5, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+            break;
+        case 6:
+            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_6, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+            break;
+        case 7:
+            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_7, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+            break;
+        case 8:
+            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_8, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+            break;
+        case 9:
+            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_9, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+            break;
+        case 10:
+            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_10, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+            break;
+        default:
+            break;
+        }
+    }
+    switch (gr_id)
     {
-    case ALERT:
-        msg_str = "ALERT";
+    case 1:
+        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_1, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
         break;
-    case THUMB_UP:
-        msg_str = "THUMBS_UP";
+    case 2:
+        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_2, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
         break;
-    case WAVE:
-        msg_str = "WAVE";
+    case 3:
+        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_3, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
         break;
-    case HEART:
-        msg_str = "HEART";
+    case 4:
+        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_4, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
         break;
-    case PARTY:
-        msg_str = "PARTY";
-        return 1;
+    case 5:
+        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_5, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+        break;
+    case 6:
+        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_6, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+        break;
+    case 7:
+        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_7, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+        break;
+    case 8:
+        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_8, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+        break;
+    case 9:
+        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_9, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+        break;
+    case 10:
+        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_10, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+        break;
     default:
-        msg_str = "UNKNOWN";
         break;
     }
-    ESP_LOGI(TAG, "msg_id: %d, msg_str: %s", msg_id, msg_str);
+    
+    common_current_group = gr_id;
+}
+
+int common_sendMessage(int msg_id) {
+    String msg_str;
+    if(msg_id == 0) {
+        msg_str = "0;" + String(msg_id);
+    } else {
+        msg_str = String(common_current_group) + ";" + String(msg_id);
+    }
+    //switch (msg_id)
+    // {
+    // case ALERT:
+    //     msg_str += "ALERT";
+    //     break;
+    // case THUMB_UP:
+    //     msg_str += "THUMBS_UP";
+    //     break;
+    // case WAVE:
+    //     msg_str += "WAVE";
+    //     break;
+    // case HEART:
+    //     msg_str += "HEART";
+    //     break;
+    // case PARTY:
+    //     msg_str += "PARTY";
+    //     break;
+    // default:
+    //     msg_str += "UNKNOWN";
+    //     break;
+    // }
+    ESP_LOGI(TAG, "gr_id: %d msg_id: %d, msg_str: %s", common_current_group, msg_id, msg_str);
     int status = sendLoraMessage(msg_str);
     return status;
 }
 
+void common_displayMessageUI(int msg_id) {
+    switch (msg_id)
+    {
+    case ALERT:
+        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_like, guider_ui.message_received_like_del, &guider_ui.message_received_like_del, setup_scr_message_received_like, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+        break;
+    case THUMB_UP:
+        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_like, guider_ui.message_received_like_del, &guider_ui.message_received_like_del, setup_scr_message_received_like, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+        break;
+    case WAVE:
+        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_wave, guider_ui.message_received_wave_del, &guider_ui.message_received_like_del, setup_scr_message_received_wave, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+        break;
+    case HEART:
+        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_heart, guider_ui.message_received_heart_del, &guider_ui.message_received_like_del, setup_scr_message_received_heart, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+        break;
+    case PARTY:
+        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_party, guider_ui.message_received_party_del, &guider_ui.message_received_like_del, setup_scr_message_received_party, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
+        break;
+    default:
+        ESP_LOGI(TAG, "msg_id: %d", msg_id);
+        break;
+    }
+    return;
+}
+
+
 // ───────────────────────────── Setup ─────────────────────────────
 void setup() {
+    common_current_group = 0; // todo: move that variable to flash memory
     Serial.begin(115200);
     esp_log_level_set("*", ESP_LOG_VERBOSE);
     watch.begin();

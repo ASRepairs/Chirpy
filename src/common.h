@@ -10,6 +10,7 @@ extern "C" {
 #endif
 
 int common_sendMessage(int msg_id); // declare as C-compatible if compiled as C++
+void common_displayMessageUI(int msg_id);
 
 enum common_emoji{
     ALERT = 0,
@@ -18,6 +19,10 @@ enum common_emoji{
     HEART = 3,
     PARTY = 4
 } common_emoji;
+
+int common_current_group;  // todo: move that variable to flash memory
+
+void common_change_group(int gr_id);
 
 #ifdef __cplusplus
 }

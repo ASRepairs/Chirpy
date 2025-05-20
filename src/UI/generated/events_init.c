@@ -484,7 +484,8 @@ static void groups_list_cont_gr_1_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(1);
         break;
     }
     default:
@@ -498,7 +499,8 @@ static void groups_list_img_group_bar_1_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(1);
         break;
     }
     default:
@@ -512,7 +514,8 @@ static void groups_list_cont_gr_2_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(2);
         break;
     }
     default:
@@ -526,7 +529,8 @@ static void groups_list_img_group_bar_2_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(2);
         break;
     }
     default:
@@ -540,7 +544,8 @@ static void groups_list_cont_gr_3_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(3);
         break;
     }
     default:
@@ -554,7 +559,8 @@ static void groups_list_img_group_bar_3_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(3);
         break;
     }
     default:
@@ -568,7 +574,8 @@ static void groups_list_cont_gr_4_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(4);
         break;
     }
     default:
@@ -582,7 +589,8 @@ static void groups_list_img_group_bar_4_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(4);
         break;
     }
     default:
@@ -596,7 +604,8 @@ static void groups_list_cont_gr_6_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(6);
         break;
     }
     default:
@@ -610,7 +619,8 @@ static void groups_list_img_group_bar_6_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(6);
         break;
     }
     default:
@@ -624,7 +634,8 @@ static void groups_list_cont_gr_8_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(8);
         break;
     }
     default:
@@ -638,7 +649,8 @@ static void groups_list_img_group_bar_8_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(8);
         break;
     }
     default:
@@ -652,7 +664,8 @@ static void groups_list_cont_gr_7_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(7);
         break;
     }
     default:
@@ -666,7 +679,8 @@ static void groups_list_img_group_bar_7_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(7);
         break;
     }
     default:
@@ -680,7 +694,8 @@ static void groups_list_cont_gr_5_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(5);
         break;
     }
     default:
@@ -694,7 +709,8 @@ static void groups_list_img_group_bar_5_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(5);
         break;
     }
     default:
@@ -708,7 +724,8 @@ static void groups_list_cont_gr_10_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(10);
         break;
     }
     default:
@@ -722,7 +739,8 @@ static void groups_list_img_group_bar_10_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(10);
         break;
     }
     default:
@@ -736,7 +754,8 @@ static void groups_list_cont_gr_9_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(9);
         break;
     }
     default:
@@ -750,7 +769,8 @@ static void groups_list_img_group_bar_9_event_handler (lv_event_t *e)
     switch (code) {
     case LV_EVENT_CLICKED:
     {
-        ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        //ui_load_scr_animation(&guider_ui, &guider_ui.groups_contacts, guider_ui.groups_contacts_del, &guider_ui.groups_list_del, setup_scr_groups_contacts, LV_SCR_LOAD_ANIM_OVER_LEFT, 200, 200, false, true);
+        common_change_group(9);
         break;
     }
     default:
