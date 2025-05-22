@@ -310,6 +310,5 @@ void setup() {
 }
 
 void loop() {
-    lv_task_handler(); // Handle LVGL tasks
-    delay(5);
+    
 }
