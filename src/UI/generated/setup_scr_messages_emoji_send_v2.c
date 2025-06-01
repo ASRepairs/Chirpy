@@ -22,6 +22,8 @@ void setup_scr_messages_emoji_send_v2(lv_ui *ui)
     ui->messages_emoji_send_v2 = lv_obj_create(NULL);
     lv_obj_set_size(ui->messages_emoji_send_v2, 240, 240);
     lv_obj_set_scrollbar_mode(ui->messages_emoji_send_v2, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_add_flag(ui->messages_emoji_send_v2, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_flag(ui->messages_emoji_send_v2, LV_OBJ_FLAG_FLOATING);
 
     //Write style for messages_emoji_send_v2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->messages_emoji_send_v2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);

@@ -14,10 +14,20 @@
 #include <stdio.h>
 #include "lvgl.h"
 #include "custom.h"
+#include "gui_guider.h"
+#include <stdio.h>  // make sure this is included for printf
 
 /*********************
  *      DEFINES
  *********************/
+void show_home_lizzard_emoji()
+{
+    if (guider_ui.home_digital != NULL) {
+        lv_obj_clear_flag(guider_ui.home_digital_lizzard, LV_OBJ_FLAG_HIDDEN);
+        // Temporarily comment this out
+        // lv_event_send(guider_ui.home_digital_lizzard, LV_EVENT_VALUE_CHANGED, NULL);
+    }
+}
 
 /**********************
  *      TYPEDEFS

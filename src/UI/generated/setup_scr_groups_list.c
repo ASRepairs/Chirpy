@@ -14,8 +14,6 @@
 #include "widgets_init.h"
 #include "custom.h"
 
-#include "../../common.h" // Added by Kacper (KSCB)
-
 
 
 void setup_scr_groups_list(lv_ui *ui)
@@ -849,17 +847,6 @@ void setup_scr_groups_list(lv_ui *ui)
     lv_obj_set_style_clip_corner(ui->groups_list_img_close, true, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //The custom code of groups_list.
-    // TODO: Make it nicer, gosh
-    if(common_current_group == 1) lv_obj_set_style_text_color(ui->groups_list_label_group_1, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    if(common_current_group == 2) lv_obj_set_style_text_color(ui->groups_list_label_group_2, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    if(common_current_group == 3) lv_obj_set_style_text_color(ui->groups_list_label_group_3, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    if(common_current_group == 4) lv_obj_set_style_text_color(ui->groups_list_label_group_4, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    if(common_current_group == 5) lv_obj_set_style_text_color(ui->groups_list_label_group_5, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    if(common_current_group == 6) lv_obj_set_style_text_color(ui->groups_list_label_group_6, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    if(common_current_group == 7) lv_obj_set_style_text_color(ui->groups_list_label_group_7, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    if(common_current_group == 8) lv_obj_set_style_text_color(ui->groups_list_label_group_8, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    if(common_current_group == 9) lv_obj_set_style_text_color(ui->groups_list_label_group_9, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    if(common_current_group == 10) lv_obj_set_style_text_color(ui->groups_list_label_group_10, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
 
 
     //Update current screen layout.

@@ -25,61 +25,11 @@ typedef struct
 	lv_obj_t *home_digital_label_time;
 	lv_obj_t *home_digital_img_1;
 	lv_obj_t *home_digital_img_2;
-	lv_obj_t *home_digital_img_4;
-	lv_obj_t *digital_settings;
-	bool digital_settings_del;
-	lv_obj_t *digital_settings_img_top_grey_bar;
-	lv_obj_t *digital_settings_label_messages_bar;
-	lv_obj_t *digital_settings_img_close;
-	lv_obj_t *digital_settings_cont_1;
-	lv_obj_t *digital_settings_btn_1;
-	lv_obj_t *digital_settings_btn_1_label;
-	lv_obj_t *digital_settings_lizzard_emoji;
-	lv_obj_t *digital_settings_btn_2;
-	lv_obj_t *digital_settings_btn_2_label;
-	lv_obj_t *digital_settings_btn_3;
-	lv_obj_t *digital_settings_btn_3_label;
-	lv_obj_t *digital_settings_btn_4;
-	lv_obj_t *digital_settings_btn_4_label;
-	lv_obj_t *digital_settings_img_3;
-	lv_obj_t *digital_settings_img_1;
-	lv_obj_t *digital_settings_img_2;
-	lv_obj_t *phoenix_home_digital;
-	bool phoenix_home_digital_del;
-	lv_obj_t *phoenix_home_digital_label_week;
-	lv_obj_t *phoenix_home_digital_label_date;
-	lv_obj_t *phoenix_home_digital_label_time;
-	lv_obj_t *phoenix_home_digital_img_1;
-	lv_obj_t *phoenix_home_digital_img_2;
-	lv_obj_t *phoenix_home_digital_img_4;
-	lv_obj_t *phoenix_home_digital_img_5;
-	lv_obj_t *lizard_home_digital;
-	bool lizard_home_digital_del;
-	lv_obj_t *lizard_home_digital_label_week;
-	lv_obj_t *lizard_home_digital_label_date;
-	lv_obj_t *lizard_home_digital_label_time;
-	lv_obj_t *lizard_home_digital_img_1;
-	lv_obj_t *lizard_home_digital_img_2;
-	lv_obj_t *lizard_home_digital_img_4;
-	lv_obj_t *lizard_home_digital_img_5;
-	lv_obj_t *dog_home_digital;
-	bool dog_home_digital_del;
-	lv_obj_t *dog_home_digital_label_week;
-	lv_obj_t *dog_home_digital_label_date;
-	lv_obj_t *dog_home_digital_label_time;
-	lv_obj_t *dog_home_digital_img_1;
-	lv_obj_t *dog_home_digital_img_2;
-	lv_obj_t *dog_home_digital_img_4;
-	lv_obj_t *dog_home_digital_img_5;
-	lv_obj_t *cat_home_digital;
-	bool cat_home_digital_del;
-	lv_obj_t *cat_home_digital_label_week;
-	lv_obj_t *cat_home_digital_label_date;
-	lv_obj_t *cat_home_digital_label_time;
-	lv_obj_t *cat_home_digital_img_1;
-	lv_obj_t *cat_home_digital_img_2;
-	lv_obj_t *cat_home_digital_img_4;
-	lv_obj_t *cat_home_digital_img_5;
+	lv_obj_t *home_digital_lizzard;
+	lv_obj_t *home_digital_phoenix;
+	lv_obj_t *home_digital_dog;
+	lv_obj_t *home_digital_cat;
+	lv_obj_t *home_digital_img_7;
 	lv_obj_t *home_messages;
 	bool home_messages_del;
 	lv_obj_t *home_messages_messages_menu_button;
@@ -88,6 +38,7 @@ typedef struct
 	lv_obj_t *home_messages_img_2;
 	lv_obj_t *home_messages_img_3;
 	lv_obj_t *home_messages_img_4;
+	lv_obj_t *home_messages_img_5;
 	lv_obj_t *messages_emoji_send_v2;
 	bool messages_emoji_send_v2_del;
 	lv_obj_t *messages_emoji_send_v2_img_top_grey_bar;
@@ -150,6 +101,7 @@ typedef struct
 	lv_obj_t *home_menu_alert_img_1;
 	lv_obj_t *home_menu_alert_img_2;
 	lv_obj_t *home_menu_alert_img_3;
+	lv_obj_t *home_menu_alert_img_4;
 	lv_obj_t *alert_menu;
 	bool alert_menu_del;
 	lv_obj_t *alert_menu_img_top_grey_bar;
@@ -187,6 +139,7 @@ typedef struct
 	lv_obj_t *home_menu_groups_img_1;
 	lv_obj_t *home_menu_groups_img_2;
 	lv_obj_t *home_menu_groups_img_3;
+	lv_obj_t *home_menu_groups_img_4;
 	lv_obj_t *groups_list;
 	bool groups_list_del;
 	lv_obj_t *groups_list_cont_groups_scroll;
@@ -251,6 +204,32 @@ typedef struct
 	lv_obj_t *groups_contacts_img_top_grey_bar;
 	lv_obj_t *groups_contacts_label_groups_bar;
 	lv_obj_t *groups_contacts_img_close;
+	lv_obj_t *home_settings;
+	bool home_settings_del;
+	lv_obj_t *home_settings_label_alert;
+	lv_obj_t *home_settings_img_2;
+	lv_obj_t *home_settings_img_3;
+	lv_obj_t *home_settings_img_4;
+	lv_obj_t *home_settings_imgbtn_1;
+	lv_obj_t *home_settings_imgbtn_1_label;
+	lv_obj_t *digital_settings;
+	bool digital_settings_del;
+	lv_obj_t *digital_settings_img_top_grey_bar;
+	lv_obj_t *digital_settings_label_messages_bar;
+	lv_obj_t *digital_settings_img_close;
+	lv_obj_t *digital_settings_cont_1;
+	lv_obj_t *digital_settings_btn_1;
+	lv_obj_t *digital_settings_btn_1_label;
+	lv_obj_t *digital_settings_btn_2;
+	lv_obj_t *digital_settings_btn_2_label;
+	lv_obj_t *digital_settings_btn_3;
+	lv_obj_t *digital_settings_btn_3_label;
+	lv_obj_t *digital_settings_btn_4;
+	lv_obj_t *digital_settings_btn_4_label;
+	lv_obj_t *digital_settings_dog_emoji;
+	lv_obj_t *digital_settings_phoenix_emoji;
+	lv_obj_t *digital_settings_lizzard_emoji;
+	lv_obj_t *digital_settings_cat_emoji;
 }lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui * ui);
@@ -275,11 +254,6 @@ extern lv_ui guider_ui;
 
 
 void setup_scr_home_digital(lv_ui *ui);
-void setup_scr_digital_settings(lv_ui *ui);
-void setup_scr_phoenix_home_digital(lv_ui *ui);
-void setup_scr_lizard_home_digital(lv_ui *ui);
-void setup_scr_dog_home_digital(lv_ui *ui);
-void setup_scr_cat_home_digital(lv_ui *ui);
 void setup_scr_home_messages(lv_ui *ui);
 void setup_scr_messages_emoji_send_v2(lv_ui *ui);
 void setup_scr_message_received_like(lv_ui *ui);
@@ -296,46 +270,23 @@ void setup_scr_alert_send_successful(lv_ui *ui);
 void setup_scr_home_menu_groups(lv_ui *ui);
 void setup_scr_groups_list(lv_ui *ui);
 void setup_scr_groups_contacts(lv_ui *ui);
+void setup_scr_home_settings(lv_ui *ui);
+void setup_scr_digital_settings(lv_ui *ui);
 
 LV_IMG_DECLARE(_homescreen_UI_240x240);
 LV_IMG_DECLARE(_three_dot_icon1321_alpha_50x50);
 LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
-LV_IMG_DECLARE(_gear_twitter_alpha_50x50);
-LV_IMG_DECLARE(_menu_bar_alpha_240x55);
-LV_IMG_DECLARE(_x_thin_alpha_40x40);
-LV_IMG_DECLARE(_lizard_emoji_alpha_75x75);
-LV_IMG_DECLARE(_phoenix_bird_alpha_75x75);
-LV_IMG_DECLARE(_dog_emoji_alpha_75x75);
-LV_IMG_DECLARE(_cat_emoji_alpha_75x75);
-
-LV_IMG_DECLARE(_homescreen_UI_240x240);
-LV_IMG_DECLARE(_three_dot_icon1321_alpha_50x50);
-LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
-LV_IMG_DECLARE(_gear_twitter_alpha_50x50);
-LV_IMG_DECLARE(_phoenix_bird_alpha_50x50);
-
-LV_IMG_DECLARE(_homescreen_UI_240x240);
-LV_IMG_DECLARE(_three_dot_icon1321_alpha_50x50);
-LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
-LV_IMG_DECLARE(_gear_twitter_alpha_50x50);
 LV_IMG_DECLARE(_lizard_emoji_alpha_50x50);
-
-LV_IMG_DECLARE(_homescreen_UI_240x240);
-LV_IMG_DECLARE(_three_dot_icon1321_alpha_50x50);
-LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
-LV_IMG_DECLARE(_gear_twitter_alpha_50x50);
+LV_IMG_DECLARE(_phoenix_bird_alpha_50x50);
 LV_IMG_DECLARE(_dog_emoji_alpha_50x50);
-
-LV_IMG_DECLARE(_homescreen_UI_240x240);
+LV_IMG_DECLARE(_cat_emoji_alpha_50x50);
+LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
+LV_IMG_DECLARE(_message_icon_alpha_100x100);
+LV_IMG_DECLARE(_message_icon_alpha_100x100);
+LV_IMG_DECLARE(_message_icon_alpha_100x100);
+LV_IMG_DECLARE(_message_icon_alpha_100x100);
 LV_IMG_DECLARE(_three_dot_icon1321_alpha_50x50);
 LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
-LV_IMG_DECLARE(_gear_twitter_alpha_50x50);
-LV_IMG_DECLARE(_cat_emoji_alpha_50x50);
-LV_IMG_DECLARE(_message_icon_alpha_100x100);
-LV_IMG_DECLARE(_message_icon_alpha_100x100);
-LV_IMG_DECLARE(_message_icon_alpha_100x100);
-LV_IMG_DECLARE(_message_icon_alpha_100x100);
-LV_IMG_DECLARE(_three_dot_icon1321_alpha_50x50);
 LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
 LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
 LV_IMG_DECLARE(_menu_bar_alpha_240x55);
@@ -371,6 +322,7 @@ LV_IMG_DECLARE(_alert_icon_alpha_100x100);
 LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_46x16);
 LV_IMG_DECLARE(_three_dot_icon1321_alpha_50x50);
 LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
+LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
 LV_IMG_DECLARE(_menu_bar_alpha_240x55);
 LV_IMG_DECLARE(_alert_icon_alpha_90x90);
 LV_IMG_DECLARE(_alert_icon_alpha_90x90);
@@ -393,6 +345,7 @@ LV_IMG_DECLARE(_groups_icon_alpha_100x100);
 LV_IMG_DECLARE(_groups_icon_alpha_100x100);
 LV_IMG_DECLARE(_groups_icon_alpha_100x100);
 LV_IMG_DECLARE(_three_dot_icon1321_alpha_50x50);
+LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
 LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
 LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
 LV_IMG_DECLARE(_message_list_rectangle_alpha_200x50);
@@ -427,13 +380,26 @@ LV_IMG_DECLARE(_message_list_rectangle_alpha_200x50);
 LV_IMG_DECLARE(_img_avatar_1_alpha_30x30);
 LV_IMG_DECLARE(_menu_bar_alpha_240x55);
 LV_IMG_DECLARE(_x_thin_alpha_40x40);
+LV_IMG_DECLARE(_three_dot_icon1321_alpha_50x50);
+LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
+LV_IMG_DECLARE(_three_dot_icon13214214214_alpha_49x17);
+LV_IMG_DECLARE(_gear_microsoft_alpha_120x120);
+LV_IMG_DECLARE(_gear_microsoft_alpha_120x120);
+LV_IMG_DECLARE(_gear_microsoft_alpha_120x120);
+LV_IMG_DECLARE(_gear_microsoft_alpha_120x120);
+LV_IMG_DECLARE(_menu_bar_alpha_240x55);
+LV_IMG_DECLARE(_x_thin_alpha_40x40);
+LV_IMG_DECLARE(_dog_emoji_alpha_75x75);
+LV_IMG_DECLARE(_phoenix_bird_alpha_75x75);
+LV_IMG_DECLARE(_lizard_emoji_alpha_75x75);
+LV_IMG_DECLARE(_cat_emoji_alpha_75x75);
 
 LV_FONT_DECLARE(lv_font_montserratMedium_13)
 LV_FONT_DECLARE(lv_font_montserratMedium_10)
 LV_FONT_DECLARE(lv_font_montserratMedium_45)
 LV_FONT_DECLARE(lv_font_montserratMedium_16)
-LV_FONT_DECLARE(lv_font_montserratMedium_21)
 LV_FONT_DECLARE(lv_font_montserratMedium_12)
+LV_FONT_DECLARE(lv_font_montserratMedium_21)
 LV_FONT_DECLARE(lv_font_montserratMedium_19)
 
 
