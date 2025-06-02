@@ -4,6 +4,8 @@
 #include "UI/custom/custom.h"
 #include "UI/generated/gui_guider.h"
 #include "common.h" // Added by Kacper (KSCB)
+#include <time.h>
+#include <TinyGPSPlus.h>
 
 #define LORA_FREQUENCY        868.0f
 #define TASK_STACK_SIZE       4096
@@ -15,6 +17,9 @@ static const char* TAG = "MAIN";
 // global vars
 SX1262 radio = newModule();
 lv_obj_t* label1 = nullptr;
+TinyGPSPlus gps;
+const char *TIMEZONE = "CET-1CEST,M3.5.0/02:00:00,M10.5.0/03:00:00"; // central Europe with daylight saving time
+volatile bool timeSynced = false;
 volatile bool receivedFlag = false;
 volatile bool isTransmitting = false;
 bool isPmuIRQ = false;
@@ -144,7 +149,64 @@ void TaskCheckShortButtonPressed(void* pvParameters){
         vTaskDelay(pdMS_TO_TICKS(20));
     }
 }
+void TaskSyncTimeFromGPS(void *pvParameters)
+{
+    // Wait until Serial is ready
+    vTaskDelay(pdMS_TO_TICKS(1000));
 
+    ESP_LOGI(TAG, "[GPS] Waiting for a valid date/time…");
+    while (true)
+    {
+        // read everything from GPS UART
+        while (GPSSerial.available())
+        {
+            char c = GPSSerial.read();
+            gps.encode(c);
+        }
+
+        // see if we have a valid date & time
+        if (!timeSynced && gps.date.isValid() && gps.time.isValid())
+        {
+            // Extract UTC date/time from GPS
+            uint16_t year = gps.date.year();
+            uint8_t month = gps.date.month();
+            uint8_t day = gps.date.day();
+            uint8_t hour = gps.time.hour();
+            uint8_t minute = gps.time.minute();
+            uint8_t second = gps.time.second();
+
+            // make a struct tm in UTC
+            struct tm tm_utc;
+            tm_utc.tm_year = year - 1900;
+            tm_utc.tm_mon = month - 1;
+            tm_utc.tm_mday = day;
+            tm_utc.tm_hour = hour;
+            tm_utc.tm_min = minute;
+            tm_utc.tm_sec = second;
+            tm_utc.tm_isdst = 0;
+
+            // change it to time_t (interpreted as UTC)
+            time_t t = mktime(&tm_utc);
+            if (t != (time_t)-1)
+            {
+                // Set the ESP32 system clock (UTC)
+                struct timeval now = {.tv_sec = t, .tv_usec = 0};
+                settimeofday(&now, nullptr);
+                ESP_LOGI(TAG, "[GPS] System time set to UTC %04d-%02d-%02d %02d:%02d:%02d",
+                         year, month, day, hour, minute, second);
+
+                // write that UTC system time into the watch's RTC hardware
+                // (watch.hwClockWrite writes system time to the hardware RTC)
+                watch.hwClockWrite();
+                ESP_LOGI(TAG, "[GPS] Wrote time to RTC.");
+
+                timeSynced = true; // do this only once per power-on
+            }
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+}
 
 // ─────────── Common functions definition (common.h) ──────────────
 
@@ -271,6 +333,8 @@ void setup() {
     common_current_group = 0; // todo: move that variable to flash memory
     Serial.begin(115200);
     esp_log_level_set("*", ESP_LOG_VERBOSE);
+    setenv("TZ", TIMEZONE, 1);
+    tzset();
     watch.begin();
     beginLvglHelper();
     watch.attachPMU([]() {
@@ -306,6 +370,7 @@ void setup() {
     xTaskCreatePinnedToCore(TaskLoraReceiver, "TaskLoraReceiver", TASK_STACK_SIZE, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(TaskLvglUpdate, "TaskLvglUpdate", TASK_STACK_SIZE, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(TaskCheckShortButtonPressed, "TaskCheckShortButtonPressed",TASK_STACK_SIZE, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(TaskSyncTimeFromGPS, "TaskSyncTimeFromGPS", TASK_STACK_SIZE / 2, NULL, 1, NULL, 1);
     //xTaskCreatePinnedToCore(TaskShowRecievedFrame, "TaskShowRecievedFrame",TASK_STACK_SIZE, NULL, 1, NULL, 0);
 }
 
