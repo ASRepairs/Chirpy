@@ -6,12 +6,14 @@
 #include "common.h" // Added by Kacper (KSCB)
 #include <time.h>
 #include <TinyGPSPlus.h>
+#include <deque>
 
 #define LORA_FREQUENCY        868.0f
 #define TASK_STACK_SIZE       4096
 #define TX_INTERVAL_MS        3000
 #define UI_REFRESH_MS         10
 #define RX_CHECK_INTERVAL_MS  50
+#define MAX_MSG_HISTORY 10
 
 static const char* TAG = "MAIN";
 // global vars
@@ -22,7 +24,8 @@ const char *TIMEZONE = "CET-1CEST,M3.5.0/02:00:00,M10.5.0/03:00:00"; // central 
 volatile bool timeSynced = false;
 volatile bool receivedFlag = false;
 volatile bool isTransmitting = false;
-
+String node_id;
+std::deque<String> recentMessages;
 struct GPSData
 {
     float latitude;
@@ -86,32 +89,62 @@ void displayReceivedMessage() {
 
     if (state == RADIOLIB_ERR_NONE) {
         ESP_LOGI(TAG, "[SX1262] Received message: %s", receivedMsg.c_str());
-        int index_1_delim = receivedMsg.indexOf(';');
-        String group_str = receivedMsg.substring(0, index_1_delim);
-        ESP_LOGI(TAG, "[SX1262] Group ID: %s", group_str.c_str());
+        int first_colon = receivedMsg.indexOf(':');
+        int second_colon = receivedMsg.indexOf(':', first_colon + 1);
+        int semicolon = receivedMsg.indexOf(';');
+
+        if (first_colon == -1 || second_colon == -1 || semicolon == -1 || semicolon <= second_colon)
+        {
+            ESP_LOGW(TAG, "[SX1262] Invalid message format");
+            return;
+        }
+
+        String sender = receivedMsg.substring(0, first_colon);
+        String msg_id = receivedMsg.substring(first_colon + 1, second_colon);
+        String group_str = receivedMsg.substring(second_colon + 1, semicolon);
+        String payload_str = receivedMsg.substring(semicolon + 1);
+
+        // skip if we were the sender
+        if (sender == node_id)
+        {
+            ESP_LOGI(TAG, "[SX1262] Skipping own message: %s", msg_id.c_str());
+            return;
+        }
+
+        // skip if we already processed this message before
+        if (std::find(recentMessages.begin(), recentMessages.end(), msg_id) != recentMessages.end())
+        {
+            ESP_LOGI(TAG, "[SX1262] Already forwarded message ID: %s", msg_id.c_str());
+            return;
+        }
+
+        // keep track of messages to prevent infinite mesh loop
+        recentMessages.push_back(msg_id);
+        if (recentMessages.size() > MAX_MSG_HISTORY) recentMessages.pop_front();
+
+        // processing of the message happens here
         int gr_id = atoi(group_str.c_str());
-        if((gr_id == common_current_group) || (gr_id == 0) || (common_current_group == 0)) {
-            String msg_str = receivedMsg.substring(index_1_delim+1);
-            ESP_LOGI(TAG, "[SX1262] Message STR: %s", msg_str.c_str());
-            int msg_id = atoi(msg_str.c_str());
-            common_displayMessageUI(msg_id);
+        int msg_payload = atoi(payload_str.c_str());
+
+        if ((gr_id == common_current_group) || (gr_id == 0) || (common_current_group == 0)) {
+            ESP_LOGI(TAG, "[SX1262] Displaying message for group %d", gr_id);
+            common_displayMessageUI(msg_payload);
             watch.setWaveform(0, 15);  // play effect
             watch.setWaveform(1, 0);  // end waveform
             watch.setWaveform(3, 15);  // play effect
             watch.setWaveform(4, 0);  // end waveform
             watch.run();
         }
-        //replace with some nice gui to show the message/emoji
-        // lv_label_set_text_fmt(label1, "RX Success\nMessage: %s\nRSSI: %d dBm", receivedMsg.c_str(), radio.getRSSI());
-        
-    } else {
+
+        // rebroadcast
+        ESP_LOGI(TAG, "[SX1262] Rebroadcasting message: %s", receivedMsg.c_str());
+        sendLoraMessage(receivedMsg);
+    }
+    else
+    {
         ESP_LOGE(TAG, "[SX1262] Failed to read message, code: %d", state);
-        //lv_label_set_text_fmt(label1, "RX Failed\nError: %d", state);
     }
     vTaskDelay(pdMS_TO_TICKS(1000));
-    //after accepting, return to normal gui or something
-    //lv_label_set_text(label1, "Waiting for message...");
-    //radio.startReceive();  // go back to RX mode after sending so we can receive the next messages
 }
 
 // ───────────────────────────── Tasks ─────────────────────────────
@@ -342,14 +375,17 @@ void common_change_group(int gr_id){
     common_current_group = gr_id;
 }
 
-int common_sendMessage(int msg_id) {
+int common_sendMessage(int msg_id) { // message structure is: "<node_id>:<msg_uid>:<group_id>;<payload "msg_id">"
     String msg_str;
+    String msg_uid = String(millis()); // could also use timestamp
     if(msg_id == 0) {
-        msg_str = "0;" + String(msg_id);
-    } else {
-        msg_str = String(common_current_group) + ";" + String(msg_id);
+        msg_str = node_id + ":" + msg_uid + ":0;" + String(msg_id);
     }
-    ESP_LOGI(TAG, "gr_id: %d msg_id: %d, msg_str: %s", common_current_group, msg_id, msg_str);
+    else
+    {
+        msg_str = node_id + ":" + msg_uid + ":" + String(common_current_group) + ";" + String(msg_id);
+    }
+    ESP_LOGI(TAG, "Sending msg: %s", msg_str.c_str());
     int status = sendLoraMessage(msg_str);
     return status;
 }
@@ -393,6 +429,11 @@ void setup() {
     watch.attachPMU([]() {
         isPmuIRQ = true;
     });
+    uint64_t chip_id = ESP.getEfuseMac();
+    char chip_id_str[13];
+    sprintf(chip_id_str, "%012llX", chip_id); // or "%012llx" for lowercase
+    node_id = String(chip_id_str);
+    ESP_LOGI(TAG, "[Node ID] %s", node_id.c_str()); // 80E58A63B0E4
     ESP_LOGI(TAG, "[SX1262] Initializing...");
     int state = radio.begin();
     if (state != RADIOLIB_ERR_NONE) {
