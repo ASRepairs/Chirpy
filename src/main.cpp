@@ -22,6 +22,22 @@ const char *TIMEZONE = "CET-1CEST,M3.5.0/02:00:00,M10.5.0/03:00:00"; // central 
 volatile bool timeSynced = false;
 volatile bool receivedFlag = false;
 volatile bool isTransmitting = false;
+
+struct GPSData
+{
+    float latitude;
+    float longitude;
+    uint16_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
+    bool valid;
+};
+
+volatile GPSData currentGPSData;
+
 bool isPmuIRQ = false;
 // ───────────────────────────── ISR ─────────────────────────────
 
@@ -149,12 +165,11 @@ void TaskCheckShortButtonPressed(void* pvParameters){
         vTaskDelay(pdMS_TO_TICKS(20));
     }
 }
-void TaskSyncTimeFromGPS(void *pvParameters)
-{
-    // Wait until Serial is ready
-    vTaskDelay(pdMS_TO_TICKS(1000));
 
-    ESP_LOGI(TAG, "[GPS] Waiting for a valid date/time…");
+void TaskUpdateGPSLocationAndTime(void *pvParameters) //TODO: might wanna separate this into two tasks, one for location and one for time so it saves battery..
+{
+    ESP_LOGI(TAG, "[GPS] Waiting for a valid GPS signal...");
+
     while (true)
     {
         // read everything from GPS UART
@@ -164,47 +179,85 @@ void TaskSyncTimeFromGPS(void *pvParameters)
             gps.encode(c);
         }
 
-        // see if we have a valid date & time
-        if (!timeSynced && gps.date.isValid() && gps.time.isValid())
+        time_t current_time;
+        struct tm tm_utc;
+
+        // Get existing system time to preserve unmodified parts
+        gettimeofday((struct timeval *)&current_time, NULL);
+        localtime_r(&current_time, &tm_utc);
+
+        bool timeUpdated = false;
+
+        // Location
+        if (gps.location.isValid())
         {
-            // Extract UTC date/time from GPS
-            uint16_t year = gps.date.year();
-            uint8_t month = gps.date.month();
-            uint8_t day = gps.date.day();
-            uint8_t hour = gps.time.hour();
-            uint8_t minute = gps.time.minute();
-            uint8_t second = gps.time.second();
+            currentGPSData.latitude = gps.location.lat();
+            currentGPSData.longitude = gps.location.lng();
+            currentGPSData.valid = true;
 
-            // make a struct tm in UTC
-            struct tm tm_utc;
-            tm_utc.tm_year = year - 1900;
-            tm_utc.tm_mon = month - 1;
-            tm_utc.tm_mday = day;
-            tm_utc.tm_hour = hour;
-            tm_utc.tm_min = minute;
-            tm_utc.tm_sec = second;
-            tm_utc.tm_isdst = 0;
+            ESP_LOGI(TAG, "[GPS] Location updated: Lat=%.6f, Lon=%.6f",
+                     currentGPSData.latitude, currentGPSData.longitude);
+        }
 
-            // change it to time_t (interpreted as UTC)
-            time_t t = mktime(&tm_utc);
-            if (t != (time_t)-1)
+        // Update date if available
+        if (gps.date.isValid())
+        {
+            currentGPSData.year = gps.date.year();
+            currentGPSData.month = gps.date.month();
+            currentGPSData.day = gps.date.day();
+
+            tm_utc.tm_year = currentGPSData.year - 1900;
+            tm_utc.tm_mon = currentGPSData.month - 1;
+            tm_utc.tm_mday = currentGPSData.day;
+
+            timeUpdated = true;
+
+            ESP_LOGI(TAG, "[GPS] Date updated: %04d-%02d-%02d",
+                     currentGPSData.year, currentGPSData.month, currentGPSData.day);
+        }
+
+        // Update time if available
+        if (gps.time.isValid())
+        {
+            currentGPSData.hour = gps.time.hour();
+            currentGPSData.minute = gps.time.minute();
+            currentGPSData.second = gps.time.second();
+
+            tm_utc.tm_hour = currentGPSData.hour;
+            tm_utc.tm_min = currentGPSData.minute;
+            tm_utc.tm_sec = currentGPSData.second;
+
+            timeUpdated = true;
+
+            ESP_LOGI(TAG, "[GPS] Time updated: %02d:%02d:%02d",
+                     currentGPSData.hour, currentGPSData.minute, currentGPSData.second);
+        }
+
+        // Set RTC if either date or time was updated
+        if (timeUpdated)
+        {
+            time_t updated_time = mktime(&tm_utc);
+            if (updated_time != (time_t)-1)
             {
-                // Set the ESP32 system clock (UTC)
-                struct timeval now = {.tv_sec = t, .tv_usec = 0};
+                struct timeval now = {.tv_sec = updated_time, .tv_usec = 0};
                 settimeofday(&now, nullptr);
-                ESP_LOGI(TAG, "[GPS] System time set to UTC %04d-%02d-%02d %02d:%02d:%02d",
-                         year, month, day, hour, minute, second);
-
-                // write that UTC system time into the watch's RTC hardware
-                // (watch.hwClockWrite writes system time to the hardware RTC)
                 watch.hwClockWrite();
-                ESP_LOGI(TAG, "[GPS] Wrote time to RTC.");
 
-                timeSynced = true; // do this only once per power-on
+                ESP_LOGI(TAG, "[GPS] System and RTC updated to: %04d-%02d-%02d %02d:%02d:%02d",
+                         tm_utc.tm_year + 1900,
+                         tm_utc.tm_mon + 1,
+                         tm_utc.tm_mday,
+                         tm_utc.tm_hour,
+                         tm_utc.tm_min,
+                         tm_utc.tm_sec);
+            }
+            else
+            {
+                ESP_LOGW(TAG, "[GPS] mktime() failed; RTC not updated.");
             }
         }
 
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(1000)); // Run every second
     }
 }
 
@@ -370,7 +423,7 @@ void setup() {
     xTaskCreatePinnedToCore(TaskLoraReceiver, "TaskLoraReceiver", TASK_STACK_SIZE, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(TaskLvglUpdate, "TaskLvglUpdate", TASK_STACK_SIZE, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(TaskCheckShortButtonPressed, "TaskCheckShortButtonPressed",TASK_STACK_SIZE, NULL, 1, NULL, 0);
-    xTaskCreatePinnedToCore(TaskSyncTimeFromGPS, "TaskSyncTimeFromGPS", TASK_STACK_SIZE / 2, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskUpdateGPSLocationAndTime, "TaskUpdateGPSLocationAndTime", TASK_STACK_SIZE / 2, NULL, 3, NULL, 1);
     //xTaskCreatePinnedToCore(TaskShowRecievedFrame, "TaskShowRecievedFrame",TASK_STACK_SIZE, NULL, 1, NULL, 0);
 }
 
