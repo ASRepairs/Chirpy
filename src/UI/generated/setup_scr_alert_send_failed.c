@@ -114,4 +114,6 @@ void setup_scr_alert_send_failed(lv_ui *ui)
     //Update current screen layout.
     lv_obj_update_layout(ui->alert_send_failed);
 
+    //Init events for screen.
+    events_init_alert_send_failed(ui);
 }

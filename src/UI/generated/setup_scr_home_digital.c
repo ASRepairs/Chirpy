@@ -32,7 +32,7 @@ void setup_scr_home_digital(lv_ui *ui)
 
     //Write codes home_digital_label_week
     ui->home_digital_label_week = lv_label_create(ui->home_digital);
-    lv_label_set_text(ui->home_digital_label_week, "TUE");
+    lv_label_set_text(ui->home_digital_label_week, "WED");
     lv_label_set_long_mode(ui->home_digital_label_week, LV_LABEL_LONG_WRAP);
     lv_obj_set_pos(ui->home_digital_label_week, 99, 142);
     lv_obj_set_size(ui->home_digital_label_week, 41, 15);
@@ -55,7 +55,7 @@ void setup_scr_home_digital(lv_ui *ui)
 
     //Write codes home_digital_label_date
     ui->home_digital_label_date = lv_label_create(ui->home_digital);
-    lv_label_set_text(ui->home_digital_label_date, "05/20");
+    lv_label_set_text(ui->home_digital_label_date, "05/15");
     lv_label_set_long_mode(ui->home_digital_label_date, LV_LABEL_LONG_WRAP);
     lv_obj_set_pos(ui->home_digital_label_date, 97, 126);
     lv_obj_set_size(ui->home_digital_label_date, 45, 12);
@@ -78,7 +78,7 @@ void setup_scr_home_digital(lv_ui *ui)
 
     //Write codes home_digital_label_time
     ui->home_digital_label_time = lv_label_create(ui->home_digital);
-    lv_label_set_text(ui->home_digital_label_time, "18:30");
+    lv_label_set_text(ui->home_digital_label_time, "05:25");
     lv_label_set_long_mode(ui->home_digital_label_time, LV_LABEL_LONG_WRAP);
     lv_obj_set_pos(ui->home_digital_label_time, 55, 65);
     lv_obj_set_size(ui->home_digital_label_time, 130, 45);
@@ -129,20 +129,84 @@ void setup_scr_home_digital(lv_ui *ui)
     lv_obj_set_style_radius(ui->home_digital_img_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_clip_corner(ui->home_digital_img_2, true, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    //Write codes home_digital_img_4
-    ui->home_digital_img_4 = lv_img_create(ui->home_digital);
-    lv_obj_add_flag(ui->home_digital_img_4, LV_OBJ_FLAG_CLICKABLE);
-    lv_img_set_src(ui->home_digital_img_4, &_gear_twitter_alpha_50x50);
-    lv_img_set_pivot(ui->home_digital_img_4, 50,50);
-    lv_img_set_angle(ui->home_digital_img_4, 0);
-    lv_obj_set_pos(ui->home_digital_img_4, 6, 6);
-    lv_obj_set_size(ui->home_digital_img_4, 50, 50);
+    //Write codes home_digital_lizzard
+    ui->home_digital_lizzard = lv_img_create(ui->home_digital);
+    lv_obj_add_flag(ui->home_digital_lizzard, LV_OBJ_FLAG_CLICKABLE);
+    lv_img_set_src(ui->home_digital_lizzard, &_lizard_emoji_alpha_50x50);
+    lv_img_set_pivot(ui->home_digital_lizzard, 50,50);
+    lv_img_set_angle(ui->home_digital_lizzard, 0);
+    lv_obj_set_pos(ui->home_digital_lizzard, 2, 4);
+    lv_obj_set_size(ui->home_digital_lizzard, 50, 50);
+    lv_obj_add_flag(ui->home_digital_lizzard, LV_OBJ_FLAG_HIDDEN);
 
-    //Write style for home_digital_img_4, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_img_recolor_opa(ui->home_digital_img_4, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_img_opa(ui->home_digital_img_4, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->home_digital_img_4, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_clip_corner(ui->home_digital_img_4, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //Write style for home_digital_lizzard, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->home_digital_lizzard, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->home_digital_lizzard, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_digital_lizzard, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_digital_lizzard, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes home_digital_phoenix
+    ui->home_digital_phoenix = lv_img_create(ui->home_digital);
+    lv_obj_add_flag(ui->home_digital_phoenix, LV_OBJ_FLAG_CLICKABLE);
+    lv_img_set_src(ui->home_digital_phoenix, &_phoenix_bird_alpha_50x50);
+    lv_img_set_pivot(ui->home_digital_phoenix, 50,50);
+    lv_img_set_angle(ui->home_digital_phoenix, 0);
+    lv_obj_set_pos(ui->home_digital_phoenix, 2, 4);
+    lv_obj_set_size(ui->home_digital_phoenix, 50, 50);
+    lv_obj_add_flag(ui->home_digital_phoenix, LV_OBJ_FLAG_HIDDEN);
+
+    //Write style for home_digital_phoenix, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->home_digital_phoenix, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->home_digital_phoenix, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_digital_phoenix, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_digital_phoenix, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes home_digital_dog
+    ui->home_digital_dog = lv_img_create(ui->home_digital);
+    lv_obj_add_flag(ui->home_digital_dog, LV_OBJ_FLAG_CLICKABLE);
+    lv_img_set_src(ui->home_digital_dog, &_dog_emoji_alpha_50x50);
+    lv_img_set_pivot(ui->home_digital_dog, 50,50);
+    lv_img_set_angle(ui->home_digital_dog, 0);
+    lv_obj_set_pos(ui->home_digital_dog, 2, 4);
+    lv_obj_set_size(ui->home_digital_dog, 50, 50);
+    lv_obj_add_flag(ui->home_digital_dog, LV_OBJ_FLAG_HIDDEN);
+
+    //Write style for home_digital_dog, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->home_digital_dog, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->home_digital_dog, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_digital_dog, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_digital_dog, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes home_digital_cat
+    ui->home_digital_cat = lv_img_create(ui->home_digital);
+    lv_obj_add_flag(ui->home_digital_cat, LV_OBJ_FLAG_CLICKABLE);
+    lv_img_set_src(ui->home_digital_cat, &_cat_emoji_alpha_50x50);
+    lv_img_set_pivot(ui->home_digital_cat, 50,50);
+    lv_img_set_angle(ui->home_digital_cat, 0);
+    lv_obj_set_pos(ui->home_digital_cat, 2, 4);
+    lv_obj_set_size(ui->home_digital_cat, 50, 50);
+    lv_obj_add_flag(ui->home_digital_cat, LV_OBJ_FLAG_HIDDEN);
+
+    //Write style for home_digital_cat, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->home_digital_cat, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->home_digital_cat, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_digital_cat, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_digital_cat, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes home_digital_img_7
+    ui->home_digital_img_7 = lv_img_create(ui->home_digital);
+    lv_obj_add_flag(ui->home_digital_img_7, LV_OBJ_FLAG_CLICKABLE);
+    lv_img_set_src(ui->home_digital_img_7, &_three_dot_icon13214214214_alpha_49x17);
+    lv_img_set_pivot(ui->home_digital_img_7, 50,50);
+    lv_img_set_angle(ui->home_digital_img_7, 0);
+    lv_obj_set_pos(ui->home_digital_img_7, 190, 144);
+    lv_obj_set_size(ui->home_digital_img_7, 49, 17);
+
+    //Write style for home_digital_img_7, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_img_recolor_opa(ui->home_digital_img_7, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->home_digital_img_7, 100, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_digital_img_7, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_digital_img_7, true, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //The custom code of home_digital.
 

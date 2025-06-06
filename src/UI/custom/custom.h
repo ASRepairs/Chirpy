@@ -11,6 +11,8 @@ extern "C" {
 
 void custom_init(lv_ui *ui);
 
+void show_home_lizzard_emoji(void);
+
 #ifdef __cplusplus
 }
 #endif

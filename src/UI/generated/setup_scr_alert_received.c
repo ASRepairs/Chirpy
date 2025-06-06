@@ -174,4 +174,6 @@ void setup_scr_alert_received(lv_ui *ui)
     //Update current screen layout.
     lv_obj_update_layout(ui->alert_received);
 
+    //Init events for screen.
+    events_init_alert_received(ui);
 }
