@@ -8,9 +8,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+// declare as C-compatible if compiled as C++
 
-int common_sendMessage(int msg_id); // declare as C-compatible if compiled as C++
-void common_displayMessageUI(int msg_id);
+int common_sendMessage(int msg_id);
+void common_displayMessageUI(int msg_id, int usr_id);
 
 enum common_emoji{
     ALERT = 0,

@@ -89,9 +89,10 @@ void displayReceivedMessage() {
         ESP_LOGI(TAG, "[SX1262] Received message: %s", receivedMsg.c_str());
         int first_colon = receivedMsg.indexOf(':');
         int second_colon = receivedMsg.indexOf(':', first_colon + 1);
-        int semicolon = receivedMsg.indexOf(';');
+        int third_colon = receivedMsg.indexOf(':', second_colon + 1);
+        int forth_colon = receivedMsg.indexOf(':', third_colon + 1);
 
-        if (first_colon == -1 || second_colon == -1 || semicolon == -1 || semicolon <= second_colon)
+        if (first_colon == -1 || second_colon == -1 || forth_colon == -1 || forth_colon <= second_colon)
         {
             ESP_LOGW(TAG, "[SX1262] Invalid message format");
             return;
@@ -99,13 +100,14 @@ void displayReceivedMessage() {
 
         String sender = receivedMsg.substring(0, first_colon);
         String msg_id = receivedMsg.substring(first_colon + 1, second_colon);
-        String group_str = receivedMsg.substring(second_colon + 1, semicolon);
-        String payload_str = receivedMsg.substring(semicolon + 1);
+        String group_str = receivedMsg.substring(second_colon + 1, third_colon);
+        String usr_str = receivedMsg.substring(third_colon + 1, forth_colon);
+        String payload_str = receivedMsg.substring(forth_colon + 1);
 
         // skip if we were the sender
         if (sender == node_id)
         {
-            ESP_LOGI(TAG, "[SX1262] Skipping own message: %s", msg_id.c_str());
+            ESP_LOGI(TAG, "[SX1262] Skipping own message ID: %s", msg_id.c_str());
             return;
         }
 
@@ -122,11 +124,12 @@ void displayReceivedMessage() {
 
         // processing of the message happens here
         int gr_id = atoi(group_str.c_str());
+        int usr_id = atoi(usr_str.c_str());
         int msg_payload = atoi(payload_str.c_str());
 
         if ((gr_id == common_current_group) || (gr_id == 0) || (common_current_group == 0)) {
             ESP_LOGI(TAG, "[SX1262] Displaying message for group %d", gr_id);
-            common_displayMessageUI(msg_payload);
+            common_displayMessageUI(msg_payload, usr_id);
             watch.setWaveform(0, 15);  // play effect
             watch.setWaveform(1, 0);  // end waveform
             watch.setWaveform(3, 15);  // play effect
@@ -283,11 +286,11 @@ int common_sendMessage(int msg_id) { // message structure is: "<node_id>:<msg_ui
     String msg_str;
     String msg_uid = String(millis()); // could also use timestamp
     if(msg_id == 0) {
-        msg_str = node_id + ":" + msg_uid + ":0;" + String(msg_id);
+        msg_str = node_id + ":" + msg_uid + ":0:" + String(common_current_user) + ":" + String(msg_id);
     }
     else
     {
-        msg_str = node_id + ":" + msg_uid + ":" + String(common_current_group) + ";" + String(msg_id);
+        msg_str = node_id + ":" + msg_uid + ":" + String(common_current_group) + ":" + String(common_current_user) + ":" + String(msg_id);
     }
     ESP_LOGI(TAG, "Sending msg: %s", msg_str.c_str());
     int status = sendLoraMessage(msg_str);
@@ -295,7 +298,10 @@ int common_sendMessage(int msg_id) { // message structure is: "<node_id>:<msg_ui
 }
 
 // TODO: Make it nicer
-void common_displayMessageUI(int msg_id) {
+void common_displayMessageUI(int msg_id, int usr_id) {
+    ESP_LOGI(TAG, "usr_id: %d", usr_id);
+    ESP_LOGI(TAG, "msg_id: %d", msg_id);
+
     switch (msg_id)
     {
     case ALERT:
@@ -314,7 +320,6 @@ void common_displayMessageUI(int msg_id) {
         ui_load_scr_animation(&guider_ui, &guider_ui.message_received_party, guider_ui.message_received_party_del, &guider_ui.message_received_party_del, setup_scr_message_received_party, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
         break;
     default:
-        ESP_LOGI(TAG, "msg_id: %d", msg_id);
         break;
     }
     return;
@@ -324,6 +329,7 @@ void common_displayMessageUI(int msg_id) {
 // ───────────────────────────── Setup ─────────────────────────────
 void setup() {
     common_current_group = 0; // todo: move that variable to flash memory
+    common_current_user = 0; // todo: move that variable to flash memory
     Serial.begin(115200);
     Serial.setDebugOutput(true); 
     esp_log_level_set("*", ESP_LOG_VERBOSE);

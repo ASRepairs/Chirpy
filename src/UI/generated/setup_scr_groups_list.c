@@ -13,6 +13,7 @@
 #include "events_init.h"
 #include "widgets_init.h"
 #include "custom.h"
+#include "../../common.h" // Added by Kacper (KSCB)
 
 
 
@@ -110,7 +111,11 @@ void setup_scr_groups_list(lv_ui *ui)
     //Write style for groups_list_label_group_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->groups_list_label_group_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->groups_list_label_group_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->groups_list_label_group_1, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    if(common_current_group == 1) {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_1, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    } else {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_1, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    }
     lv_obj_set_style_text_font(ui->groups_list_label_group_1, &lv_font_montserratMedium_19, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->groups_list_label_group_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->groups_list_label_group_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -184,7 +189,11 @@ void setup_scr_groups_list(lv_ui *ui)
     //Write style for groups_list_label_group_2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->groups_list_label_group_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->groups_list_label_group_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->groups_list_label_group_2, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    if(common_current_group == 2) {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_2, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    } else {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_2, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    }
     lv_obj_set_style_text_font(ui->groups_list_label_group_2, &lv_font_montserratMedium_19, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->groups_list_label_group_2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->groups_list_label_group_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -258,7 +267,11 @@ void setup_scr_groups_list(lv_ui *ui)
     //Write style for groups_list_label_group_3, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->groups_list_label_group_3, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->groups_list_label_group_3, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->groups_list_label_group_3, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    if(common_current_group == 3) {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_3, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    } else {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_3, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    }
     lv_obj_set_style_text_font(ui->groups_list_label_group_3, &lv_font_montserratMedium_19, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->groups_list_label_group_3, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->groups_list_label_group_3, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -332,7 +345,11 @@ void setup_scr_groups_list(lv_ui *ui)
     //Write style for groups_list_label_group_4, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->groups_list_label_group_4, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->groups_list_label_group_4, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->groups_list_label_group_4, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    if(common_current_group == 4) {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_4, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    } else {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_4, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    }
     lv_obj_set_style_text_font(ui->groups_list_label_group_4, &lv_font_montserratMedium_19, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->groups_list_label_group_4, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->groups_list_label_group_4, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -406,7 +423,11 @@ void setup_scr_groups_list(lv_ui *ui)
     //Write style for groups_list_label_group_6, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->groups_list_label_group_6, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->groups_list_label_group_6, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->groups_list_label_group_6, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    if(common_current_group == 6) {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_6, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    } else {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_6, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    }
     lv_obj_set_style_text_font(ui->groups_list_label_group_6, &lv_font_montserratMedium_19, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->groups_list_label_group_6, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->groups_list_label_group_6, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -480,7 +501,11 @@ void setup_scr_groups_list(lv_ui *ui)
     //Write style for groups_list_label_group_8, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->groups_list_label_group_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->groups_list_label_group_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->groups_list_label_group_8, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    if(common_current_group == 8) {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_8, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    } else {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_8, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    }
     lv_obj_set_style_text_font(ui->groups_list_label_group_8, &lv_font_montserratMedium_19, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->groups_list_label_group_8, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->groups_list_label_group_8, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -554,7 +579,11 @@ void setup_scr_groups_list(lv_ui *ui)
     //Write style for groups_list_label_group_7, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->groups_list_label_group_7, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->groups_list_label_group_7, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->groups_list_label_group_7, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    if(common_current_group == 7) {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_7, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    } else {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_7, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    }
     lv_obj_set_style_text_font(ui->groups_list_label_group_7, &lv_font_montserratMedium_19, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->groups_list_label_group_7, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->groups_list_label_group_7, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -628,7 +657,11 @@ void setup_scr_groups_list(lv_ui *ui)
     //Write style for groups_list_label_group_5, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->groups_list_label_group_5, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->groups_list_label_group_5, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->groups_list_label_group_5, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    if(common_current_group == 5) {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_5, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    } else {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_5, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    }
     lv_obj_set_style_text_font(ui->groups_list_label_group_5, &lv_font_montserratMedium_19, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->groups_list_label_group_5, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->groups_list_label_group_5, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -702,7 +735,11 @@ void setup_scr_groups_list(lv_ui *ui)
     //Write style for groups_list_label_group_10, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->groups_list_label_group_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->groups_list_label_group_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->groups_list_label_group_10, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    if(common_current_group == 10) {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_10, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    } else {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_10, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    }
     lv_obj_set_style_text_font(ui->groups_list_label_group_10, &lv_font_montserratMedium_19, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->groups_list_label_group_10, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->groups_list_label_group_10, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -776,7 +813,11 @@ void setup_scr_groups_list(lv_ui *ui)
     //Write style for groups_list_label_group_9, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->groups_list_label_group_9, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->groups_list_label_group_9, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->groups_list_label_group_9, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    if(common_current_group == 9) {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_9, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    } else {
+        lv_obj_set_style_text_color(ui->groups_list_label_group_9, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    }
     lv_obj_set_style_text_font(ui->groups_list_label_group_9, &lv_font_montserratMedium_19, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->groups_list_label_group_9, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->groups_list_label_group_9, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
