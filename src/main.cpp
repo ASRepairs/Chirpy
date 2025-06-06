@@ -203,86 +203,41 @@ void TaskCheckShortButtonPressed(void* pvParameters){
 
 // ─────────── Common functions definition (common.h) ──────────────
 
-// TODO: Make it nicer
 void common_change_group(int gr_id){
+    lv_obj_t* group_labels[] = {
+        NULL, // Index 0 unused to match group numbers starting from 1
+        guider_ui.groups_list_label_group_1,
+        guider_ui.groups_list_label_group_2,
+        guider_ui.groups_list_label_group_3,
+        guider_ui.groups_list_label_group_4,
+        guider_ui.groups_list_label_group_5,
+        guider_ui.groups_list_label_group_6,
+        guider_ui.groups_list_label_group_7,
+        guider_ui.groups_list_label_group_8,
+        guider_ui.groups_list_label_group_9,
+        guider_ui.groups_list_label_group_10
+    };
     ESP_LOGI(TAG, "Group id changed from %d to %d", common_current_group, gr_id);
     if(common_current_group != 0){
-        switch (common_current_group)
-        {
-        case 1:
-            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_1, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-            break;
-        case 2:
-            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_2, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-            break;
-        case 3:
-            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_3, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-            break;
-        case 4:
-            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_4, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-            break;
-        case 5:
-            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_5, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-            break;
-        case 6:
-            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_6, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-            break;
-        case 7:
-            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_7, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-            break;
-        case 8:
-            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_8, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-            break;
-        case 9:
-            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_9, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-            break;
-        case 10:
-            lv_obj_set_style_text_color(guider_ui.groups_list_label_group_10, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-            break;
-        default:
-            break;
+        if (common_current_group >= 1 && common_current_group <= 10) {
+            lv_obj_set_style_text_color(
+                group_labels[common_current_group],
+                lv_color_hex(0xffffff),
+                LV_PART_MAIN | LV_STATE_DEFAULT
+            );
         }
     }
-    switch (gr_id)
-    {
-    case 1:
-        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_1, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-        break;
-    case 2:
-        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_2, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-        break;
-    case 3:
-        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_3, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-        break;
-    case 4:
-        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_4, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-        break;
-    case 5:
-        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_5, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-        break;
-    case 6:
-        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_6, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-        break;
-    case 7:
-        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_7, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-        break;
-    case 8:
-        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_8, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-        break;
-    case 9:
-        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_9, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-        break;
-    case 10:
-        lv_obj_set_style_text_color(guider_ui.groups_list_label_group_10, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-        break;
-    default:
-        break;
+    if (gr_id >= 1 && gr_id <= 10) {
+        lv_obj_set_style_text_color(
+            group_labels[gr_id],
+            lv_color_hex(0xff0000),
+            LV_PART_MAIN | LV_STATE_DEFAULT
+        );
     }
-    
     common_current_group = gr_id;
 }
 
-int common_sendMessage(int msg_id) { // message structure is: "<node_id>:<msg_uid>:<group_id>;<payload "msg_id">"
+int common_sendMessage(int msg_id) { // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id>:<payload "msg_id">"
     String msg_str;
     String msg_uid = String(millis()); // could also use timestamp
     if(msg_id == 0) {
@@ -297,32 +252,37 @@ int common_sendMessage(int msg_id) { // message structure is: "<node_id>:<msg_ui
     return status;
 }
 
-// TODO: Make it nicer
+typedef struct {
+    int msg_id;
+    lv_obj_t **screen;
+    bool *del_cb_ptr;  // store pointer to the callback pointer
+    void (*setup_func)(lv_ui *);
+} MessageUIConfig;
+
+MessageUIConfig message_ui_map[] = {
+    { ALERT, &guider_ui.alert_received, &guider_ui.alert_received_del, setup_scr_alert_received },
+    { THUMB_UP, &guider_ui.message_received_like, &guider_ui.message_received_like_del, setup_scr_message_received_like },
+    { WAVE, &guider_ui.message_received_wave, &guider_ui.message_received_wave_del, setup_scr_message_received_wave },
+    { HEART, &guider_ui.message_received_heart, &guider_ui.message_received_heart_del, setup_scr_message_received_heart },
+    { PARTY, &guider_ui.message_received_party, &guider_ui.message_received_party_del, setup_scr_message_received_party },
+};
+
 void common_displayMessageUI(int msg_id, int usr_id) {
     ESP_LOGI(TAG, "usr_id: %d", usr_id);
     ESP_LOGI(TAG, "msg_id: %d", msg_id);
 
-    switch (msg_id)
-    {
-    case ALERT:
-        ui_load_scr_animation(&guider_ui, &guider_ui.alert_received, guider_ui.alert_received_del, &guider_ui.alert_received_del, setup_scr_alert_received, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
-        break;
-    case THUMB_UP:
-        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_like, guider_ui.message_received_like_del, &guider_ui.message_received_like_del, setup_scr_message_received_like, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
-        break;
-    case WAVE:
-        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_wave, guider_ui.message_received_wave_del, &guider_ui.message_received_wave_del, setup_scr_message_received_wave, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
-        break;
-    case HEART:
-        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_heart, guider_ui.message_received_heart_del, &guider_ui.message_received_heart_del, setup_scr_message_received_heart, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
-        break;
-    case PARTY:
-        ui_load_scr_animation(&guider_ui, &guider_ui.message_received_party, guider_ui.message_received_party_del, &guider_ui.message_received_party_del, setup_scr_message_received_party, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
-        break;
-    default:
-        break;
-    }
-    return;
+    ui_load_scr_animation(
+        &guider_ui,
+        message_ui_map[msg_id].screen,
+        *message_ui_map[msg_id].del_cb_ptr, // dereference now
+        message_ui_map[msg_id].del_cb_ptr,
+        message_ui_map[msg_id].setup_func,
+        LV_SCR_LOAD_ANIM_OVER_BOTTOM,
+        200,
+        200,
+        false,
+        true
+    );
 }
 
 
