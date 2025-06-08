@@ -6,6 +6,12 @@
 #include "common.h" // Added by Kacper (KSCB)
 #include <time.h>
 #include <deque>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
+#include "bleFuncs.h"
+#include "structs.h"
 
 #define LORA_FREQUENCY        868.0f
 #define TASK_STACK_SIZE       4096
@@ -16,6 +22,8 @@
 
 static const char* TAG = "MAIN";
 // global vars
+BLEServer *pServer = nullptr;
+
 SX1262 radio = newModule();
 lv_obj_t* label1 = nullptr;
 const char *TIMEZONE = "CET-1CEST,M3.5.0/02:00:00,M10.5.0/03:00:00"; // central Europe with daylight saving time
@@ -24,20 +32,9 @@ volatile bool receivedFlag = false;
 volatile bool isTransmitting = false;
 String node_id;
 std::deque<String> recentMessages;
-struct GPSData
-{
-    float latitude;
-    float longitude;
-    uint16_t year;
-    uint8_t month;
-    uint8_t day;
-    uint8_t hour;
-    uint8_t minute;
-    uint8_t second;
-    bool valid;
-};
 
-volatile GPSData currentGPSData;
+
+GPSData currentGPSData;
 
 bool isPmuIRQ = false;
 // ───────────────────────────── ISR ─────────────────────────────
@@ -237,7 +234,7 @@ void common_change_group(int gr_id){
     common_current_group = gr_id;
 }
 
-int common_sendMessage(int msg_id) { // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id>:<payload "msg_id">"
+int common_sendMessage(int msg_id) { // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id (emoji)>:<payload "msg_id">"
     String msg_str;
     String msg_uid = String(millis()); // could also use timestamp
     if(msg_id == 0) {
@@ -327,7 +324,8 @@ void setup() {
         while (true);
     }
 
-    //UI stuff replace with actual ui stuff
+    startBLETask(node_id, &currentGPSData);    // Initialize BLE
+    // UI stuff replace with actual ui stuff
     setup_ui(&guider_ui); // Initialize the UI
     custom_init(&guider_ui);
     //FreeRTOS tasks
