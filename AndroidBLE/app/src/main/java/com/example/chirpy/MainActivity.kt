@@ -1,5 +1,4 @@
-@file:SuppressLint("InlinedApi") // allows using BLUETOOTH_SCAN/CONNECT on minSdk<31
-
+@file:SuppressLint("InlinedApi")   // lets us reference SCAN / CONNECT on <31
 package com.example.chirpy
 
 import android.Manifest
@@ -9,6 +8,7 @@ import android.bluetooth.le.*
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.os.ParcelUuid
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -30,23 +30,27 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         private const val SERVICE_UUID = "0000abcd-0000-1000-8000-00805f9b34fb"
-        private const val CHAR_UUID = "0000dcba-0000-1000-8000-00805f9b34fb"
+        private const val CHAR_UUID    = "0000dcba-0000-1000-8000-00805f9b34fb"
+        private const val NOTIFY_UUID = "0000dcb1-0000-1000-8000-00805f9b34fb"
+        private val CCC_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
     }
 
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private var bluetoothLeScanner: BluetoothLeScanner? = null
     private var bluetoothGatt: BluetoothGatt? = null
     private var writeCharacteristic: BluetoothGattCharacteristic? = null
+    private var notifyCharacteristic: BluetoothGattCharacteristic? = null   // NEW
 
-    private var devices by mutableStateOf(listOf<BluetoothDevice>())
-    private var showDialog by mutableStateOf(false)
-    private var isConnected by mutableStateOf(false)
-    private var statusText by mutableStateOf("Idle")
+    private var devices       by mutableStateOf(listOf<BluetoothDevice>())
+    private var showDialog    by mutableStateOf(false)
+    private var isConnected   by mutableStateOf(false)
+    private var statusText    by mutableStateOf("Idle")
+
+    /* ──────────────────────────── SET-UP UI & PERMS ─────────────────────────── */
 
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { perms ->
-            if (perms.values.all { it }) initBle()
-            else statusText = "Permissions denied"
+            if (perms.values.all { it }) initBle() else statusText = "Permissions denied"
         }
 
     @SuppressLint("MissingPermission")
@@ -64,34 +68,30 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    Modifier.fillMaxSize().padding(24.dp),
+                    Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                    Alignment.CenterHorizontally
                 ) {
-                    Text("BLE GPS Sender", style = MaterialTheme.typography.headlineSmall)
+                    Text("Chirpy Client", style = MaterialTheme.typography.headlineSmall)
 
                     Button(
                         onClick = {
                             statusText = "Scanning…"
-                            devices = listOf() // reset
+                            devices = emptyList()
                             startScan()
                         },
                         enabled = !isConnected
-                    ) {
-                        Text("Connect to Watch")
-                    }
+                    ) { Text("Connect to Watch") }
 
                     Button(
                         onClick = {
                             statusText = "Sending GPS…"
-                            sendLocation { ok -> statusText = if (ok) "Sent!" else "Failed" }
+                            sendGps { ok ->
+                                statusText = if (ok) "Sent!" else "Failed"
+                            }
                         },
                         enabled = isConnected
-                    ) {
-                        Text("Send GPS Coords")
-                    }
+                    ) { Text("Send GPS Coords") }
 
                     Text(statusText)
                 }
@@ -123,10 +123,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /* ──────────────────────────── BLE BASIC HELPERS ─────────────────────────── */
+
     private fun initBle() {
-        val manager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothAdapter = manager.adapter
-        bluetoothLeScanner = bluetoothAdapter.bluetoothLeScanner
+        val mgr = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothAdapter    = mgr.adapter
+        bluetoothLeScanner  = bluetoothAdapter.bluetoothLeScanner
     }
 
     private fun startScan() {
@@ -147,139 +149,139 @@ class MainActivity : ComponentActivity() {
 
     private val scanCallback = object : ScanCallback() {
         @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
-        override fun onScanResult(callbackType: Int, result: ScanResult) {
-            // Explicit runtime check for BLUETOOTH_SCAN permission
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.BLUETOOTH_SCAN)
-                != PackageManager.PERMISSION_GRANTED
-            ) {
-                return
-            }
-
-            val device = result.device
-            val name = device.name ?: return
-            if (!name.startsWith("Chirpy_")) return
-
+        override fun onScanResult(type: Int, result: ScanResult) {
+            val dev = result.device
+            val nm  = dev.name ?: return
+            if (!nm.startsWith("Chirpy_")) return
             bluetoothLeScanner?.stopScan(this)
-
             runOnUiThread {
-                devices = listOf(device)
+                devices    = listOf(dev)
                 showDialog = true
             }
         }
-
     }
+
+    /* ─────────────────────────── CONNECT & DISCOVER ─────────────────────────── */
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     private fun connectToDevice(device: BluetoothDevice) {
-        // Runtime permission check for BLUETOOTH_SCAN
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
-
         bluetoothLeScanner?.stopScan(scanCallback)
-
-        // Runtime permission check for BLUETOOTH_CONNECT
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
-
-        device.connectGatt(this, false, gattCallback)
         statusText = "Connecting to ${device.name ?: "device"}…"
+        device.connectGatt(this, false, gattCallback)
     }
-    private val gattCallback = object : BluetoothGattCallback() {
-        override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                bluetoothGatt = g
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                    ContextCompat.checkSelfPermission(
-                        this@MainActivity,
-                        Manifest.permission.BLUETOOTH_CONNECT
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    g.discoverServices()
-                }
+    private val gattCallback = object : BluetoothGattCallback() {
+
+        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+                bluetoothGatt = gatt
+                gatt.discoverServices()
 
                 runOnUiThread {
                     isConnected = true
-                    statusText = "Connected!"
+                    statusText  = "Connected!"
                 }
+                Handler(mainLooper).postDelayed({
+                    sendTime { ok ->
+                        runOnUiThread {
+                            statusText = if (ok) "Time sent ✅" else "Time send ❌"
+                            Handler(mainLooper).postDelayed({
+                                statusText = "Connected!"
+                            }, 1500)
+                        }
+                    }
+                }, 1000)
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                bluetoothGatt = null
+                bluetoothGatt       = null
                 writeCharacteristic = null
-
+                notifyCharacteristic = null
                 runOnUiThread {
                     isConnected = false
-                    statusText = "Disconnected"
+                    statusText  = "Disconnected"
                 }
             }
         }
 
-        override fun onServicesDiscovered(g: BluetoothGatt, status: Int) {
-            val svc = g.getService(UUID.fromString(SERVICE_UUID))
-            writeCharacteristic = svc?.getCharacteristic(UUID.fromString(CHAR_UUID))
+        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+            val svc  = gatt.getService(UUID.fromString(SERVICE_UUID))
+            writeCharacteristic  = svc?.getCharacteristic(UUID.fromString(CHAR_UUID))
+            notifyCharacteristic = svc?.getCharacteristic(UUID.fromString(NOTIFY_UUID))   // NEW
+
+            // ── enable notifications if characteristic found
+            notifyCharacteristic?.let { ch ->
+                gatt.setCharacteristicNotification(ch, true)
+                val ccc = ch.getDescriptor(CCC_UUID)
+                if (ccc != null) {
+                    ccc.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                    gatt.writeDescriptor(ccc)
+                } else {
+                    runOnUiThread { statusText = "Notify descriptor missing" }
+                }
+
+            }
 
             runOnUiThread {
-                statusText = if (writeCharacteristic != null) "Ready to send" else "Characteristic not found"
+                statusText =
+                    if (writeCharacteristic != null) "Ready" else "Characteristic missing"
+            }
+        }
+
+        /* ──────────────  HANDLE INCOMING NOTIFICATIONS  ────────────── */
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic
+        ) {
+            if (characteristic.uuid.toString().equals(NOTIFY_UUID, ignoreCase = true)) {
+                val cmd = characteristic.getStringValue(0)
+                when (cmd) {
+                    "REQ:GPS" -> sendGps  { runOnUiThread { statusText = if (it) "Sent GPS ✅" else "Send GPS ❌" } }
+                    "REQ:TIME" -> sendTime { runOnUiThread { statusText = if (it) "Sent Time ✅" else "Send Time ❌" } }
+                    else -> { /* ignore */ }
+                }
+
             }
         }
     }
 
-    private fun sendLocation(onDone: (Boolean) -> Unit) {
-        val char = writeCharacteristic
+    /* ─────────────────────────── WRITE (GPS + DATE) ─────────────────────────── */
+
+    private fun sendGps(onDone: (Boolean) -> Unit) {
+        val ch = writeCharacteristic
         val gatt = bluetoothGatt
-        if (char == null || gatt == null) {
-            onDone(false)
-            return
-        }
+        if (ch == null || gatt == null) { onDone(false); return }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
-        ) {
-            onDone(false)
-            return
-        }
+        ) { onDone(false); return }
 
         val fused = LocationServices.getFusedLocationProviderClient(this)
         fused.lastLocation
             .addOnSuccessListener { loc ->
-                if (loc == null) {
-                    onDone(false)
-                    return@addOnSuccessListener
-                }
+                if (loc == null) { onDone(false); return@addOnSuccessListener }
 
-                val now = Calendar.getInstance()
-                val payload = buildString {
-                    append(loc.latitude)
-                    append(",")
-                    append(loc.longitude)
-                    append(",")
-                    append(now.get(Calendar.YEAR))
-                    append(",")
-                    append(now.get(Calendar.MONTH) + 1) // Months are 0-based
-                    append(",")
-                    append(now.get(Calendar.DAY_OF_MONTH))
-                    append(",")
-                    append(now.get(Calendar.HOUR_OF_DAY))
-                    append(",")
-                    append(now.get(Calendar.MINUTE))
-                    append(",")
-                    append(now.get(Calendar.SECOND))
-                }
+                val payload = "${loc.latitude},${loc.longitude}"
+                ch.setValue(payload.toByteArray(StandardCharsets.UTF_8))
+                onDone(gatt.writeCharacteristic(ch))
+            }
+            .addOnFailureListener { onDone(false) }
+    }
 
-                char.setValue(payload.toByteArray(StandardCharsets.UTF_8))
-                val success = gatt.writeCharacteristic(char)
-                onDone(success)
-            }
-            .addOnFailureListener {
-                onDone(false)
-            }
+    private fun sendTime(onDone: (Boolean) -> Unit) {
+        val ch = writeCharacteristic
+        val gatt = bluetoothGatt
+        if (ch == null || gatt == null) { onDone(false); return }
+
+        val now = Calendar.getInstance()
+        val payload = buildString {
+            append(now.get(Calendar.YEAR)); append(',')
+            append(now.get(Calendar.MONTH) + 1); append(',')
+            append(now.get(Calendar.DAY_OF_MONTH)); append(',')
+            append(now.get(Calendar.HOUR_OF_DAY)); append(',')
+            append(now.get(Calendar.MINUTE));      append(',')
+            append(now.get(Calendar.SECOND))
+        }
+
+        ch.setValue(payload.toByteArray(StandardCharsets.UTF_8))
+        onDone(gatt.writeCharacteristic(ch))
     }
 }

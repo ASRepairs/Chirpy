@@ -26,8 +26,6 @@ BLEServer *pServer = nullptr;
 
 SX1262 radio = newModule();
 lv_obj_t* label1 = nullptr;
-const char *TIMEZONE = "CET-1CEST,M3.5.0/02:00:00,M10.5.0/03:00:00"; // central Europe with daylight saving time
-volatile bool timeSynced = false;
 volatile bool receivedFlag = false;
 volatile bool isTransmitting = false;
 String node_id;
@@ -290,8 +288,6 @@ void setup() {
     Serial.begin(115200);
     Serial.setDebugOutput(true); 
     esp_log_level_set("*", ESP_LOG_VERBOSE);
-    setenv("TZ", TIMEZONE, 1);
-    tzset();
     watch.begin();
     beginLvglHelper();
     watch.attachPMU([]() {

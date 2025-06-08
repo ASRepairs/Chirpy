@@ -2,147 +2,210 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
-#include <LilyGoLib.h>
 #include <esp_log.h>
+#include <esp_timer.h>
 
-#define SERVICE_UUID "0000abcd-0000-1000-8000-00805f9b34fb"
-#define CHAR_UUID "0000dcba-0000-1000-8000-00805f9b34fb"
+/* ─────────────  UUIDs  ───────────── */
+constexpr char SERVICE_UUID[] = "0000abcd-0000-1000-8000-00805f9b34fb";
+constexpr char CHAR_RX_UUID[] = "0000dcba-0000-1000-8000-00805f9b34fb"; // Android ➜ ESP
+constexpr char CHAR_TX_UUID[] = "0000dcb1-0000-1000-8000-00805f9b34fb"; // ESP ➜ Android
 
-
-#define BLELOG // Uncomment to enable BLE logging
+/* ─────────────  Compile–time logging switch  ───────────── */
+#define BLELOG
 #ifdef BLELOG
-static const char *TAG = "BLE_TASK";
+static const char *TAG = "BLE";
 #endif
 
-// BLE state
-static BLEServer *pServer = nullptr;
-static BLECharacteristic *pCharacteristic = nullptr;
-static BLEAdvertising *pAdvertising = nullptr;
-static volatile bool isConnected = false;
-static volatile bool wasConnected = false;
-static GPSData *gpsDataPtr = nullptr;
+/* ─────────────  Globals kept in .bss / .data  ───────────── */
+static BLECharacteristic *rxChar = nullptr;
+static BLECharacteristic *txChar = nullptr;
+static BLEAdvertising *adv = nullptr;
+static BLEServer *srv = nullptr;
+static GPSData *extGpsData = nullptr;
+static esp_timer_handle_t gpsTimer = nullptr;
+static volatile bool gConnected = false;
 
-// ───────────────────────────── CALLBACKS ─────────────────────────────
-class MyServerCallbacks : public BLEServerCallbacks
+/* ─────────────  Small helpers – no heap, no std::string  ───────────── */
+static inline void sendReqTime()
+{
+    static constexpr char msg[] = "REQ:TIME";
+    if (gConnected && txChar)
+    {
+        txChar->setValue((uint8_t *)msg, sizeof(msg) - 1);
+        txChar->notify();
+    }
+}
+
+static void sendReqGps()
+{
+    static constexpr char msg[] = "REQ:GPS";
+    if (gConnected && txChar)
+    {
+        txChar->setValue((uint8_t *)msg, sizeof(msg) - 1);
+        txChar->notify();
+    }
+}
+
+/* ─────────────  ESP-timer callback (runs in its own tiny task)  ───────────── */
+static void gpsTimerCb(void *)
+{
+    sendReqGps();
+#ifdef BLELOG
+    ESP_LOGI(TAG, "TX → REQ:GPS");
+#endif
+}
+
+/* ─────────────  BLE Callbacks  ───────────── */
+class RxCallback : public BLECharacteristicCallbacks
+{
+    void onWrite(BLECharacteristic *c) override
+    {
+        const std::string &v = c->getValue();
+        if (!extGpsData)
+            return; // safety
+
+        /* Fast comma count to decide what we received */
+        uint8_t comma = 0;
+        for (char ch : v)
+            if (ch == ',')
+                ++comma;
+
+        /* ─────  CASE 1: GPS only  (lat,lon)  ───── */
+        if (comma == 1)
+        {
+            float lat, lon;
+            if (sscanf(v.c_str(), "%f,%f", &lat, &lon) == 2)
+            {
+                extGpsData->latitude = lat;
+                extGpsData->longitude = lon;
+                /* leave date/time untouched */
+#ifdef BLELOG
+                ESP_LOGI(TAG, "RX ← GPS  %.5f,%.5f", lat, lon);
+#endif
+            }
+            else
+#ifdef BLELOG
+                ESP_LOGW(TAG, "Bad GPS string: %s", v.c_str());
+#endif
+        }
+
+        /* ─────  CASE 2: Time only (Y,M,D,h,m,s) ───── */
+        else if (comma == 5)
+        {
+            int Y, M, D, h, m, s;
+            if (sscanf(v.c_str(), "%d,%d,%d,%d,%d,%d",
+                       &Y, &M, &D, &h, &m, &s) == 6)
+            {
+#ifdef BLELOG
+                ESP_LOGI(TAG, "RX ← TIME %04d-%02d-%02d %02d:%02d:%02d",
+                         Y, M, D, h, m, s);
+#endif
+                struct tm t;
+                t.tm_year = Y - 1900;
+                t.tm_mon = M - 1;
+                t.tm_mday = D;
+                t.tm_hour = h;
+                t.tm_min = m;
+                t.tm_sec = s;
+
+                // set system time first
+                time_t tt = mktime(&t);
+                struct timeval now = {.tv_sec = tt, .tv_usec = 0};
+                settimeofday(&now, nullptr);
+                watch.hwClockWrite();
+            }
+            else
+#ifdef BLELOG
+                ESP_LOGW(TAG, "Bad TIME string: %s", v.c_str());
+#endif
+        }
+
+        /* ─────  Anything else: ignore  ───── */
+#ifdef BLELOG
+        else
+            ESP_LOGW(TAG, "Unexpected payload (commas=%u): %s",
+                     comma, v.c_str());
+#endif
+    }
+};
+
+class SrvCb : public BLEServerCallbacks
 {
     void onConnect(BLEServer *) override
     {
-        isConnected = true;
+        gConnected = true;
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        sendReqTime();                                           // once
+        esp_timer_start_periodic(gpsTimer, 5ULL * 60 * 1000000); // five min
 #ifdef BLELOG
-        ESP_LOGI(TAG, "Device connected");
+        ESP_LOGI(TAG, "Client connected");
 #endif
     }
-
     void onDisconnect(BLEServer *) override
     {
-        isConnected = false;
+        gConnected = false;
+        esp_timer_stop(gpsTimer);
+        adv->start(); // resume adverts
 #ifdef BLELOG
-        ESP_LOGW(TAG, "Device disconnected");
-#endif
-        vTaskDelay(pdMS_TO_TICKS(200)); // allow stack to clear
-        pAdvertising->start();
-#ifdef BLELOG
-        ESP_LOGI(TAG, "Advertising restarted");
+        ESP_LOGI(TAG, "Client disconnected");
 #endif
     }
 };
 
-class GPSWriteCallback : public BLECharacteristicCallbacks
+/* ─────────────  The FreeRTOS task  ───────────── */
+static void bleTask(void *arg)
 {
-    void onWrite(BLECharacteristic *pChar) override
-    {
-        const std::string &value = pChar->getValue();
+    /* copy nodeId into a fixed-size buffer on stack, drop String */
+    String *sPtr = static_cast<String *>(arg);
+    char devName[16] = "Chirpy_";
+    strlcat(devName, sPtr->c_str(), sizeof(devName));
+    delete sPtr;
 
-        float lat, lon;
-        int yr, mon, d, h, m, s;
+    BLEDevice::init(devName);
+    BLEDevice::setMTU(23); // keep ATT payload short
 
-        if (sscanf(value.c_str(), "%f,%f,%d,%d,%d,%d,%d,%d",
-                   &lat, &lon, &yr, &mon, &d, &h, &m, &s) == 8 &&
-            gpsDataPtr)
-        {
+    srv = BLEDevice::createServer();
+    static SrvCb srvCb;
+    srv->setCallbacks(&srvCb);
 
-            gpsDataPtr->latitude = lat;
-            gpsDataPtr->longitude = lon;
-            gpsDataPtr->year = yr;
-            gpsDataPtr->month = mon;
-            gpsDataPtr->day = d;
-            gpsDataPtr->hour = h;
-            gpsDataPtr->minute = m;
-            gpsDataPtr->second = s;
-            gpsDataPtr->valid = true;
+    auto *svc = srv->createService(SERVICE_UUID);
 
-#ifdef BLELOG
-            ESP_LOGI(TAG, "Parsed: %.6f, %.6f @ %04d-%02d-%02d %02d:%02d:%02d",
-                     lat, lon, yr, mon, d, h, m, s);
-#endif
-        }
-        else
-        {
-#ifdef BLELOG
-            ESP_LOGW(TAG, "Invalid GPS+time string or null pointer");
-#endif
-        }
-    }
-};
+    rxChar = svc->createCharacteristic(CHAR_RX_UUID, BLECharacteristic::PROPERTY_WRITE);
+    static RxCallback rxCb;
+    rxChar->setCallbacks(&rxCb);
+    rxChar->addDescriptor(new BLE2902()); // 2 × 3 bytes; fine
 
-// ───────────────────────────── TASK ─────────────────────────────
-void bleTask(void *param)
-{
-    std::string *nodeId = static_cast<std::string *>(param);
-    std::string deviceName = "Chirpy_" + *nodeId;
-    delete nodeId;
+    txChar = svc->createCharacteristic(CHAR_TX_UUID, BLECharacteristic::PROPERTY_NOTIFY);
+    txChar->addDescriptor(new BLE2902());
 
-    BLEDevice::init(deviceName.c_str());
-    BLEDevice::setMTU(23); // prevent long writes
+    svc->start();
 
-    pServer = BLEDevice::createServer();
-    static MyServerCallbacks serverCallbacks;
-    pServer->setCallbacks(&serverCallbacks);
-
-    BLEService *service = pServer->createService(SERVICE_UUID);
-    pCharacteristic = service->createCharacteristic(
-        CHAR_UUID, BLECharacteristic::PROPERTY_WRITE);
-
-    pCharacteristic->addDescriptor(new BLE2902()); // safe to heap alloc
-    static GPSWriteCallback writeCb;
-    pCharacteristic->setCallbacks(&writeCb);
-
-    service->start();
-
-    pAdvertising = BLEDevice::getAdvertising();
-    pAdvertising->addServiceUUID(SERVICE_UUID);
-    pAdvertising->start();
+    adv = BLEDevice::getAdvertising();
+    adv->addServiceUUID(SERVICE_UUID);
+    adv->setScanResponse(false);
+    adv->start();
 
 #ifdef BLELOG
-    ESP_LOGI(TAG, "Advertising as %s", deviceName.c_str());
+    ESP_LOGI(TAG, "Advertising as %s", devName);
 #endif
 
+    /* create 1× esp-timer once – reusable */
+    esp_timer_create_args_t ta{.callback = gpsTimerCb, .name = "gpsT"};
+    esp_timer_create(&ta, &gpsTimer);
+
+    /* Idle loop: nothing heavy – 4 kB stack would already be enough */
     while (true)
-    {
-        if (isConnected && !wasConnected)
-        {
-            wasConnected = true;
-#ifdef BLELOG
-            ESP_LOGI(TAG, "Client connected");
-#endif
-        }
-
-        if (!isConnected && wasConnected)
-        {
-            wasConnected = false;
-#ifdef BLELOG
-            ESP_LOGI(TAG, "Client disconnected");
-#endif
-        }
-
-        vTaskDelay(pdMS_TO_TICKS(500));
-    }
+        vTaskDelay(pdMS_TO_TICKS(1000));
 }
 
-// ───────────────────────────── PUBLIC ─────────────────────────────
-void startBLETask(const String &node_id, GPSData *gpsData)
+/* ─────────────  API ───────────── */
+void startBLETask(const String &nodeId, GPSData *gpsData)
 {
-    gpsDataPtr = gpsData;
-    auto *idCopy = new std::string(node_id.c_str());
-    xTaskCreatePinnedToCore(bleTask, "BLETask", 6144, idCopy, 1, NULL, 0);
+    extGpsData = gpsData;
+    auto *copy = new String(nodeId); // freed inside task
+    xTaskCreatePinnedToCore(bleTask, "ble", 8192 * 3, copy, 1, NULL, 1);
 }
+
+/* optional helpers --------------------------------------------------*/
+bool bleClientConnected() { return gConnected; }
+void bleSendReqGpsNow() { sendReqGps(); }

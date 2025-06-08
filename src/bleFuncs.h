@@ -7,6 +7,8 @@
 #include <LilyGoLib.h>
 #include "structs.h"
 
+bool bleClientConnected();
+void bleSendReqGpsNow();
 void startBLETask(const String &node_id, GPSData *gpsData);
 
 #endif // BLEFUNCS_H
