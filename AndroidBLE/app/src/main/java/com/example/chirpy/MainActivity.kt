@@ -255,7 +255,26 @@ class MainActivity : ComponentActivity() {
                     return@addOnSuccessListener
                 }
 
-                char.setValue("${loc.latitude},${loc.longitude}".toByteArray(StandardCharsets.UTF_8))
+                val now = Calendar.getInstance()
+                val payload = buildString {
+                    append(loc.latitude)
+                    append(",")
+                    append(loc.longitude)
+                    append(",")
+                    append(now.get(Calendar.YEAR))
+                    append(",")
+                    append(now.get(Calendar.MONTH) + 1) // Months are 0-based
+                    append(",")
+                    append(now.get(Calendar.DAY_OF_MONTH))
+                    append(",")
+                    append(now.get(Calendar.HOUR_OF_DAY))
+                    append(",")
+                    append(now.get(Calendar.MINUTE))
+                    append(",")
+                    append(now.get(Calendar.SECOND))
+                }
+
+                char.setValue(payload.toByteArray(StandardCharsets.UTF_8))
                 val success = gatt.writeCharacteristic(char)
                 onDone(success)
             }

@@ -45,16 +45,25 @@ class GPSWriteCallback : public BLECharacteristicCallbacks
         ESP_LOGI(TAG, "Received: %s", gpsRaw.c_str());
 
         float lat, lon;
-        if (sscanf(gpsRaw.c_str(), "%f,%f", &lat, &lon) == 2 && gpsDataPtr != nullptr)
+        int yr, mon, d, h, m, s;
+        if (sscanf(gpsRaw.c_str(), "%f,%f,%d,%d,%d,%d,%d,%d", &lat, &lon, &yr, &mon, &d, &h, &m, &s) == 8)
         {
             gpsDataPtr->latitude = lat;
             gpsDataPtr->longitude = lon;
+            gpsDataPtr->year = yr;
+            gpsDataPtr->month = mon;
+            gpsDataPtr->day = d;
+            gpsDataPtr->hour = h;
+            gpsDataPtr->minute = m;
+            gpsDataPtr->second = s;
             gpsDataPtr->valid = true;
-            ESP_LOGI(TAG, "Parsed: %.6f, %.6f", lat, lon);
+
+            ESP_LOGI(TAG, "Parsed: %.6f, %.6f @ %04d-%02d-%02d %02d:%02d:%02d",
+                     lat, lon, yr, mon, d, h, m, s);
         }
         else
         {
-            ESP_LOGW(TAG, "Invalid GPS string or null pointer");
+            ESP_LOGW(TAG, "Invalid GPS+time string");
         }
     }
 };
