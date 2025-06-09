@@ -12,6 +12,7 @@
 #include <BLE2902.h>
 #include "bleFuncs.h"
 #include "structs.h"
+#include "ChirpyUI/ui.h"
 
 #define LORA_FREQUENCY        868.0f
 #define TASK_STACK_SIZE       4096
@@ -31,6 +32,7 @@ volatile bool isTransmitting = false;
 String node_id;
 std::deque<String> recentMessages;
 
+struct userData globalUserData = {0, 0};
 
 GPSData currentGPSData;
 
@@ -232,15 +234,15 @@ void common_change_group(int gr_id){
     common_current_group = gr_id;
 }
 
-int common_sendMessage(int msg_id) { // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id (emoji)>:<payload "msg_id">"
+int common_sendMessage(String msg) { // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id (emoji)>:<payload "msg_id">"
     String msg_str;
     String msg_uid = String(millis()); // could also use timestamp
-    if(msg_id == 0) {
-        msg_str = node_id + ":" + msg_uid + ":0:" + String(common_current_user) + ":" + String(msg_id);
+    if(msg == "EMERGENCY") {
+        msg_str = node_id + ":" + msg_uid + ":0:" + String(globalUserData.userId) + ":" + msg;
     }
     else
     {
-        msg_str = node_id + ":" + msg_uid + ":" + String(common_current_group) + ":" + String(common_current_user) + ":" + String(msg_id);
+        msg_str = node_id + ":" + msg_uid + ":" + String(globalUserData.groupId) + ":" + String(globalUserData.userId) + ":" + msg;
     }
     ESP_LOGI(TAG, "Sending msg: %s", msg_str.c_str());
     int status = sendLoraMessage(msg_str);
@@ -321,9 +323,9 @@ void setup() {
     }
 
     startBLETask(node_id, &currentGPSData);    // Initialize BLE
-    // UI stuff replace with actual ui stuff
-    setup_ui(&guider_ui); // Initialize the UI
-    custom_init(&guider_ui);
+
+    ui_init(); //LVGL UI
+
     //FreeRTOS tasks
     //xTaskCreatePinnedToCore(TaskLoraSender, "TaskLoraSender", TASK_STACK_SIZE, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(TaskLoraReceiver, "TaskLoraReceiver", TASK_STACK_SIZE, NULL, 1, NULL, 1);
