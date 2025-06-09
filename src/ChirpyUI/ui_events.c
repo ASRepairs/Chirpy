@@ -5,11 +5,11 @@
 
 #include "ui.h"
 #include "common.h"
+#include <esp_err.h>
 
 void sendLoraTextMsg(lv_event_t * e)
 {
-	const char *text = lv_textarea_get_text(ui_MessageInputBox);
-	common_sendLoraMessage(text);
+
 }
 
 void loraChangeGroup(lv_event_t * e)
@@ -24,25 +24,52 @@ void loraEmergency(lv_event_t * e)
 
 void loraSendLike(lv_event_t * e)
 {
-	// Your code here
+	if (common_sendLoraEmoji(THUMB_UP) == ESP_OK)
+	{
+		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
+		vtaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
+		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
+	}
 }
 
 void loraSendWave(lv_event_t * e)
 {
-	// Your code here
+	if (common_sendLoraEmoji(WAVE) == ESP_OK)
+	{
+		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
+		vtaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
+		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
+	}
 }
 
 void loraSendHeart(lv_event_t * e)
 {
-	// Your code here
+	if (common_sendLoraEmoji(HEART) == ESP_OK)
+	{
+		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
+		vtaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
+		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
+	}
 }
 
 void loraSendParty(lv_event_t * e)
 {
-	// Your code here
+	if (common_sendLoraEmoji(PARTY) == ESP_OK)
+	{
+		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
+		vtaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
+		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
+	}
 }
 
 void loraSendMessageFromBox(lv_event_t * e)
 {
-	// Your code here
+	const char *text = lv_textarea_get_text(ui_MessageInputBox);
+	if (common_sendLoraMessage(text) == ESP_OK)
+	{
+		lv_textarea_set_placeholder_text(ui_MessageInputBox, "Type a message...");
+		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
+		vtaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
+		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
+	}
 }

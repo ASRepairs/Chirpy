@@ -234,19 +234,30 @@ void common_change_group(int gr_id){
     common_current_group = gr_id;
 }
 
-int common_sendMessage(String msg) { // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id (emoji)>:<payload "msg_id">"
+esp_err_t common_sendMessage(String msg) { // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id (emoji)>:<payload "msg_id">"
     String msg_str;
     String msg_uid = String(millis()); // could also use timestamp
-    if(msg == "EMERGENCY") {
-        msg_str = node_id + ":" + msg_uid + ":0:" + String(globalUserData.userId) + ":" + msg;
+
+    msg_str = node_id + ":" + msg_uid + ":" + String(globalUserData.groupId) + ":" + String(globalUserData.userId) + ":" + msg;
+
+    ESP_LOGI(TAG, "Sending msg: %s", msg_str.c_str());
+    return sendLoraMessage(msg_str);
+}
+
+esp_err_t common_sendEmoji(int msg)
+{ // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id (emoji)>:<payload "msg_id">"
+    String msg_str;
+    String msg_uid = String(millis()); // could also use timestamp
+    if (msg == ALERT)
+    {
+        msg_str = node_id + ":" + msg_uid + ":0:" + String(globalUserData.userId) + ":" + String(msg);
     }
     else
     {
-        msg_str = node_id + ":" + msg_uid + ":" + String(globalUserData.groupId) + ":" + String(globalUserData.userId) + ":" + msg;
+        msg_str = node_id + ":" + msg_uid + ":" + String(globalUserData.groupId) + ":" + String(globalUserData.userId) + ":" + String(msg);
     }
     ESP_LOGI(TAG, "Sending msg: %s", msg_str.c_str());
-    int status = sendLoraMessage(msg_str);
-    return status;
+    return sendLoraMessage(msg_str);
 }
 
 typedef struct {

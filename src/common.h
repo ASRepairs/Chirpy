@@ -11,6 +11,7 @@ extern "C" {
 // declare as C-compatible if compiled as C++
 
 int common_sendMessage(int msg_id);
+esp_err_t common_sendEmoji(int msg);
 void common_displayMessageUI(int msg_id, int usr_id);
 
 enum common_emoji{
