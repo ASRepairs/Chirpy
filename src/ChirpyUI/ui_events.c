@@ -5,21 +5,20 @@
 
 #include "ui.h"
 #include "common.h"
+#include "structs.h"
 #include <esp_err.h>
-
-void sendLoraTextMsg(lv_event_t * e)
-{
-
-}
-
-void loraChangeGroup(lv_event_t * e)
-{
-	// Your code here
-}
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 void loraEmergency(lv_event_t * e)
 {
-	// Your code here
+	if (common_sendLoraEmoji(ALERT) == ESP_OK) //TODO: Replace this function with a special function that also sends GPS coords
+	{
+		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
+		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
+		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
+	}
 }
 
 void loraSendLike(lv_event_t * e)
@@ -27,7 +26,7 @@ void loraSendLike(lv_event_t * e)
 	if (common_sendLoraEmoji(THUMB_UP) == ESP_OK)
 	{
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		vtaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
+		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 	}
 }
@@ -37,7 +36,7 @@ void loraSendWave(lv_event_t * e)
 	if (common_sendLoraEmoji(WAVE) == ESP_OK)
 	{
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		vtaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
+		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 	}
 }
@@ -47,7 +46,7 @@ void loraSendHeart(lv_event_t * e)
 	if (common_sendLoraEmoji(HEART) == ESP_OK)
 	{
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		vtaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
+		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 	}
 }
@@ -57,7 +56,7 @@ void loraSendParty(lv_event_t * e)
 	if (common_sendLoraEmoji(PARTY) == ESP_OK)
 	{
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		vtaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
+		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 	}
 }
@@ -69,7 +68,33 @@ void loraSendMessageFromBox(lv_event_t * e)
 	{
 		lv_textarea_set_placeholder_text(ui_MessageInputBox, "Type a message...");
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		vtaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
+		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
+	}
+}
+
+void loraChangeGroup(lv_event_t * e)
+{
+	char buf[16]; // buffer for the selected text
+	lv_roller_get_selected_str(ui_GroupSelector, buf, sizeof(buf));
+	ESP_LOGI("UI", "Selected roller item: %s", buf);
+
+	// format "Gr. x", extract the number
+	int group = 0;
+	if (sscanf(buf, "Gr. %d", &group) == 1)
+	{
+		if (group >= 0 && group <= 9)
+		{
+			globalUserData.groupId = group;
+			ESP_LOGI("UI", "Updated globalUserData.groupId to %d", group);
+		}
+		else
+		{
+			ESP_LOGW("UI", "Group number out of range: %d", group);
+		}
+	}
+	else
+	{
+		ESP_LOGW("UI", "Failed to parse group number from: %s", buf);
 	}
 }

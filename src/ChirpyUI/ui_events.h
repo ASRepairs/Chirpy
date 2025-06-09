@@ -15,7 +15,6 @@ void loraSendWave(lv_event_t * e);
 void loraSendHeart(lv_event_t * e);
 void loraSendParty(lv_event_t * e);
 void loraSendMessageFromBox(lv_event_t * e);
-void sendLoraTextMsg(lv_event_t * e);
 void loraEmergency(lv_event_t * e);
 void loraChangeGroup(lv_event_t * e);
 

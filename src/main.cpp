@@ -1,8 +1,6 @@
 #include <LilyGoLib.h> 
 #include <LV_Helper.h>
 #include "esp_log.h"
-#include "UI/custom/custom.h"
-#include "UI/generated/gui_guider.h"
 #include "common.h" // Added by Kacper (KSCB)
 #include <time.h>
 #include <deque>
@@ -124,9 +122,8 @@ void displayReceivedMessage() {
         int usr_id = atoi(usr_str.c_str());
         int msg_payload = atoi(payload_str.c_str());
 
-        if ((gr_id == common_current_group) || (gr_id == 0) || (common_current_group == 0)) {
+        if ((gr_id == globalUserData.groupId) || (gr_id == 0) || (globalUserData.groupId == 0)) {
             ESP_LOGI(TAG, "[SX1262] Displaying message for group %d", gr_id);
-            common_displayMessageUI(msg_payload, usr_id);
             watch.setWaveform(0, 15);  // play effect
             watch.setWaveform(1, 0);  // end waveform
             watch.setWaveform(3, 15);  // play effect
@@ -183,8 +180,6 @@ void TaskCheckShortButtonPressed(void* pvParameters){
                 //sendLoraMessage(msg);
                 // Pekey button as "lock screen"
                 
-                ui_load_scr_animation(&guider_ui, &guider_ui.home_digital, guider_ui.home_digital_del, &guider_ui.message_received_heart_del, setup_scr_home_digital, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
-                //ui_load_scr_animation(&guider_ui, &guider_ui.message_received_heart, guider_ui.message_received_heart_del, &guider_ui.message_received_heart_del, setup_scr_message_received_heart, LV_SCR_LOAD_ANIM_OVER_BOTTOM, 200, 200, false, true);
                 watch.setWaveform(0, 1);  // play effect
                 watch.setWaveform(1, 0);  // end waveform
                 watch.run();
@@ -200,51 +195,17 @@ void TaskCheckShortButtonPressed(void* pvParameters){
 
 // ─────────── Common functions definition (common.h) ──────────────
 
-void common_change_group(int gr_id){
-    lv_obj_t* group_labels[] = {
-        NULL, // Index 0 unused to match group numbers starting from 1
-        guider_ui.groups_list_label_group_1,
-        guider_ui.groups_list_label_group_2,
-        guider_ui.groups_list_label_group_3,
-        guider_ui.groups_list_label_group_4,
-        guider_ui.groups_list_label_group_5,
-        guider_ui.groups_list_label_group_6,
-        guider_ui.groups_list_label_group_7,
-        guider_ui.groups_list_label_group_8,
-        guider_ui.groups_list_label_group_9,
-        guider_ui.groups_list_label_group_10
-    };
-    ESP_LOGI(TAG, "Group id changed from %d to %d", common_current_group, gr_id);
-    if(common_current_group != 0){
-        if (common_current_group >= 1 && common_current_group <= 10) {
-            lv_obj_set_style_text_color(
-                group_labels[common_current_group],
-                lv_color_hex(0xffffff),
-                LV_PART_MAIN | LV_STATE_DEFAULT
-            );
-        }
-    }
-    if (gr_id >= 1 && gr_id <= 10) {
-        lv_obj_set_style_text_color(
-            group_labels[gr_id],
-            lv_color_hex(0xff0000),
-            LV_PART_MAIN | LV_STATE_DEFAULT
-        );
-    }
-    common_current_group = gr_id;
-}
-
-esp_err_t common_sendMessage(String msg) { // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id (emoji)>:<payload "msg_id">"
+esp_err_t common_sendLoraMessage(const char *msg){ // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id (emoji)>:<payload "msg_id">"
     String msg_str;
     String msg_uid = String(millis()); // could also use timestamp
 
-    msg_str = node_id + ":" + msg_uid + ":" + String(globalUserData.groupId) + ":" + String(globalUserData.userId) + ":" + msg;
+    msg_str = node_id + ":" + msg_uid + ":" + String(globalUserData.groupId) + ":" + String(globalUserData.userId) + ":" + String(msg);
 
     ESP_LOGI(TAG, "Sending msg: %s", msg_str.c_str());
     return sendLoraMessage(msg_str);
 }
 
-esp_err_t common_sendEmoji(int msg)
+esp_err_t common_sendLoraEmoji(int msg)
 { // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id (emoji)>:<payload "msg_id">"
     String msg_str;
     String msg_uid = String(millis()); // could also use timestamp
@@ -260,44 +221,11 @@ esp_err_t common_sendEmoji(int msg)
     return sendLoraMessage(msg_str);
 }
 
-typedef struct {
-    int msg_id;
-    lv_obj_t **screen;
-    bool *del_cb_ptr;  // store pointer to the callback pointer
-    void (*setup_func)(lv_ui *);
-} MessageUIConfig;
 
-MessageUIConfig message_ui_map[] = {
-    { ALERT, &guider_ui.alert_received, &guider_ui.alert_received_del, setup_scr_alert_received },
-    { THUMB_UP, &guider_ui.message_received_like, &guider_ui.message_received_like_del, setup_scr_message_received_like },
-    { WAVE, &guider_ui.message_received_wave, &guider_ui.message_received_wave_del, setup_scr_message_received_wave },
-    { HEART, &guider_ui.message_received_heart, &guider_ui.message_received_heart_del, setup_scr_message_received_heart },
-    { PARTY, &guider_ui.message_received_party, &guider_ui.message_received_party_del, setup_scr_message_received_party },
-};
-
-void common_displayMessageUI(int msg_id, int usr_id) {
-    ESP_LOGI(TAG, "usr_id: %d", usr_id);
-    ESP_LOGI(TAG, "msg_id: %d", msg_id);
-
-    ui_load_scr_animation(
-        &guider_ui,
-        message_ui_map[msg_id].screen,
-        *message_ui_map[msg_id].del_cb_ptr, // dereference now
-        message_ui_map[msg_id].del_cb_ptr,
-        message_ui_map[msg_id].setup_func,
-        LV_SCR_LOAD_ANIM_OVER_BOTTOM,
-        200,
-        200,
-        false,
-        true
-    );
-}
 
 
 // ───────────────────────────── Setup ─────────────────────────────
 void setup() {
-    common_current_group = 0; // todo: move that variable to flash memory
-    common_current_user = 0; // todo: move that variable to flash memory
     Serial.begin(115200);
     Serial.setDebugOutput(true); 
     esp_log_level_set("*", ESP_LOG_VERBOSE);

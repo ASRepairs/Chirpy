@@ -174,7 +174,7 @@ void ui_event_SendBtnLabel(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
-        sendLoraTextMsg(e);
+        loraSendMessageFromBox(e);
     }
 }
 
@@ -316,7 +316,7 @@ void ui_MessagesMenu_screen_init(void)
     lv_obj_set_x(ui_MessageInputBox, -40);
     lv_obj_set_y(ui_MessageInputBox, -25);
     lv_obj_set_align(ui_MessageInputBox, LV_ALIGN_CENTER);
-    lv_textarea_set_placeholder_text(ui_MessageInputBox, "Type Message..");
+    lv_textarea_set_placeholder_text(ui_MessageInputBox, "Type a message...");
     lv_obj_add_flag(ui_MessageInputBox, LV_OBJ_FLAG_HIDDEN);     /// Flags
 
     ui_SendMessageButton = lv_btn_create(ui_MessagesMenu);

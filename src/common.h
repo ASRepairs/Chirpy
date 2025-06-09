@@ -4,29 +4,27 @@
 // Added by Kacper (KSCB) 2025-05-14 00:10
 
 #pragma once
-
+#include <esp_err.h>
 #ifdef __cplusplus
+#include <Arduino.h>
 extern "C" {
 #endif
 // declare as C-compatible if compiled as C++
 
-int common_sendMessage(int msg_id);
-esp_err_t common_sendEmoji(int msg);
+esp_err_t common_sendLoraMessage(const char *msg);
+esp_err_t common_sendLoraEmoji(int msg);
 void common_displayMessageUI(int msg_id, int usr_id);
 
-enum common_emoji{
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
+
+typedef enum
+{
     ALERT = 0,
     THUMB_UP = 1,
     WAVE = 2,
     HEART = 3,
     PARTY = 4
 } common_emoji;
-
-int common_current_group;  // TODO: move that variable to flash memory
-int common_current_user;  // TODO: move that variable to flash memory
-
-void common_change_group(int gr_id);
-
-#ifdef __cplusplus
-}
-#endif
