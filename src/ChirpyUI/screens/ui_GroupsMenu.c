@@ -3,9 +3,9 @@
 // LVGL version: 8.3.11
 // Project name: ChirpyUI
 
-#include "ui.h"
+#include "../ui.h"
 
-lv_obj_t * uic_Groups;
+lv_obj_t * uic_GroupSelector;
 lv_obj_t * ui_GroupsMenu;
 lv_obj_t * ui_Image1;
 lv_obj_t * ui_GroupSelector;
@@ -53,14 +53,12 @@ void ui_GroupsMenu_screen_init(void)
     lv_obj_clear_flag(ui_Image1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_GroupSelector = lv_roller_create(ui_GroupsMenu);
-    lv_roller_set_options(ui_GroupSelector, "Gr. 1\nGr. 2\nGr. 3\nGr. 4\nGr. 5", LV_ROLLER_MODE_INFINITE);
+    lv_roller_set_options(ui_GroupSelector, "Gr. 1\nGr. 2\nGr. 3\nGr. 4\nGr. 5", LV_ROLLER_MODE_NORMAL);
     lv_obj_set_width(ui_GroupSelector, 200);
     lv_obj_set_height(ui_GroupSelector, 150);
     lv_obj_set_x(ui_GroupSelector, 0);
     lv_obj_set_y(ui_GroupSelector, 15);
     lv_obj_set_align(ui_GroupSelector, LV_ALIGN_CENTER);
-    lv_obj_add_state(ui_GroupSelector, LV_STATE_FOCUSED | LV_STATE_USER_1 | LV_STATE_USER_2 | LV_STATE_USER_3 |
-                     LV_STATE_USER_4);      /// States
     lv_obj_set_style_text_font(ui_GroupSelector, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_GroupSelector, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_GroupSelector, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -82,7 +80,7 @@ void ui_GroupsMenu_screen_init(void)
 
     lv_obj_add_event_cb(ui_GroupSelector, ui_event_GroupSelector, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_GroupsMenu, ui_event_GroupsMenu, LV_EVENT_ALL, NULL);
-    uic_Groups = ui_GroupSelector;
+    uic_GroupSelector = ui_GroupSelector;
 
 }
 
@@ -93,7 +91,7 @@ void ui_GroupsMenu_screen_destroy(void)
     // NULL screen variables
     ui_GroupsMenu = NULL;
     ui_Image1 = NULL;
-    uic_Groups = NULL;
+    uic_GroupSelector = NULL;
     ui_GroupSelector = NULL;
     ui_Label1 = NULL;
 

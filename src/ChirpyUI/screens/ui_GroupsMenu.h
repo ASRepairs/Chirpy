@@ -20,7 +20,7 @@ extern void ui_event_GroupSelector(lv_event_t * e);
 extern lv_obj_t * ui_GroupSelector;
 extern lv_obj_t * ui_Label1;
 // CUSTOM VARIABLES
-extern lv_obj_t * uic_Groups;
+extern lv_obj_t * uic_GroupSelector;
 
 #ifdef __cplusplus
 } /*extern "C"*/

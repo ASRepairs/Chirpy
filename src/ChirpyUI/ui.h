@@ -27,15 +27,15 @@ extern "C" {
 
 ///////////////////// SCREENS ////////////////////
 
-#include "ui_MainScreen.h"
-#include "ui_AvatarScreen.h"
-#include "ui_GroupsScreen.h"
-#include "ui_MessagesMenu.h"
-#include "ui_EmergencyMenu.h"
-#include "ui_AvatarMenu.h"
-#include "ui_GroupsMenu.h"
-#include "ui_PhoneConnectScreen.h"
-#include "ui_PhoneQRMenu.h"
+#include "screens/ui_MainScreen.h"
+#include "screens/ui_AvatarScreen.h"
+#include "screens/ui_GroupsScreen.h"
+#include "screens/ui_MessagesMenu.h"
+#include "screens/ui_EmergencyMenu.h"
+#include "screens/ui_AvatarMenu.h"
+#include "screens/ui_GroupsMenu.h"
+#include "screens/ui_PhoneConnectScreen.h"
+#include "screens/ui_PhoneQRMenu.h"
 
 ///////////////////// VARIABLES ////////////////////
 

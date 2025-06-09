@@ -3,7 +3,7 @@
 // LVGL version: 8.3.11
 // Project name: ChirpyUI
 
-#include "ui.h"
+#include "../ui.h"
 
 lv_obj_t * uic_SendBtnLabel;
 lv_obj_t * uic_SendMessageButton;
@@ -202,7 +202,7 @@ void ui_MessagesMenu_screen_init(void)
     lv_obj_set_x(ui_MessageSendCheckMark, 86);
     lv_obj_set_y(ui_MessageSendCheckMark, -92);
     lv_obj_set_align(ui_MessageSendCheckMark, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_img_set_zoom(ui_MessageSendCheckMark, 150);
 

@@ -3,7 +3,7 @@
 // LVGL version: 8.3.11
 // Project name: ChirpyUI
 
-#include "ui.h"
+#include "../ui.h"
 
 lv_obj_t * uic_PhoneConnectScreen;
 lv_obj_t * ui_PhoneConnectScreen;
