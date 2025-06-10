@@ -5,21 +5,67 @@
 
 #include "../ui.h"
 
+lv_obj_t * uic_SenderAvatarInNotificationImage;
+lv_obj_t * uic_ReceivedEmojiImage;
 lv_obj_t * uic_ReceivedMessageLabel;
+lv_obj_t * uic_HasSentTextLabel;
 lv_obj_t * uic_NotificationOverlayPanel;
 lv_obj_t * uic_NotificationScreen;
 lv_obj_t * ui_NotificationScreen;
+lv_obj_t * ui_NotificationContainer;
 lv_obj_t * ui_NotificationOverlayPanel;
+lv_obj_t * ui_HasSentTextLabel;
 lv_obj_t * ui_ReceivedMessageLabel;
+lv_obj_t * ui_ReceivedEmojiImage;
+lv_obj_t * ui_SenderAvatarInNotificationImage;
 
 // event funtions
+void ui_event_NotificationContainer(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP) {
+        lv_indev_wait_release(lv_indev_get_act());
+        DismissNotificationAnimation_Animation(ui_NotificationContainer, 0);
+    }
+    if(event_code == LV_EVENT_CLICKED) {
+        DismissNotificationAnimation_Animation(ui_NotificationContainer, 0);
+    }
+}
+
 void ui_event_NotificationOverlayPanel(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP) {
         lv_indev_wait_release(lv_indev_get_act());
-        DismissNoticationAnimation_Animation(ui_NotificationOverlayPanel, 0);
+        DismissNotificationAnimation_Animation(ui_NotificationContainer, 0);
+    }
+    if(event_code == LV_EVENT_CLICKED) {
+        DismissNotificationAnimation_Animation(ui_NotificationContainer, 0);
+    }
+}
+
+void ui_event_ReceivedMessageLabel(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP) {
+        lv_indev_wait_release(lv_indev_get_act());
+        DismissNotificationAnimation_Animation(ui_NotificationContainer, 0);
+    }
+}
+
+void ui_event_ReceivedEmojiImage(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        DismissNotificationAnimation_Animation(ui_NotificationContainer, 0);
+    }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP) {
+        lv_indev_wait_release(lv_indev_get_act());
+        DismissNotificationAnimation_Animation(ui_NotificationContainer, 0);
     }
 }
 
@@ -32,15 +78,34 @@ void ui_NotificationScreen_screen_init(void)
     lv_obj_set_style_bg_color(ui_NotificationScreen, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_NotificationScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_NotificationOverlayPanel = lv_obj_create(ui_NotificationScreen);
+    ui_NotificationContainer = lv_obj_create(ui_NotificationScreen);
+    lv_obj_remove_style_all(ui_NotificationContainer);
+    lv_obj_set_width(ui_NotificationContainer, 240);
+    lv_obj_set_height(ui_NotificationContainer, 281);
+    lv_obj_set_align(ui_NotificationContainer, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_NotificationContainer, LV_OBJ_FLAG_EVENT_BUBBLE);     /// Flags
+    lv_obj_clear_flag(ui_NotificationContainer,
+                      LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM |
+                      LV_OBJ_FLAG_SCROLL_CHAIN);     /// Flags
+
+    ui_NotificationOverlayPanel = lv_obj_create(ui_NotificationContainer);
     lv_obj_set_width(ui_NotificationOverlayPanel, 200);
-    lv_obj_set_height(ui_NotificationOverlayPanel, 120);
+    lv_obj_set_height(ui_NotificationOverlayPanel, 130);
     lv_obj_set_x(ui_NotificationOverlayPanel, 0);
     lv_obj_set_y(ui_NotificationOverlayPanel, -50);
     lv_obj_set_align(ui_NotificationOverlayPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_NotificationOverlayPanel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_NotificationOverlayPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_NotificationOverlayPanel, 50, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_NotificationOverlayPanel, lv_color_hex(0x3F3F3F), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_NotificationOverlayPanel, 150, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_HasSentTextLabel = lv_label_create(ui_NotificationOverlayPanel);
+    lv_obj_set_width(ui_HasSentTextLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_HasSentTextLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_HasSentTextLabel, 0);
+    lv_obj_set_y(ui_HasSentTextLabel, -45);
+    lv_obj_set_align(ui_HasSentTextLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_HasSentTextLabel, "Has sent:");
+    lv_obj_set_style_text_font(ui_HasSentTextLabel, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ReceivedMessageLabel = lv_label_create(ui_NotificationOverlayPanel);
     lv_obj_set_width(ui_ReceivedMessageLabel, 180);
@@ -50,11 +115,40 @@ void ui_NotificationScreen_screen_init(void)
     lv_obj_set_align(ui_ReceivedMessageLabel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_ReceivedMessageLabel,
                       "TextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextTextText");
+    lv_obj_set_style_text_color(ui_ReceivedMessageLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_ReceivedMessageLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_ReceivedMessageLabel, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_ReceivedEmojiImage = lv_img_create(ui_NotificationContainer);
+    lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_celebrationemoji_png);
+    lv_obj_set_width(ui_ReceivedEmojiImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_ReceivedEmojiImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_ReceivedEmojiImage, 0);
+    lv_obj_set_y(ui_ReceivedEmojiImage, -35);
+    lv_obj_set_align(ui_ReceivedEmojiImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_SenderAvatarInNotificationImage = lv_img_create(ui_NotificationContainer);
+    lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_froggy_png);
+    lv_obj_set_width(ui_SenderAvatarInNotificationImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_SenderAvatarInNotificationImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_SenderAvatarInNotificationImage, -85);
+    lv_obj_set_y(ui_SenderAvatarInNotificationImage, -85);
+    lv_obj_set_align(ui_SenderAvatarInNotificationImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_SenderAvatarInNotificationImage, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_SenderAvatarInNotificationImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    lv_obj_add_event_cb(ui_ReceivedMessageLabel, ui_event_ReceivedMessageLabel, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_NotificationOverlayPanel, ui_event_NotificationOverlayPanel, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_ReceivedEmojiImage, ui_event_ReceivedEmojiImage, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_NotificationContainer, ui_event_NotificationContainer, LV_EVENT_ALL, NULL);
     uic_NotificationScreen = ui_NotificationScreen;
     uic_NotificationOverlayPanel = ui_NotificationOverlayPanel;
+    uic_HasSentTextLabel = ui_HasSentTextLabel;
     uic_ReceivedMessageLabel = ui_ReceivedMessageLabel;
+    uic_ReceivedEmojiImage = ui_ReceivedEmojiImage;
+    uic_SenderAvatarInNotificationImage = ui_SenderAvatarInNotificationImage;
 
 }
 
@@ -65,9 +159,16 @@ void ui_NotificationScreen_screen_destroy(void)
     // NULL screen variables
     uic_NotificationScreen = NULL;
     ui_NotificationScreen = NULL;
+    ui_NotificationContainer = NULL;
     uic_NotificationOverlayPanel = NULL;
     ui_NotificationOverlayPanel = NULL;
+    uic_HasSentTextLabel = NULL;
+    ui_HasSentTextLabel = NULL;
     uic_ReceivedMessageLabel = NULL;
     ui_ReceivedMessageLabel = NULL;
+    uic_ReceivedEmojiImage = NULL;
+    ui_ReceivedEmojiImage = NULL;
+    uic_SenderAvatarInNotificationImage = NULL;
+    ui_SenderAvatarInNotificationImage = NULL;
 
 }

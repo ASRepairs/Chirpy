@@ -39,6 +39,7 @@ extern void ui_event_SendMessageButton(lv_event_t * e);
 extern lv_obj_t * ui_SendMessageButton;
 extern void ui_event_SendBtnLabel(lv_event_t * e);
 extern lv_obj_t * ui_SendBtnLabel;
+extern lv_obj_t * ui_SendAMessageLabel;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_MessagesMenu;
 extern lv_obj_t * uic_MessageSendCheckMark;

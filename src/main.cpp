@@ -30,7 +30,7 @@ volatile bool isTransmitting = false;
 String node_id;
 std::deque<String> recentMessages;
 
-struct userData globalUserData = {0, 0};
+struct userData globalUserData = {1, 0}; //start with first group and froggy
 
 GPSData currentGPSData;
 
@@ -74,6 +74,88 @@ esp_err_t sendLoraMessage(String& msg) {
 
     return ESP_FAIL;
 }
+
+// ──────────────────────── Notification Handling ────────────────────────
+void handleReceivedNotification(int user_id, const char *payload_str)
+{
+    ESP_LOGI(TAG, "UI Received notification from user %d: %s", user_id, payload_str);
+    lv_obj_set_y(ui_NotificationContainer, 0); // Force Y to top
+
+    // Set sender image
+    switch (user_id)
+    {
+    case FROGGY:
+        lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_froggy_png);
+        break;
+    case PIGGY:
+        lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_piggy_png);
+        break;
+    case HORSY:
+        lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_horsy_png);
+        break;
+    case PANDY:
+        lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_pandy_png);
+        break;
+    default:
+        lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_froggy_png); // default to Froggy
+        break;
+    }
+
+    // Interpret the payload
+    int emoji_code = atoi(payload_str);
+    ESP_LOGI(TAG, "Parsed emoji code: %d", emoji_code);
+    if (emoji_code > 0 && emoji_code <= 4)
+    {
+        lv_obj_add_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN); // hide text label
+        lv_obj_clear_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN); // show emoji image
+
+        // Display emoji
+        switch (emoji_code)
+        {
+        case ALERT:
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_emergencyemoji_png);
+            break;
+        case THUMB_UP:
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_likeemoji_png);
+            break;
+        case WAVE:
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_waveemoji_png);
+            break;
+        case HEART:
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_heartemoji_png);
+            break;
+        case PARTY:
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_celebrationemoji_png);
+            break;
+        }
+    }
+    else
+    {
+        lv_obj_add_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN); // hide emoji image
+        lv_obj_clear_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN); // show text label
+        // Treat as plain text message
+        lv_label_set_text(ui_ReceivedMessageLabel, payload_str);
+    }
+    // show the notification overlay
+    lv_obj_clear_flag(ui_NotificationContainer, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_parent(ui_NotificationContainer, lv_layer_top());
+
+    // Auto-hide after 5 seconds
+    static lv_timer_t *hide_timer = nullptr;
+    if (hide_timer)
+        lv_timer_del(hide_timer);
+
+    hide_timer = lv_timer_create([](lv_timer_t *t)
+    {
+        DismissNotificationAnimation_Animation(ui_NotificationContainer, 0);
+        lv_timer_create([](lv_timer_t *t)
+                        {
+            lv_obj_add_flag(ui_NotificationContainer, LV_OBJ_FLAG_HIDDEN);
+            lv_timer_del(t);
+        }, 500, NULL);
+    }, 5000, nullptr);
+}
+
 
 // ──────────────────────── LoRa Reception ────────────────────────
 void displayReceivedMessage() {
@@ -120,10 +202,10 @@ void displayReceivedMessage() {
         // processing of the message happens here
         int gr_id = atoi(group_str.c_str());
         int usr_id = atoi(usr_str.c_str());
-        int msg_payload = atoi(payload_str.c_str());
 
         if ((gr_id == globalUserData.groupId) || (gr_id == 0) || (globalUserData.groupId == 0)) {
             ESP_LOGI(TAG, "[SX1262] Displaying message for group %d", gr_id);
+            handleReceivedNotification(usr_id, payload_str.c_str());
             watch.setWaveform(0, 15);  // play effect
             watch.setWaveform(1, 0);  // end waveform
             watch.setWaveform(3, 15);  // play effect
@@ -211,7 +293,7 @@ esp_err_t common_sendLoraEmoji(int msg)
     String msg_uid = String(millis()); // could also use timestamp
     if (msg == ALERT)
     {
-        msg_str = node_id + ":" + msg_uid + ":0:" + String(globalUserData.userId) + ":" + String(msg);
+        msg_str = node_id + ":" + msg_uid + ":5:" + String(globalUserData.userId) + ":" + String(msg);
     }
     else
     {

@@ -25,10 +25,7 @@ void loraSendLike(lv_event_t * e)
 	if (common_sendLoraEmoji(THUMB_UP) == ESP_OK)
 	{
 		lv_obj_clear_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
-		lv_obj_set_style_opa(ui_MessageSendCheckMark, LV_OPA_0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
 	}
 }
@@ -37,7 +34,7 @@ void loraSendWave(lv_event_t * e)
 {
 	if (common_sendLoraEmoji(WAVE) == ESP_OK)
 	{
-		lv_obj_set_parent(ui_checkk, lv_layer_top());
+		lv_obj_set_parent(ui_NotificationContainer, lv_layer_top());
 		lv_obj_clear_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
 		lv_obj_set_style_opa(ui_MessageSendCheckMark, LV_OPA_0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -52,10 +49,7 @@ void loraSendHeart(lv_event_t * e)
 	if (common_sendLoraEmoji(HEART) == ESP_OK)
 	{
 		lv_obj_clear_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
-		lv_obj_set_style_opa(ui_MessageSendCheckMark, LV_OPA_0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
 	}
 }
@@ -65,10 +59,7 @@ void loraSendParty(lv_event_t * e)
 	if (common_sendLoraEmoji(PARTY) == ESP_OK)
 	{
 		lv_obj_clear_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
-		lv_obj_set_style_opa(ui_MessageSendCheckMark, LV_OPA_0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
 	}
 }
@@ -114,4 +105,28 @@ void loraChangeGroup(lv_event_t * e)
 	{
 		ESP_LOGW("UI", "Failed to parse group number from: %s", buf);
 	}
+}
+
+void ChangeUserPiggy(lv_event_t * e)
+{
+	globalUserData.userId = PIGGY;
+	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_piggy_png);
+}
+
+void ChangeUserFroggy(lv_event_t * e)
+{
+	globalUserData.userId = FROGGY;
+	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_froggy_png);	
+}
+
+void ChangeUserHorsy(lv_event_t * e)
+{
+	globalUserData.userId = HORSY;
+	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_horsy_png);
+}
+
+void ChangeUserPandy(lv_event_t * e)
+{
+	globalUserData.userId = PANDY;
+	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_pandy_png);
 }

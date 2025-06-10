@@ -37,12 +37,13 @@ extern "C" {
 #include "screens/ui_PhoneConnectScreen.h"
 #include "screens/ui_PhoneQRMenu.h"
 #include "screens/ui_NotificationScreen.h"
+#include "screens/ui_Images.h"
 
 ///////////////////// VARIABLES ////////////////////
 
 extern lv_anim_t * MessageSentSuccessStart_Animation(lv_obj_t * TargetObject, int delay);
 extern lv_anim_t * MessageSentSuccessEnd_Animation(lv_obj_t * TargetObject, int delay);
-extern lv_anim_t * DismissNoticationAnimation_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * DismissNotificationAnimation_Animation(lv_obj_t * TargetObject, int delay);
 
 // EVENTS
 
@@ -50,6 +51,7 @@ extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
 LV_IMG_DECLARE(ui_img_ui_png);    // assets/UI.png
+LV_IMG_DECLARE(ui_img_froggy_png);    // assets/froggy.png
 LV_IMG_DECLARE(ui_img_avatar_png);    // assets/Avatar.png
 LV_IMG_DECLARE(ui_img_groups_png);    // assets/Groups.png
 LV_IMG_DECLARE(ui_img_messagepanel_png);    // assets/MessagePanel.png
@@ -57,7 +59,16 @@ LV_IMG_DECLARE(ui_img_checkmark_png);    // assets/CheckMark.png
 LV_IMG_DECLARE(ui_img_emojismsg_png);    // assets/EmojisMSG.png
 LV_IMG_DECLARE(ui_img_emergency_png);    // assets/Emergency.png
 LV_IMG_DECLARE(ui_img_whitepanel_png);    // assets/WhitePanel.png
+LV_IMG_DECLARE(ui_img_profiles_png);    // assets/profiles.png
 LV_IMG_DECLARE(ui_img_phoneconnect_png);    // assets/PhoneConnect.png
+LV_IMG_DECLARE(ui_img_celebrationemoji_png);    // assets/celebrationEmoji.png
+LV_IMG_DECLARE(ui_img_waveemoji_png);    // assets/waveEmoji.png
+LV_IMG_DECLARE(ui_img_likeemoji_png);    // assets/likeEmoji.png
+LV_IMG_DECLARE(ui_img_heartemoji_png);    // assets/HeartEmoji.png
+LV_IMG_DECLARE(ui_img_piggy_png);    // assets/piggy.png
+LV_IMG_DECLARE(ui_img_horsy_png);    // assets/horsy.png
+LV_IMG_DECLARE(ui_img_pandy_png);    // assets/pandy.png
+LV_IMG_DECLARE(ui_img_emergencyemoji_png);    // assets/emergencyEmoji.png
 
 // UI INIT
 void ui_init(void);

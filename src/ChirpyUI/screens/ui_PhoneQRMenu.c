@@ -7,6 +7,7 @@
 
 lv_obj_t * ui_PhoneQRMenu;
 lv_obj_t * ui_Image7;
+lv_obj_t * ui_Label4;
 
 // event funtions
 void ui_event_PhoneQRMenu(lv_event_t * e)
@@ -34,6 +35,15 @@ void ui_PhoneQRMenu_screen_init(void)
     lv_obj_add_flag(ui_Image7, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_Image7, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
+    ui_Label4 = lv_label_create(ui_PhoneQRMenu);
+    lv_obj_set_width(ui_Label4, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Label4, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Label4, 0);
+    lv_obj_set_y(ui_Label4, -95);
+    lv_obj_set_align(ui_Label4, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_Label4, "Scan With App");
+    lv_obj_set_style_text_font(ui_Label4, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     lv_obj_add_event_cb(ui_PhoneQRMenu, ui_event_PhoneQRMenu, LV_EVENT_ALL, NULL);
 
 }
@@ -45,5 +55,6 @@ void ui_PhoneQRMenu_screen_destroy(void)
     // NULL screen variables
     ui_PhoneQRMenu = NULL;
     ui_Image7 = NULL;
+    ui_Label4 = NULL;
 
 }

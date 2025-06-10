@@ -20,12 +20,14 @@ extern lv_obj_t * ui_HomeBG;
 extern lv_obj_t * ui_Time;
 extern lv_obj_t * ui_Date;
 extern lv_obj_t * ui_GroupNr;
+extern lv_obj_t * ui_CurrentAvatarImage;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_MainScreen;
 extern lv_obj_t * uic_HomeBG;
 extern lv_obj_t * uic_Time;
 extern lv_obj_t * uic_Date;
 extern lv_obj_t * uic_GroupNr;
+extern lv_obj_t * uic_CurrentAvatarImage;
 
 #ifdef __cplusplus
 } /*extern "C"*/

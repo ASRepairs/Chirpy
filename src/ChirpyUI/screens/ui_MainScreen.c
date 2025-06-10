@@ -5,6 +5,7 @@
 
 #include "../ui.h"
 
+lv_obj_t * uic_CurrentAvatarImage;
 lv_obj_t * uic_GroupNr;
 lv_obj_t * uic_Date;
 lv_obj_t * uic_Time;
@@ -15,6 +16,7 @@ lv_obj_t * ui_HomeBG;
 lv_obj_t * ui_Time;
 lv_obj_t * ui_Date;
 lv_obj_t * ui_GroupNr;
+lv_obj_t * ui_CurrentAvatarImage;
 
 // event funtions
 void ui_event_MainScreen(lv_event_t * e)
@@ -88,6 +90,16 @@ void ui_MainScreen_screen_init(void)
     lv_label_set_text(ui_GroupNr, "Gr. 1");
     lv_obj_set_style_text_font(ui_GroupNr, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_CurrentAvatarImage = lv_img_create(ui_MainScreen);
+    lv_img_set_src(ui_CurrentAvatarImage, &ui_img_froggy_png);
+    lv_obj_set_width(ui_CurrentAvatarImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_CurrentAvatarImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_CurrentAvatarImage, 85);
+    lv_obj_set_y(ui_CurrentAvatarImage, -85);
+    lv_obj_set_align(ui_CurrentAvatarImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_CurrentAvatarImage, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_CurrentAvatarImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
     lv_obj_add_event_cb(ui_HomeBG, ui_event_HomeBG, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MainScreen, ui_event_MainScreen, LV_EVENT_ALL, NULL);
     uic_MainScreen = ui_MainScreen;
@@ -95,6 +107,7 @@ void ui_MainScreen_screen_init(void)
     uic_Time = ui_Time;
     uic_Date = ui_Date;
     uic_GroupNr = ui_GroupNr;
+    uic_CurrentAvatarImage = ui_CurrentAvatarImage;
 
 }
 
@@ -113,5 +126,7 @@ void ui_MainScreen_screen_destroy(void)
     ui_Date = NULL;
     uic_GroupNr = NULL;
     ui_GroupNr = NULL;
+    uic_CurrentAvatarImage = NULL;
+    ui_CurrentAvatarImage = NULL;
 
 }

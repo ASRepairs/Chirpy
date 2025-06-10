@@ -14,13 +14,23 @@ extern "C" {
 extern void ui_NotificationScreen_screen_init(void);
 extern void ui_NotificationScreen_screen_destroy(void);
 extern lv_obj_t * ui_NotificationScreen;
+extern void ui_event_NotificationContainer(lv_event_t * e);
+extern lv_obj_t * ui_NotificationContainer;
 extern void ui_event_NotificationOverlayPanel(lv_event_t * e);
 extern lv_obj_t * ui_NotificationOverlayPanel;
+extern lv_obj_t * ui_HasSentTextLabel;
+extern void ui_event_ReceivedMessageLabel(lv_event_t * e);
 extern lv_obj_t * ui_ReceivedMessageLabel;
+extern void ui_event_ReceivedEmojiImage(lv_event_t * e);
+extern lv_obj_t * ui_ReceivedEmojiImage;
+extern lv_obj_t * ui_SenderAvatarInNotificationImage;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_NotificationScreen;
 extern lv_obj_t * uic_NotificationOverlayPanel;
+extern lv_obj_t * uic_HasSentTextLabel;
 extern lv_obj_t * uic_ReceivedMessageLabel;
+extern lv_obj_t * uic_ReceivedEmojiImage;
+extern lv_obj_t * uic_SenderAvatarInNotificationImage;
 
 #ifdef __cplusplus
 } /*extern "C"*/

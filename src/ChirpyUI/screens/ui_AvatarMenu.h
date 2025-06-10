@@ -16,8 +16,26 @@ extern void ui_AvatarMenu_screen_destroy(void);
 extern void ui_event_AvatarMenu(lv_event_t * e);
 extern lv_obj_t * ui_AvatarMenu;
 extern lv_obj_t * ui_Image8;
+extern lv_obj_t * ui_AvatarsImage;
+extern lv_obj_t * ui_AvatarMenuLabel;
+extern lv_obj_t * ui_AvatarUpdateSuccessImage;
+extern void ui_event_PiggyUserBtn(lv_event_t * e);
+extern lv_obj_t * ui_PiggyUserBtn;
+extern void ui_event_FroggyUserBtn(lv_event_t * e);
+extern lv_obj_t * ui_FroggyUserBtn;
+extern void ui_event_HorsyUserBtn(lv_event_t * e);
+extern lv_obj_t * ui_HorsyUserBtn;
+extern void ui_event_PandyUserBtn(lv_event_t * e);
+extern lv_obj_t * ui_PandyUserBtn;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_AvatarMenu;
+extern lv_obj_t * uic_AvatarsImage;
+extern lv_obj_t * uic_AvatarMenuLabel;
+extern lv_obj_t * uic_AvatarUpdateSuccessImage;
+extern lv_obj_t * uic_PiggyUserBtn;
+extern lv_obj_t * uic_FroggyUserBtn;
+extern lv_obj_t * uic_HorsyUserBtn;
+extern lv_obj_t * uic_PandyUserBtn;
 
 #ifdef __cplusplus
 } /*extern "C"*/

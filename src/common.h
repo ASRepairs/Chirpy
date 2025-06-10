@@ -22,9 +22,17 @@ void common_displayMessageUI(int msg_id, int usr_id);
 
 typedef enum
 {
-    ALERT = 0,
+    ALERT = 5,
     THUMB_UP = 1,
     WAVE = 2,
     HEART = 3,
     PARTY = 4
 } common_emoji;
+
+typedef enum
+{
+    FROGGY = 0,
+    PIGGY = 1,
+    HORSY = 2,
+    PANDY = 3
+} user_emoji;

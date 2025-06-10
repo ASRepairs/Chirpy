@@ -26,3 +26,19 @@ def loraEmergency(event_struct):
 def loraChangeGroup(event_struct):
     return
 
+
+def ChangeUserPiggy(event_struct):
+    return
+
+
+def ChangeUserFroggy(event_struct):
+    return
+
+
+def ChangeUserHorsy(event_struct):
+    return
+
+
+def ChangeUserPandy(event_struct):
+    return
+

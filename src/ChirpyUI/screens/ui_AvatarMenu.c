@@ -5,15 +5,85 @@
 
 #include "../ui.h"
 
+lv_obj_t * uic_PandyUserBtn;
+lv_obj_t * uic_HorsyUserBtn;
+lv_obj_t * uic_FroggyUserBtn;
+lv_obj_t * uic_PiggyUserBtn;
+lv_obj_t * uic_AvatarUpdateSuccessImage;
+lv_obj_t * uic_AvatarMenuLabel;
+lv_obj_t * uic_AvatarsImage;
 lv_obj_t * uic_AvatarMenu;
 lv_obj_t * ui_AvatarMenu;
 lv_obj_t * ui_Image8;
+lv_obj_t * ui_AvatarsImage;
+lv_obj_t * ui_AvatarMenuLabel;
+lv_obj_t * ui_AvatarUpdateSuccessImage;
+lv_obj_t * ui_PiggyUserBtn;
+lv_obj_t * ui_FroggyUserBtn;
+lv_obj_t * ui_HorsyUserBtn;
+lv_obj_t * ui_PandyUserBtn;
 
 // event funtions
 void ui_event_AvatarMenu(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_AvatarScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_AvatarScreen_screen_init);
+    }
+}
+
+void ui_event_PiggyUserBtn(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        ChangeUserPiggy(e);
+        (e);
+    }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_AvatarScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_AvatarScreen_screen_init);
+    }
+}
+
+void ui_event_FroggyUserBtn(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        ChangeUserFroggy(e);
+        (e);
+    }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_AvatarScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_AvatarScreen_screen_init);
+    }
+}
+
+void ui_event_HorsyUserBtn(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        ChangeUserHorsy(e);
+        (e);
+    }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_AvatarScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_AvatarScreen_screen_init);
+    }
+}
+
+void ui_event_PandyUserBtn(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        ChangeUserPandy(e);
+        (e);
+    }
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_AvatarScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_AvatarScreen_screen_init);
@@ -37,8 +107,93 @@ void ui_AvatarMenu_screen_init(void)
     lv_obj_add_flag(ui_Image8, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_Image8, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
+    ui_AvatarsImage = lv_img_create(ui_AvatarMenu);
+    lv_img_set_src(ui_AvatarsImage, &ui_img_profiles_png);
+    lv_obj_set_width(ui_AvatarsImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AvatarsImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AvatarsImage, 0);
+    lv_obj_set_y(ui_AvatarsImage, -10);
+    lv_obj_set_align(ui_AvatarsImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_AvatarsImage, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_AvatarsImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
+    ui_AvatarMenuLabel = lv_label_create(ui_AvatarMenu);
+    lv_obj_set_width(ui_AvatarMenuLabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AvatarMenuLabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AvatarMenuLabel, 0);
+    lv_obj_set_y(ui_AvatarMenuLabel, -95);
+    lv_obj_set_align(ui_AvatarMenuLabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_AvatarMenuLabel, "Pick an avatar");
+    lv_obj_set_style_text_font(ui_AvatarMenuLabel, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_AvatarUpdateSuccessImage = lv_img_create(ui_AvatarMenu);
+    lv_img_set_src(ui_AvatarUpdateSuccessImage, &ui_img_checkmark_png);
+    lv_obj_set_width(ui_AvatarUpdateSuccessImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_AvatarUpdateSuccessImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_AvatarUpdateSuccessImage, 0);
+    lv_obj_set_y(ui_AvatarUpdateSuccessImage, 5);
+    lv_obj_set_align(ui_AvatarUpdateSuccessImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_AvatarUpdateSuccessImage, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_AvatarUpdateSuccessImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_zoom(ui_AvatarUpdateSuccessImage, 110);
+
+    ui_PiggyUserBtn = lv_btn_create(ui_AvatarMenu);
+    lv_obj_set_width(ui_PiggyUserBtn, 60);
+    lv_obj_set_height(ui_PiggyUserBtn, 60);
+    lv_obj_set_x(ui_PiggyUserBtn, 40);
+    lv_obj_set_y(ui_PiggyUserBtn, -35);
+    lv_obj_set_align(ui_PiggyUserBtn, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_PiggyUserBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_PiggyUserBtn, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_PiggyUserBtn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_PiggyUserBtn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_FroggyUserBtn = lv_btn_create(ui_AvatarMenu);
+    lv_obj_set_width(ui_FroggyUserBtn, 60);
+    lv_obj_set_height(ui_FroggyUserBtn, 60);
+    lv_obj_set_x(ui_FroggyUserBtn, -42);
+    lv_obj_set_y(ui_FroggyUserBtn, -35);
+    lv_obj_set_align(ui_FroggyUserBtn, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_FroggyUserBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_FroggyUserBtn, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_FroggyUserBtn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_FroggyUserBtn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_HorsyUserBtn = lv_btn_create(ui_AvatarMenu);
+    lv_obj_set_width(ui_HorsyUserBtn, 60);
+    lv_obj_set_height(ui_HorsyUserBtn, 60);
+    lv_obj_set_x(ui_HorsyUserBtn, -42);
+    lv_obj_set_y(ui_HorsyUserBtn, 45);
+    lv_obj_set_align(ui_HorsyUserBtn, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_HorsyUserBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_HorsyUserBtn, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_HorsyUserBtn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_HorsyUserBtn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_PandyUserBtn = lv_btn_create(ui_AvatarMenu);
+    lv_obj_set_width(ui_PandyUserBtn, 60);
+    lv_obj_set_height(ui_PandyUserBtn, 60);
+    lv_obj_set_x(ui_PandyUserBtn, 40);
+    lv_obj_set_y(ui_PandyUserBtn, 45);
+    lv_obj_set_align(ui_PandyUserBtn, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_PandyUserBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_PandyUserBtn, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_PandyUserBtn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_PandyUserBtn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_add_event_cb(ui_PiggyUserBtn, ui_event_PiggyUserBtn, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_FroggyUserBtn, ui_event_FroggyUserBtn, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_HorsyUserBtn, ui_event_HorsyUserBtn, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_PandyUserBtn, ui_event_PandyUserBtn, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_AvatarMenu, ui_event_AvatarMenu, LV_EVENT_ALL, NULL);
     uic_AvatarMenu = ui_AvatarMenu;
+    uic_AvatarsImage = ui_AvatarsImage;
+    uic_AvatarMenuLabel = ui_AvatarMenuLabel;
+    uic_AvatarUpdateSuccessImage = ui_AvatarUpdateSuccessImage;
+    uic_PiggyUserBtn = ui_PiggyUserBtn;
+    uic_FroggyUserBtn = ui_FroggyUserBtn;
+    uic_HorsyUserBtn = ui_HorsyUserBtn;
+    uic_PandyUserBtn = ui_PandyUserBtn;
 
 }
 
@@ -50,5 +205,19 @@ void ui_AvatarMenu_screen_destroy(void)
     uic_AvatarMenu = NULL;
     ui_AvatarMenu = NULL;
     ui_Image8 = NULL;
+    uic_AvatarsImage = NULL;
+    ui_AvatarsImage = NULL;
+    uic_AvatarMenuLabel = NULL;
+    ui_AvatarMenuLabel = NULL;
+    uic_AvatarUpdateSuccessImage = NULL;
+    ui_AvatarUpdateSuccessImage = NULL;
+    uic_PiggyUserBtn = NULL;
+    ui_PiggyUserBtn = NULL;
+    uic_FroggyUserBtn = NULL;
+    ui_FroggyUserBtn = NULL;
+    uic_HorsyUserBtn = NULL;
+    ui_HorsyUserBtn = NULL;
+    uic_PandyUserBtn = NULL;
+    ui_PandyUserBtn = NULL;
 
 }

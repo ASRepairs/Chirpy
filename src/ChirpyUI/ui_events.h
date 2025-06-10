@@ -16,6 +16,10 @@ void loraSendHeart(lv_event_t * e);
 void loraSendParty(lv_event_t * e);
 void loraSendMessageFromBox(lv_event_t * e);
 void loraEmergency(lv_event_t * e);
+void ChangeUserPiggy(lv_event_t * e);
+void ChangeUserFroggy(lv_event_t * e);
+void ChangeUserHorsy(lv_event_t * e);
+void ChangeUserPandy(lv_event_t * e);
 void loraChangeGroup(lv_event_t * e);
 
 #ifdef __cplusplus
