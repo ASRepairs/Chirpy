@@ -36,18 +36,20 @@ extern "C" {
 #include "screens/ui_GroupsMenu.h"
 #include "screens/ui_PhoneConnectScreen.h"
 #include "screens/ui_PhoneQRMenu.h"
+#include "screens/ui_NotificationScreen.h"
 
 ///////////////////// VARIABLES ////////////////////
 
 extern lv_anim_t * MessageSentSuccessStart_Animation(lv_obj_t * TargetObject, int delay);
 extern lv_anim_t * MessageSentSuccessEnd_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * DismissNoticationAnimation_Animation(lv_obj_t * TargetObject, int delay);
 
 // EVENTS
 
 extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
-LV_IMG_DECLARE(ui_img_homebg_png);    // assets/HomeBG.png
+LV_IMG_DECLARE(ui_img_ui_png);    // assets/UI.png
 LV_IMG_DECLARE(ui_img_avatar_png);    // assets/Avatar.png
 LV_IMG_DECLARE(ui_img_groups_png);    // assets/Groups.png
 LV_IMG_DECLARE(ui_img_messagepanel_png);    // assets/MessagePanel.png

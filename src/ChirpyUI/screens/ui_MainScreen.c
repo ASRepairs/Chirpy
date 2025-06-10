@@ -53,7 +53,7 @@ void ui_MainScreen_screen_init(void)
     lv_obj_clear_flag(ui_MainScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_HomeBG = lv_img_create(ui_MainScreen);
-    lv_img_set_src(ui_HomeBG, &ui_img_homebg_png);
+    lv_img_set_src(ui_HomeBG, &ui_img_ui_png);
     lv_obj_set_width(ui_HomeBG, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_HomeBG, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(ui_HomeBG, LV_ALIGN_CENTER);

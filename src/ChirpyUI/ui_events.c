@@ -16,7 +16,6 @@ void loraEmergency(lv_event_t * e)
 	if (common_sendLoraEmoji(ALERT) == ESP_OK) //TODO: Replace this function with a special function that also sends GPS coords
 	{
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 	}
 }
@@ -29,7 +28,6 @@ void loraSendLike(lv_event_t * e)
 		lv_obj_set_style_opa(ui_MessageSendCheckMark, LV_OPA_0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
 	}
@@ -39,11 +37,11 @@ void loraSendWave(lv_event_t * e)
 {
 	if (common_sendLoraEmoji(WAVE) == ESP_OK)
 	{
+		lv_obj_set_parent(ui_checkk, lv_layer_top());
 		lv_obj_clear_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
 		lv_obj_set_style_opa(ui_MessageSendCheckMark, LV_OPA_0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
 	}
@@ -57,7 +55,6 @@ void loraSendHeart(lv_event_t * e)
 		lv_obj_set_style_opa(ui_MessageSendCheckMark, LV_OPA_0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
 	}
@@ -71,7 +68,6 @@ void loraSendParty(lv_event_t * e)
 		lv_obj_set_style_opa(ui_MessageSendCheckMark, LV_OPA_0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
 	}
@@ -88,7 +84,6 @@ void loraSendMessageFromBox(lv_event_t * e)
 		lv_textarea_set_text(ui_MessageInputBox, ""); // clear input box after sending
 		lv_textarea_set_placeholder_text(ui_MessageInputBox, "Type a message...");
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		vTaskDelay(pdMS_TO_TICKS(1000)); // wait for animation to finish
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
 		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
 	}
@@ -108,6 +103,7 @@ void loraChangeGroup(lv_event_t * e)
 		{
 			globalUserData.groupId = group;
 			ESP_LOGI("UI", "Updated globalUserData.groupId to %d", group);
+			lv_label_set_text_fmt(ui_GroupNr, "Group: %d", group);
 		}
 		else
 		{

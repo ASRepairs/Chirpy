@@ -53,7 +53,8 @@ void ui_GroupsMenu_screen_init(void)
     lv_obj_clear_flag(ui_Image1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_GroupSelector = lv_roller_create(ui_GroupsMenu);
-    lv_roller_set_options(ui_GroupSelector, "Gr. 1\nGr. 2\nGr. 3\nGr. 4\nGr. 5", LV_ROLLER_MODE_NORMAL);
+    lv_roller_set_options(ui_GroupSelector, "Gr. 1\nGr. 2\nGr. 3\nGr. 4\nGr. 5\nGr. 6\nGr. 7\nGr. 8\nGr. 9\nGr. 10",
+                          LV_ROLLER_MODE_INFINITE);
     lv_obj_set_width(ui_GroupSelector, 200);
     lv_obj_set_height(ui_GroupSelector, 150);
     lv_obj_set_x(ui_GroupSelector, 0);
@@ -62,6 +63,9 @@ void ui_GroupsMenu_screen_init(void)
     lv_obj_set_style_text_font(ui_GroupSelector, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_GroupSelector, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_GroupSelector, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_GroupSelector, lv_color_hex(0xFFA300), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_GroupSelector, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui_GroupSelector, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_set_style_radius(ui_GroupSelector, 100, LV_PART_SELECTED | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_GroupSelector, lv_color_hex(0xECA21A), LV_PART_SELECTED | LV_STATE_DEFAULT);

@@ -7,11 +7,12 @@ SET(SOURCES screens/ui_MainScreen.c
     screens/ui_GroupsMenu.c
     screens/ui_PhoneConnectScreen.c
     screens/ui_PhoneQRMenu.c
+    screens/ui_NotificationScreen.c
     ui.c
     components/ui_comp_hook.c
     ui_helpers.c
     ui_events.c
-    images/ui_img_homebg_png.c
+    images/ui_img_ui_png.c
     images/ui_img_avatar_png.c
     images/ui_img_groups_png.c
     images/ui_img_messagepanel_png.c
