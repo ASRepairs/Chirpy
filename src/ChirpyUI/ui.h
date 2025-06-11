@@ -38,6 +38,8 @@ extern "C" {
 #include "screens/ui_PhoneQRMenu.h"
 #include "screens/ui_NotificationScreen.h"
 #include "screens/ui_Images.h"
+#include "screens/ui_SettingsScreen.h"
+#include "screens/ui_SettingsMenu.h"
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -69,6 +71,7 @@ LV_IMG_DECLARE(ui_img_piggy_png);    // assets/piggy.png
 LV_IMG_DECLARE(ui_img_horsy_png);    // assets/horsy.png
 LV_IMG_DECLARE(ui_img_pandy_png);    // assets/pandy.png
 LV_IMG_DECLARE(ui_img_emergencyemoji_png);    // assets/emergencyEmoji.png
+LV_IMG_DECLARE(ui_img_settings_png);    // assets/Settings.png
 
 // UI INIT
 void ui_init(void);

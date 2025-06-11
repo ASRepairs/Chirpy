@@ -22,6 +22,10 @@ void ui_event_PhoneConnectScreen(lv_event_t * e)
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_PhoneQRMenu, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, &ui_PhoneQRMenu_screen_init);
     }
+    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP) {
+        lv_indev_wait_release(lv_indev_get_act());
+        _ui_screen_change(&ui_SettingsScreen, LV_SCR_LOAD_ANIM_MOVE_TOP, 200, 0, &ui_SettingsScreen_screen_init);
+    }
 }
 
 // build funtions

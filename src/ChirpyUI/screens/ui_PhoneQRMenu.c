@@ -5,9 +5,12 @@
 
 #include "../ui.h"
 
+lv_obj_t * uic_QRContainer;
+lv_obj_t * uic_PhoneQRMenu;
 lv_obj_t * ui_PhoneQRMenu;
 lv_obj_t * ui_Image7;
 lv_obj_t * ui_Label4;
+lv_obj_t * ui_QRContainer;
 
 // event funtions
 void ui_event_PhoneQRMenu(lv_event_t * e)
@@ -44,7 +47,18 @@ void ui_PhoneQRMenu_screen_init(void)
     lv_label_set_text(ui_Label4, "Scan With App");
     lv_obj_set_style_text_font(ui_Label4, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_QRContainer = lv_obj_create(ui_PhoneQRMenu);
+    lv_obj_remove_style_all(ui_QRContainer);
+    lv_obj_set_width(ui_QRContainer, 200);
+    lv_obj_set_height(ui_QRContainer, 160);
+    lv_obj_set_x(ui_QRContainer, 0);
+    lv_obj_set_y(ui_QRContainer, 10);
+    lv_obj_set_align(ui_QRContainer, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ui_QRContainer, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
     lv_obj_add_event_cb(ui_PhoneQRMenu, ui_event_PhoneQRMenu, LV_EVENT_ALL, NULL);
+    uic_PhoneQRMenu = ui_PhoneQRMenu;
+    uic_QRContainer = ui_QRContainer;
 
 }
 
@@ -53,8 +67,11 @@ void ui_PhoneQRMenu_screen_destroy(void)
     if(ui_PhoneQRMenu) lv_obj_del(ui_PhoneQRMenu);
 
     // NULL screen variables
+    uic_PhoneQRMenu = NULL;
     ui_PhoneQRMenu = NULL;
     ui_Image7 = NULL;
     ui_Label4 = NULL;
+    uic_QRContainer = NULL;
+    ui_QRContainer = NULL;
 
 }

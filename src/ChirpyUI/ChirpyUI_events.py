@@ -42,3 +42,11 @@ def ChangeUserHorsy(event_struct):
 def ChangeUserPandy(event_struct):
     return
 
+
+def ChangeBrightess(event_struct):
+    return
+
+
+def ChangeSoundMode(event_struct):
+    return
+

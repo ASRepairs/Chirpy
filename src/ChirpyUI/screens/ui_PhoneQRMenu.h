@@ -17,7 +17,10 @@ extern void ui_event_PhoneQRMenu(lv_event_t * e);
 extern lv_obj_t * ui_PhoneQRMenu;
 extern lv_obj_t * ui_Image7;
 extern lv_obj_t * ui_Label4;
+extern lv_obj_t * ui_QRContainer;
 // CUSTOM VARIABLES
+extern lv_obj_t * uic_PhoneQRMenu;
+extern lv_obj_t * uic_QRContainer;
 
 #ifdef __cplusplus
 } /*extern "C"*/

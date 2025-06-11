@@ -75,6 +75,60 @@ esp_err_t sendLoraMessage(String& msg) {
     return ESP_FAIL;
 }
 
+// ─────────────────────── Time/Date ────────────────────────
+static void _ui_set_time_label(void *p)
+{
+    /* p points to a NUL-terminated "HH:MM" string that lives in task scope */
+    lv_label_set_text(ui_Time, (const char *)p);
+}
+
+
+void TaskTimeUpdater(void *pvParameters)
+{
+    static char buf[6]; /* “HH:MM” — must persist between calls     */
+    struct tm tm_now;   /* POSIX time structure                      */
+
+    for (;;)
+    {
+        /* 1. read Unix time from the hardware RTC */
+        time_t t = watch.hwClockRead(); /* LilyGO helper updates ‘time’ */
+        localtime_r(&t, &tm_now); /* convert to broken-down time  */
+
+        /* 2. format hour and minute */
+        snprintf(buf, sizeof(buf), "%02d:%02d", tm_now.tm_hour, tm_now.tm_min);
+
+        /* 3. queue the label update in LVGL’s own context (thread-safe) */
+        lv_async_call(_ui_set_time_label, buf);
+
+        /* 4. repeat every second (change to 60000 ms if only minute precision wanted) */
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+static void _ui_set_date_label(void *p)
+{
+    lv_label_set_text(ui_Date, (const char *)p);
+}
+
+void TaskDateUpdater(void *pvParameters)
+{
+    static char date_buf[16]; // "Wed, 21/01" + null terminator
+    struct tm tm_now;
+
+    for (;;)
+    {
+        time_t t = watch.hwClockRead();
+        localtime_r(&t, &tm_now);
+
+        // Format: "Wed, 21/01"
+        strftime(date_buf, sizeof(date_buf), "%a, %d/%m", &tm_now);
+
+        lv_async_call(_ui_set_date_label, date_buf);
+
+        vTaskDelay(pdMS_TO_TICKS(60000)); // update every 60 seconds
+    }
+}
+
 // ──────────────────────── Notification Handling ────────────────────────
 void handleReceivedNotification(int user_id, const char *payload_str)
 {
@@ -259,30 +313,59 @@ void TaskLvglUpdate(void* pvParameters) {
     }
 }
 
-void TaskCheckShortButtonPressed(void* pvParameters){
+void TaskCheckShortButtonPressed(void *pvParameters)
+{
     while (true)
     {
-        if (isPmuIRQ) {
+        if (isPmuIRQ)
+        {
             isPmuIRQ = false;
             watch.readPMU();
-            if (watch.isPekeyShortPressIrq()) {
-                ESP_LOGI(TAG, "[watch] Pekey short-press");
-                //String msg = "button pressed";
-                //sendLoraMessage(msg);
-                // Pekey button as "lock screen"
-                
-                watch.setWaveform(0, 1);  // play effect
-                watch.setWaveform(1, 0);  // end waveform
-                watch.run();
-                ESP_LOGI(TAG, "[FFat] freeBytes: %d", FFat.freeBytes());
 
+            // Long press = turn off display
+            if (watch.isPekeyLongPressIrq())
+            {
+                if (watch.getBrightness() > 0)
+                {
+                    watch.setBrightness(0); // this will also sleep the lcd
+                    watch.powerIoctl(WATCH_POWER_TOUCH_DISP, false);
+                    ESP_LOGI(TAG, "[watch] Display turned OFF (long press)");
+                }
+            }
+
+            // Short press = wake screen or go to home
+            else if (watch.isPekeyShortPressIrq())
+            {
+                ESP_LOGI(TAG, "[watch] Pekey short-press");
+
+                if (watch.getBrightness() == 0)
+                {
+                    // lcd is off, turn it on
+                    watch.powerIoctl(WATCH_POWER_TOUCH_DISP, true);
+                    vTaskDelay(pdMS_TO_TICKS(50)); // wait for power to stabilize
+                    watch.setBrightness(50); // or restore previous brightness
+                    ESP_LOGI(TAG, "[watch] Display turned ON");
+                }
+                else
+                {
+                    // Display is on, switch to home screen if not already there
+                    if (lv_scr_act() != ui_MainScreen)
+                    {
+                        lv_scr_load_anim(ui_MainScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
+                        ESP_LOGI(TAG, "[watch] Switched to Home Screen");
+                    }
+                }
+
+                //vibrator feedback
+                watch.setWaveform(0, 1);
+                watch.setWaveform(1, 0);
+                watch.run();
             }
             watch.clearPMU();
         }
         vTaskDelay(pdMS_TO_TICKS(20));
     }
 }
-
 
 // ─────────── Common functions definition (common.h) ──────────────
 
@@ -312,24 +395,38 @@ esp_err_t common_sendLoraEmoji(int msg)
     return sendLoraMessage(msg_str);
 }
 
-
+void common_setBrightness(uint8_t level)
+{
+    if (level > 0 && level <= 255) {
+        watch.setBrightness(level);
+    } else {
+        ESP_LOGE(TAG, "[watch] Invalid brightness level: %d. Must be between 1 and 255.", level);
+    }
+}
 
 
 // ───────────────────────────── Setup ─────────────────────────────
 void setup() {
+
     Serial.begin(115200);
     Serial.setDebugOutput(true); 
     esp_log_level_set("*", ESP_LOG_VERBOSE);
+
     watch.begin();
     beginLvglHelper();
     watch.attachPMU([]() {
         isPmuIRQ = true;
     });
+
+
     uint64_t chip_id = ESP.getEfuseMac();
     char chip_id_str[13];
     sprintf(chip_id_str, "%012llX", chip_id); // or "%012llx" for lowercase
     node_id = String(chip_id_str);
     ESP_LOGI(TAG, "[Node ID] %s", node_id.c_str()); // 80E58A63B0E4
+
+
+    // Initialize LoRa radio
     ESP_LOGI(TAG, "[SX1262] Initializing...");
     int state = radio.begin();
     if (state != RADIOLIB_ERR_NONE) {
@@ -352,16 +449,30 @@ void setup() {
         while (true);
     }
 
-    startBLETask(node_id, &currentGPSData);    // Initialize BLE
+    // Initialize BLE
+    startBLETask(node_id, &currentGPSData);    
 
     ui_init(); //LVGL UI
+
+    // QR Code generation
+    char chirpy_name[32];
+    snprintf(chirpy_name, sizeof(chirpy_name), "Chirpy_%s", chip_id_str);
+    // Create QR Code object and attach to QR container
+    lv_obj_t *qr = lv_qrcode_create(ui_QRContainer, 150, lv_color_black(), lv_color_hex(0xffa300)); // that color ;)
+    lv_obj_center(qr); // center inside parent
+
+    // Set QR code data (Chirpy_<MAC>)
+    lv_qrcode_update(qr, chirpy_name, strlen(chirpy_name));
+
 
     //FreeRTOS tasks
     //xTaskCreatePinnedToCore(TaskLoraSender, "TaskLoraSender", TASK_STACK_SIZE, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(TaskLoraReceiver, "TaskLoraReceiver", TASK_STACK_SIZE, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(TaskLvglUpdate, "TaskLvglUpdate", TASK_STACK_SIZE, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(TaskCheckShortButtonPressed, "TaskCheckShortButtonPressed",TASK_STACK_SIZE, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(TaskLvglUpdate, "TaskLvglUpdate", TASK_STACK_SIZE, NULL, 100, NULL, 0);
+    xTaskCreatePinnedToCore(TaskCheckShortButtonPressed, "TaskCheckShortButtonPressed",TASK_STACK_SIZE, NULL, 1, NULL, 1);
     //xTaskCreatePinnedToCore(TaskShowRecievedFrame, "TaskShowRecievedFrame",TASK_STACK_SIZE, NULL, 1, NULL, 0);
+    xTaskCreatePinnedToCore(TaskTimeUpdater,"TaskTimeUpdater", TASK_STACK_SIZE, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskDateUpdater, "TaskDateUpdater", TASK_STACK_SIZE, NULL, 1, NULL, 1);
 }
 
 void loop() {

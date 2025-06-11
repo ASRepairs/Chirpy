@@ -9,6 +9,8 @@ SET(SOURCES screens/ui_MainScreen.c
     screens/ui_PhoneQRMenu.c
     screens/ui_NotificationScreen.c
     screens/ui_Images.c
+    screens/ui_SettingsScreen.c
+    screens/ui_SettingsMenu.c
     ui.c
     components/ui_comp_hook.c
     ui_helpers.c
@@ -31,6 +33,7 @@ SET(SOURCES screens/ui_MainScreen.c
     images/ui_img_piggy_png.c
     images/ui_img_horsy_png.c
     images/ui_img_pandy_png.c
-    images/ui_img_emergencyemoji_png.c)
+    images/ui_img_emergencyemoji_png.c
+    images/ui_img_settings_png.c)
 
 add_library(ui ${SOURCES})

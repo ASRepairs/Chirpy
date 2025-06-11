@@ -133,3 +133,13 @@ void ChangeUserPandy(lv_event_t * e)
 	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_pandy_png);
 	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
+
+void ChangeBrightess(lv_event_t * e)
+{
+	common_setBrightness(lv_slider_get_value(ui_BrightnessSlider));
+}
+
+void ChangeSoundMode(lv_event_t * e)
+{
+	// Your code here
+}

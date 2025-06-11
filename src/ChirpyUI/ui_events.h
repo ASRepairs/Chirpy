@@ -21,6 +21,8 @@ void ChangeUserFroggy(lv_event_t * e);
 void ChangeUserHorsy(lv_event_t * e);
 void ChangeUserPandy(lv_event_t * e);
 void loraChangeGroup(lv_event_t * e);
+void ChangeBrightess(lv_event_t * e);
+void ChangeSoundMode(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -139,6 +139,8 @@ void ui_init(void)
     ui_PhoneQRMenu_screen_init();
     ui_NotificationScreen_screen_init();
     ui_Images_screen_init();
+    ui_SettingsScreen_screen_init();
+    ui_SettingsMenu_screen_init();
     ui____initial_actions0 = lv_obj_create(NULL);
     lv_disp_load_scr(ui_MainScreen);
 }
@@ -156,4 +158,6 @@ void ui_destroy(void)
     ui_PhoneQRMenu_screen_destroy();
     ui_NotificationScreen_screen_destroy();
     ui_Images_screen_destroy();
+    ui_SettingsScreen_screen_destroy();
+    ui_SettingsMenu_screen_destroy();
 }

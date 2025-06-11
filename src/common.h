@@ -14,7 +14,7 @@ extern "C" {
 esp_err_t common_sendLoraMessage(const char *msg);
 esp_err_t common_sendLoraEmoji(int msg);
 void common_displayMessageUI(int msg_id, int usr_id);
-
+void common_setBrightness(uint8_t level);
 #ifdef __cplusplus
 } // extern "C"
 #endif
