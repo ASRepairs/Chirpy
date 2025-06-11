@@ -460,6 +460,10 @@ void setup() {
     // Create QR Code object and attach to QR container
     lv_obj_t *qr = lv_qrcode_create(ui_QRContainer, 150, lv_color_black(), lv_color_hex(0xffa300)); // that color ;)
     lv_obj_center(qr); // center inside parent
+    lv_obj_set_style_border_width(qr, 2, 0);
+    lv_obj_set_style_border_color(qr, lv_color_hex(0xffa300), 0);
+    lv_obj_set_style_border_opa(qr, LV_OPA_COVER, 0);
+    lv_obj_set_style_radius(qr, 0, 0);
 
     // Set QR code data (Chirpy_<MAC>)
     lv_qrcode_update(qr, chirpy_name, strlen(chirpy_name));
