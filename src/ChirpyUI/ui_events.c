@@ -20,13 +20,22 @@ void loraEmergency(lv_event_t * e)
 	}
 }
 
+void successAnimationFunc(lv_obj_t *TargetObject)
+{
+	// Unhide and reset opacity
+	lv_obj_clear_flag(TargetObject, LV_OBJ_FLAG_HIDDEN);
+	lv_obj_set_style_opa(TargetObject, LV_OPA_TRANSP, 0); // Start transparent
+
+	// Start the animation
+	MessageSentSuccessStart_Animation(TargetObject, 0);
+
+}
+
 void loraSendLike(lv_event_t * e)
 {
 	if (common_sendLoraEmoji(THUMB_UP) == ESP_OK)
 	{
-		lv_obj_clear_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
-		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
+		successAnimationFunc(ui_MessageSendCheckMark);
 	}
 }
 
@@ -34,13 +43,7 @@ void loraSendWave(lv_event_t * e)
 {
 	if (common_sendLoraEmoji(WAVE) == ESP_OK)
 	{
-		lv_obj_set_parent(ui_NotificationContainer, lv_layer_top());
-		lv_obj_clear_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
-		lv_obj_set_style_opa(ui_MessageSendCheckMark, LV_OPA_0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
-		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
+		successAnimationFunc(ui_MessageSendCheckMark);
 	}
 }
 
@@ -48,9 +51,7 @@ void loraSendHeart(lv_event_t * e)
 {
 	if (common_sendLoraEmoji(HEART) == ESP_OK)
 	{
-		lv_obj_clear_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
-		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
+		successAnimationFunc(ui_MessageSendCheckMark);
 	}
 }
 
@@ -58,9 +59,7 @@ void loraSendParty(lv_event_t * e)
 {
 	if (common_sendLoraEmoji(PARTY) == ESP_OK)
 	{
-		lv_obj_clear_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
-		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		lv_obj_add_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
+		successAnimationFunc(ui_MessageSendCheckMark);
 	}
 }
 
@@ -111,22 +110,26 @@ void ChangeUserPiggy(lv_event_t * e)
 {
 	globalUserData.userId = PIGGY;
 	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_piggy_png);
+	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
 
 void ChangeUserFroggy(lv_event_t * e)
 {
 	globalUserData.userId = FROGGY;
 	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_froggy_png);	
+	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
 
 void ChangeUserHorsy(lv_event_t * e)
 {
 	globalUserData.userId = HORSY;
 	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_horsy_png);
+	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
 
 void ChangeUserPandy(lv_event_t * e)
 {
 	globalUserData.userId = PANDY;
 	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_pandy_png);
+	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
