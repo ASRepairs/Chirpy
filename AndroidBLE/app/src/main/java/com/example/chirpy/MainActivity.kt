@@ -3,10 +3,15 @@ package com.example.chirpy
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.bluetooth.*
 import android.bluetooth.le.*
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.ParcelUuid
@@ -22,6 +27,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import java.nio.charset.StandardCharsets
@@ -67,7 +73,8 @@ class MainActivity : ComponentActivity() {
             arrayOf(
                 Manifest.permission.BLUETOOTH_SCAN,
                 Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.POST_NOTIFICATIONS
             )
         )
 
@@ -96,7 +103,7 @@ class MainActivity : ComponentActivity() {
                             }
                         },
                         enabled = isConnected
-                    ) { Text("Send GPS Coords") }
+                    ) { Text("Send GPS to Watch") }
 
                     Text(statusText)
                 }
@@ -301,13 +308,47 @@ class MainActivity : ComponentActivity() {
             characteristic: BluetoothGattCharacteristic
         ) {
             if (characteristic.uuid.toString().equals(NOTIFY_UUID, ignoreCase = true)) {
-                val cmd = characteristic.getStringValue(0)
-                when (cmd) {
-                    "REQ:GPS" -> sendGps  { runOnUiThread { statusText = if (it) "Sent GPS ✅" else "Send GPS ❌" } }
-                    "REQ:TIME" -> sendTime { runOnUiThread { statusText = if (it) "Sent Time ✅" else "Send Time ❌" } }
-                    else -> { /* ignore */ }
-                }
+                val msg = characteristic.getStringValue(0)
 
+                when {
+                    msg == "REQ:GPS" -> {
+                        sendGps {
+                            runOnUiThread {
+                                statusText = if (it) "Sent GPS!" else "Send GPS FAILED"
+                            }
+                        }
+                    }
+
+                    msg == "REQ:TIME" -> {
+                        sendTime {
+                            runOnUiThread {
+                                statusText = if (it) "Sent Time!" else "Send Time FAILED"
+                            }
+                        }
+                    }
+
+                    msg.startsWith("GPS:") -> {
+                        val coords = msg.removePrefix("GPS:").split(',')
+                        if (coords.size == 2) {
+                            val lat = coords[0].trim()
+                            val lon = coords[1].trim()
+                            runOnUiThread {
+                                showGpsNotification(lat, lon) // custom function defined earlier
+                                statusText = "Received GPS!"
+                            }
+                        } else {
+                            runOnUiThread {
+                                statusText = "Bad GPS format :("
+                            }
+                        }
+                    }
+
+                    else -> {
+                        runOnUiThread {
+                            statusText = "Unknown BLE msg: $msg"
+                        }
+                    }
+                }
             }
         }
     }
@@ -362,4 +403,36 @@ class MainActivity : ComponentActivity() {
         ch.setValue(payload.toByteArray(StandardCharsets.UTF_8))
         onDone(gatt.writeCharacteristic(ch))
     }
+    private fun showGpsNotification(lat: String, lon: String) {
+        val channelId = "gps_channel"
+        val nm = getSystemService(NotificationManager::class.java)
+
+        // 1-time channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+            nm.getNotificationChannel(channelId) == null) {
+            nm.createNotificationChannel(
+                NotificationChannel(channelId, "GPS", NotificationManager.IMPORTANCE_DEFAULT)
+            )
+        }
+
+        val geoUri = Uri.parse("geo:$lat,$lon?q=$lat,$lon")
+        val mapsIntent = Intent(Intent.ACTION_VIEW, geoUri).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val pi = PendingIntent.getActivity(
+            this, 0, mapsIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notif = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(android.R.drawable.ic_menu_mylocation)
+            .setContentTitle("Chirpy location")
+            .setContentText("Tap to open in Maps")
+            .setContentIntent(pi)
+            .setAutoCancel(true)
+            .build()
+
+        nm.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), notif)
+    }
+
 }
