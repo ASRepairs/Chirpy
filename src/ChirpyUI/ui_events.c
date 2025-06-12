@@ -13,7 +13,7 @@
 
 void loraEmergency(lv_event_t * e)
 {
-	if (common_sendLoraEmoji(ALERT) == ESP_OK) //TODO: Replace this function with a special function that also sends GPS coords
+	if (common_sendLoraAlert() == ESP_OK) //TODO: Replace this function with a special function that also sends GPS coords
 	{
 		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
 		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);

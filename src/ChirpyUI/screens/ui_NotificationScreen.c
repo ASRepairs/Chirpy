@@ -95,8 +95,8 @@ void ui_NotificationScreen_screen_init(void)
     lv_obj_set_y(ui_NotificationOverlayPanel, -50);
     lv_obj_set_align(ui_NotificationOverlayPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_NotificationOverlayPanel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_NotificationOverlayPanel, lv_color_hex(0x3F3F3F), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_NotificationOverlayPanel, 150, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_NotificationOverlayPanel, lv_color_hex(0x343434), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_NotificationOverlayPanel, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_HasSentTextLabel = lv_label_create(ui_NotificationOverlayPanel);
     lv_obj_set_width(ui_HasSentTextLabel, LV_SIZE_CONTENT);   /// 1

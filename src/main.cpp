@@ -27,7 +27,7 @@ SX1262 radio = newModule();
 lv_obj_t* label1 = nullptr;
 volatile bool receivedFlag = false;
 volatile bool isTransmitting = false;
-String node_id;
+static char chirpyName[32];
 std::deque<String> recentMessages;
 
 struct userData globalUserData = {1, 0}; //start with first group and froggy
@@ -130,7 +130,7 @@ void TaskDateUpdater(void *pvParameters)
 }
 
 // ──────────────────────── Notification Handling ────────────────────────
-void handleReceivedNotification(int user_id, const char *payload_str)
+void handleReceivedNotification(int user_id, int msg_type, const char *payload_str)
 {
     ESP_LOGI(TAG, "UI Received notification from user %d: %s", user_id, payload_str);
     lv_obj_set_y(ui_NotificationContainer, 0); // Force Y to top
@@ -156,7 +156,7 @@ void handleReceivedNotification(int user_id, const char *payload_str)
     }
     bool auto_dismiss = true;
     // Interpret the payload
-    if (strlen(payload_str) == 1 && isdigit((unsigned char)payload_str[0])) // only if it is a single digit
+    if (msg_type == MSG_TYPE_EMOJI || msg_type == MSG_TYPE_ALERT)
     {
         int emoji_code = atoi(payload_str);
         ESP_LOGI(TAG, "Parsed emoji code: %d", emoji_code);
@@ -190,11 +190,17 @@ void handleReceivedNotification(int user_id, const char *payload_str)
                 break;
             }
         }
-    } else {
+    }
+    else if (msg_type == MSG_TYPE_TEXT)
+    {
         lv_obj_add_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN);     // hide emoji image
         lv_obj_clear_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN); // show text label
         // Treat as plain text message
         lv_label_set_text(ui_ReceivedMessageLabel, payload_str);
+    }
+    else if (msg_type == MSG_TYPE_GPS)
+    {
+        //TODO: handle GPS data
     }
 
     // show the notification overlay
@@ -230,22 +236,25 @@ void displayReceivedMessage() {
         int first_colon = receivedMsg.indexOf(':');
         int second_colon = receivedMsg.indexOf(':', first_colon + 1);
         int third_colon = receivedMsg.indexOf(':', second_colon + 1);
-        int forth_colon = receivedMsg.indexOf(':', third_colon + 1);
+        int fourth_colon = receivedMsg.indexOf(':', third_colon + 1);
+        int fifth_colon = receivedMsg.indexOf(':', fourth_colon + 1);
 
-        if (first_colon == -1 || second_colon == -1 || forth_colon == -1 || forth_colon <= second_colon)
+        if (fifth_colon == -1)
         {
-            ESP_LOGW(TAG, "[SX1262] Invalid message format");
+            ESP_LOGW(TAG, "Invalid message format – type missing");
             return;
         }
 
         String sender = receivedMsg.substring(0, first_colon);
         String msg_id = receivedMsg.substring(first_colon + 1, second_colon);
         String group_str = receivedMsg.substring(second_colon + 1, third_colon);
-        String usr_str = receivedMsg.substring(third_colon + 1, forth_colon);
-        String payload_str = receivedMsg.substring(forth_colon + 1);
+        String usr_str = receivedMsg.substring(third_colon + 1, fourth_colon);
+        String type_str = receivedMsg.substring(fourth_colon + 1, fifth_colon);
+        String payload_str = receivedMsg.substring(fifth_colon + 1);
+        int msg_type = atoi(type_str.c_str());
 
         // skip if we were the sender
-        if (sender == node_id)
+        if (sender == String(chirpyName))
         {
             ESP_LOGI(TAG, "[SX1262] Skipping own message ID: %s", msg_id.c_str());
             return;
@@ -268,7 +277,7 @@ void displayReceivedMessage() {
 
         if ((gr_id == globalUserData.groupId) || (gr_id == 0) || (globalUserData.groupId == 0)) {
             ESP_LOGI(TAG, "[SX1262] Displaying message for group %d", gr_id);
-            handleReceivedNotification(usr_id, payload_str.c_str());
+            handleReceivedNotification(usr_id, msg_type, payload_str.c_str());
             watch.setWaveform(0, 15);  // play effect
             watch.setWaveform(1, 0);  // end waveform
             watch.setWaveform(3, 15);  // play effect
@@ -369,29 +378,44 @@ void TaskCheckShortButtonPressed(void *pvParameters)
 
 // ─────────── Common functions definition (common.h) ──────────────
 
-esp_err_t common_sendLoraMessage(const char *msg){ // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id (emoji)>:<payload "msg_id">"
-    String msg_str;
+esp_err_t common_sendLoraMessage(const char *msg) // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id>:<type>:<payload>"
+{ 
+        String msg_str;
     String msg_uid = String(millis()); // could also use timestamp
 
-    msg_str = node_id + ":" + msg_uid + ":" + String(globalUserData.groupId) + ":" + String(globalUserData.userId) + ":" + String(msg);
+    msg_str = String(chirpyName) + ":" + msg_uid + ":" + String(globalUserData.groupId) +
+              ":" + String(globalUserData.userId) + ":" + String(MSG_TYPE_TEXT) + ":" + String(msg);
 
     ESP_LOGI(TAG, "Sending msg: %s", msg_str.c_str());
     return sendLoraMessage(msg_str);
 }
 
-esp_err_t common_sendLoraEmoji(int msg)
-{ // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id (emoji)>:<payload "msg_id">"
+esp_err_t common_sendLoraEmoji(int emoji_code)
+{ // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id>:<type>:<payload>"
     String msg_str;
-    String msg_uid = String(millis()); // could also use timestamp
-    if (msg == ALERT)
-    {
-        msg_str = node_id + ":" + msg_uid + ":0:" + String(globalUserData.userId) + ":" + String(msg);
-    }
-    else
-    {
-        msg_str = node_id + ":" + msg_uid + ":" + String(globalUserData.groupId) + ":" + String(globalUserData.userId) + ":" + String(msg);
-    }
-    ESP_LOGI(TAG, "Sending msg: %s", msg_str.c_str());
+    String msg_uid = String(millis());
+    int type = MSG_TYPE_EMOJI;
+
+    msg_str = String(chirpyName) + ":" + msg_uid + ":" +
+              String(globalUserData.groupId) + ":" +
+              String(globalUserData.userId) + ":" + String(type) + ":" + String(emoji_code);
+
+    ESP_LOGI(TAG, "Sending emoji msg: %s", msg_str.c_str());
+    return sendLoraMessage(msg_str);
+}
+
+esp_err_t common_sendLoraAlert(void)
+{
+    // ALERT is always broadcast to all groups (groupId = 0)
+    String msg_str;
+    String msg_uid = String(millis());
+    int type = MSG_TYPE_ALERT;
+
+    msg_str = String(chirpyName) + ":" + msg_uid + ":" +
+              "0:" + // broadcast to all groups
+              String(globalUserData.userId) + ":" + String(type) + ":" + String(ALERT);
+
+    ESP_LOGI(TAG, "Sending alert msg: %s", msg_str.c_str());
     return sendLoraMessage(msg_str);
 }
 
@@ -419,7 +443,7 @@ void setup() {
     });
     uint64_t chip_id = ESP.getEfuseMac();
     char chip_id_str[13];
-    static char chirpyName[32];
+
     sprintf(chip_id_str, "%012llX", chip_id); // or "%012llx" for lowercase
     snprintf(chirpyName, sizeof(chirpyName), "Chirpy_%s", chip_id_str);
     ESP_LOGI(TAG, "[Node ID] %s", chirpyName); // 80E58A63B0E4

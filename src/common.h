@@ -13,6 +13,7 @@ extern "C" {
 
 esp_err_t common_sendLoraMessage(const char *msg);
 esp_err_t common_sendLoraEmoji(int msg);
+esp_err_t common_sendLoraAlert(void);
 void common_displayMessageUI(int msg_id, int usr_id);
 void common_setBrightness(uint8_t level);
 #ifdef __cplusplus
@@ -36,3 +37,11 @@ typedef enum
     HORSY = 2,
     PANDY = 3
 } user_emoji;
+
+typedef enum
+{
+    MSG_TYPE_TEXT = 1,
+    MSG_TYPE_EMOJI = 2,
+    MSG_TYPE_GPS = 3,
+    MSG_TYPE_ALERT = 4
+} message_type_t;
