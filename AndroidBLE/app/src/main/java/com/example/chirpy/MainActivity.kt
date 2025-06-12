@@ -6,7 +6,6 @@ import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.bluetooth.le.*
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.ParcelUuid
@@ -132,10 +131,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun startScan() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
             != PackageManager.PERMISSION_GRANTED
-        ) return
+        ) {
+            statusText = "Scan permission not granted"
+            return
+        }
 
         val filter = ScanFilter.Builder()
             .setServiceUuid(ParcelUuid(UUID.fromString(SERVICE_UUID)))
@@ -150,12 +151,17 @@ class MainActivity : ComponentActivity() {
     private val scanCallback = object : ScanCallback() {
         @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
         override fun onScanResult(type: Int, result: ScanResult) {
+            if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.BLUETOOTH_SCAN)
+                != PackageManager.PERMISSION_GRANTED
+            ) return
+
             val dev = result.device
-            val nm  = dev.name ?: return
+            val nm = dev.name ?: return
             if (!nm.startsWith("Chirpy_")) return
+
             bluetoothLeScanner?.stopScan(this)
             runOnUiThread {
-                devices    = listOf(dev)
+                devices = listOf(dev)
                 showDialog = true
             }
         }
@@ -165,6 +171,13 @@ class MainActivity : ComponentActivity() {
 
     @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
     private fun connectToDevice(device: BluetoothDevice) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            statusText = "Connect permission not granted"
+            return
+        }
+
         bluetoothLeScanner?.stopScan(scanCallback)
         statusText = "Connecting to ${device.name ?: "device"}…"
         device.connectGatt(this, false, gattCallback)
@@ -175,7 +188,15 @@ class MainActivity : ComponentActivity() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 bluetoothGatt = gatt
-                gatt.discoverServices()
+                if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.BLUETOOTH_CONNECT)
+                    == PackageManager.PERMISSION_GRANTED
+                ) {
+                    gatt.discoverServices()
+                } else {
+                    runOnUiThread {
+                        statusText = "Missing permission: cannot discover services"
+                    }
+                }
 
                 runOnUiThread {
                     isConnected = true
@@ -209,6 +230,10 @@ class MainActivity : ComponentActivity() {
 
             // ── enable notifications if characteristic found
             notifyCharacteristic?.let { ch ->
+                if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.BLUETOOTH_CONNECT)
+                    != PackageManager.PERMISSION_GRANTED
+                ) return
+
                 gatt.setCharacteristicNotification(ch, true)
                 val ccc = ch.getDescriptor(CCC_UUID)
                 if (ccc != null) {
@@ -271,6 +296,10 @@ class MainActivity : ComponentActivity() {
         val gatt = bluetoothGatt
         if (ch == null || gatt == null) { onDone(false); return }
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED
+        ) { onDone(false); return }
+
         val now = Calendar.getInstance()
         val payload = buildString {
             append(now.get(Calendar.YEAR)); append(',')
@@ -280,6 +309,9 @@ class MainActivity : ComponentActivity() {
             append(now.get(Calendar.MINUTE));      append(',')
             append(now.get(Calendar.SECOND))
         }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED
+        ) { onDone(false); return }
 
         ch.setValue(payload.toByteArray(StandardCharsets.UTF_8))
         onDone(gatt.writeCharacteristic(ch))
