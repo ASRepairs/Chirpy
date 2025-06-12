@@ -5,10 +5,12 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.bluetooth.le.*
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.ParcelUuid
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -51,6 +53,11 @@ class MainActivity : ComponentActivity() {
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { perms ->
             if (perms.values.all { it }) initBle() else statusText = "Permissions denied"
         }
+    private val qrLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val contents = result.data?.getStringExtra("SCAN_RESULT") ?: return@registerForActivityResult
+        scanForDeviceWithAddress(contents)
+    }
+
 
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,9 +82,8 @@ class MainActivity : ComponentActivity() {
 
                     Button(
                         onClick = {
-                            statusText = "Scanning…"
-                            devices = emptyList()
-                            startScan()
+                            val intent = Intent(this@MainActivity, QrScanActivity::class.java)
+                            qrLauncher.launch(intent)
                         },
                         enabled = !isConnected
                     ) { Text("Connect to Watch") }
@@ -146,6 +152,44 @@ class MainActivity : ComponentActivity() {
             .build()
 
         bluetoothLeScanner?.startScan(listOf(filter), settings, scanCallback)
+    }
+    private fun scanForDeviceWithAddress(targetName: String) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            statusText = "Scan permission not granted"
+            return
+        }
+
+        statusText = "Looking for $targetName"
+
+        val callback = object : ScanCallback() {
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+                val device = result.device
+                val name = device.name
+
+                // Log every device to help debug
+                Log.d("BLE_SCAN", "Found: ${name ?: "Unnamed"} @ ${device.address}")
+
+                if (name != null && name.equals(targetName, ignoreCase = true)) {
+                    bluetoothLeScanner?.stopScan(this)
+                    connectToDevice(device)
+                }
+            }
+        }
+
+        bluetoothLeScanner?.startScan(
+            null,
+            ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build(),
+            callback
+        )
+
+        Handler(mainLooper).postDelayed({
+            bluetoothLeScanner?.stopScan(callback)
+            if (!isConnected) {
+                statusText = "Device not found"
+            }
+        }, 10000)
     }
 
     private val scanCallback = object : ScanCallback() {
@@ -278,7 +322,9 @@ class MainActivity : ComponentActivity() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
         ) { onDone(false); return }
-
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED
+        ) { onDone(false); return }
         val fused = LocationServices.getFusedLocationProviderClient(this)
         fused.lastLocation
             .addOnSuccessListener { loc ->

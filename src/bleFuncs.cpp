@@ -155,12 +155,7 @@ class SrvCb : public BLEServerCallbacks
 /* ─────────────  The FreeRTOS task  ───────────── */
 static void bleTask(void *arg)
 {
-    /* copy nodeId into a fixed-size buffer on stack, drop String */
-    String *sPtr = static_cast<String *>(arg);
-    char devName[16] = "Chirpy_";
-    strlcat(devName, sPtr->c_str(), sizeof(devName));
-    delete sPtr;
-
+    char *devName = static_cast<char *>(arg);
     BLEDevice::init(devName);
     BLEDevice::setMTU(23); // keep ATT payload short
 
@@ -199,11 +194,10 @@ static void bleTask(void *arg)
 }
 
 /* ─────────────  API ───────────── */
-void startBLETask(const String &nodeId, GPSData *gpsData)
+void startBLETask(const char *bleName, GPSData *gpsData)
 {
     extGpsData = gpsData;
-    auto *copy = new String(nodeId); // freed inside task
-    xTaskCreatePinnedToCore(bleTask, "ble", 8192 * 3, copy, 1, NULL, 1);
+    xTaskCreatePinnedToCore(bleTask, "ble", 8192 * 4, (void *)bleName, 1, NULL, 1);
 }
 
 /* optional helpers --------------------------------------------------*/

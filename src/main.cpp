@@ -417,13 +417,12 @@ void setup() {
     watch.attachPMU([]() {
         isPmuIRQ = true;
     });
-
-
     uint64_t chip_id = ESP.getEfuseMac();
     char chip_id_str[13];
+    static char chirpyName[32];
     sprintf(chip_id_str, "%012llX", chip_id); // or "%012llx" for lowercase
-    node_id = String(chip_id_str);
-    ESP_LOGI(TAG, "[Node ID] %s", node_id.c_str()); // 80E58A63B0E4
+    snprintf(chirpyName, sizeof(chirpyName), "Chirpy_%s", chip_id_str);
+    ESP_LOGI(TAG, "[Node ID] %s", chirpyName); // 80E58A63B0E4
 
 
     // Initialize LoRa radio
@@ -450,13 +449,11 @@ void setup() {
     }
 
     // Initialize BLE
-    startBLETask(node_id, &currentGPSData);    
+    startBLETask(chirpyName, &currentGPSData);
 
     ui_init(); //LVGL UI
 
     // QR Code generation
-    char chirpy_name[32];
-    snprintf(chirpy_name, sizeof(chirpy_name), "Chirpy_%s", chip_id_str);
     // Create QR Code object and attach to QR container
     lv_obj_t *qr = lv_qrcode_create(ui_QRContainer, 150, lv_color_black(), lv_color_hex(0xffa300)); // that color ;)
     lv_obj_center(qr); // center inside parent
@@ -466,7 +463,7 @@ void setup() {
     lv_obj_set_style_radius(qr, 0, 0);
 
     // Set QR code data (Chirpy_<MAC>)
-    lv_qrcode_update(qr, chirpy_name, strlen(chirpy_name));
+    lv_qrcode_update(qr, chirpyName, strlen(chirpyName));
 
 
     //FreeRTOS tasks
