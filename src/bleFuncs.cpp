@@ -25,7 +25,7 @@ static GPSData *extGpsData = nullptr;
 static esp_timer_handle_t gpsTimer = nullptr;
 static volatile bool gConnected = false;
 
-/* ─────────────  Small helpers – no heap, no std::string  ───────────── */
+/* ─────────────  Small helpers  ───────────── */
 static inline void sendReqTime()
 {
     static constexpr char msg[] = "REQ:TIME";
@@ -44,6 +44,21 @@ static void sendReqGps()
         txChar->setValue((uint8_t *)msg, sizeof(msg) - 1);
         txChar->notify();
     }
+}
+
+void bleSendGpsNotification(float lat, float lon)
+{
+    if (!gConnected || !txChar)
+        return;
+
+    char buf[48];
+    snprintf(buf, sizeof(buf), "GPS:%.6f,%.6f", lat, lon); // example "GPS:52.4069,16.9264"
+    txChar->setValue((uint8_t *)buf, strlen(buf));
+    txChar->notify();
+
+#ifdef BLELOG
+    ESP_LOGI(TAG, "TX → %s", buf);
+#endif
 }
 
 /* ─────────────  ESP-timer callback (runs in its own tiny task)  ───────────── */
@@ -197,7 +212,7 @@ static void bleTask(void *arg)
 void startBLETask(const char *bleName, GPSData *gpsData)
 {
     extGpsData = gpsData;
-    xTaskCreatePinnedToCore(bleTask, "ble", 8192 * 4, (void *)bleName, 1, NULL, 1);
+    xTaskCreatePinnedToCore(bleTask, "ble", 8192 * 3, (void *)bleName, 1, NULL, 0);
 }
 
 /* optional helpers --------------------------------------------------*/

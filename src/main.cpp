@@ -156,41 +156,58 @@ void handleReceivedNotification(int user_id, int msg_type, const char *payload_s
     }
     bool auto_dismiss = true;
     // Interpret the payload
-    if (msg_type == MSG_TYPE_EMOJI || msg_type == MSG_TYPE_ALERT)
+    if (msg_type == MSG_TYPE_EMOJI)
     {
         int emoji_code = atoi(payload_str);
         ESP_LOGI(TAG, "Parsed emoji code: %d", emoji_code);
-        if (emoji_code > 0 && emoji_code <= 9)
-        {
-            lv_obj_add_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN); // hide text label
-            lv_obj_clear_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN); // show emoji image
+        lv_obj_add_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN); // hide text label
+        lv_obj_clear_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN); // show emoji image
 
-            // Display emoji
-            switch (emoji_code)
-            {
-            case ALERT:
-                lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_emergencyemoji_png);
-                auto_dismiss = false;
-                break;
-            case THUMB_UP:
-                lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_likeemoji_png);
-                break;
-            case WAVE:
-                lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_waveemoji_png);
-                break;
-            case HEART:
-                lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_heartemoji_png);
-                break;
-            case PARTY:
-                lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_celebrationemoji_png);
-                break;
-            default:
-                lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_likeemoji_png); // default to like emoji
-                ESP_LOGW(TAG, "Unknown emoji code: %d", emoji_code);
-                break;
-            }
+        switch (emoji_code)
+        {
+        case THUMB_UP:
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_likeemoji_png);
+            break;
+        case WAVE:
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_waveemoji_png);
+            break;
+        case HEART:
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_heartemoji_png);
+            break;
+        case PARTY:
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_celebrationemoji_png);
+            break;
+        default:
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_likeemoji_png);
+            ESP_LOGW(TAG, "Unknown emoji code: %d", emoji_code);
+            break;
         }
     }
+    else if (msg_type == MSG_TYPE_ALERT)
+    {
+        float lat = 0, lon = 0;
+        if (sscanf(payload_str, "%f,%f", &lat, &lon) == 2 && lat != 0 && lon != 0)
+        {
+            bleSendGpsNotification(lat, lon); // Send alert to phone
+            lv_obj_add_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN);
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_emergencyemoji_png);
+            auto_dismiss = false;
+        }
+        else if (lat == 0 || lon == 0)
+        {
+            // If lat/lon are zero, treat as a generic alert without GPS
+            lv_obj_add_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_clear_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN);
+            lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_emergencyemoji_png);
+            auto_dismiss = false;
+        }
+        else
+        {
+            ESP_LOGW(TAG, "Bad ALERT payload: %s", payload_str);
+        }
+    }
+
     else if (msg_type == MSG_TYPE_TEXT)
     {
         lv_obj_add_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN);     // hide emoji image
@@ -200,7 +217,16 @@ void handleReceivedNotification(int user_id, int msg_type, const char *payload_s
     }
     else if (msg_type == MSG_TYPE_GPS)
     {
-        //TODO: handle GPS data
+        float lat = 0, lon = 0;
+        if (sscanf(payload_str, "%f,%f", &lat, &lon) == 2) {
+            bleSendGpsNotification(lat, lon);
+            lv_obj_add_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN);     // hide emoji image
+            lv_obj_clear_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN); // show text label
+            // GPS as a message
+            char buf[64];
+            snprintf(buf, sizeof(buf), "Received GPS: (%.6f, %.6f)", lat, lon);
+            lv_label_set_text(ui_ReceivedMessageLabel, buf);
+        } else ESP_LOGW(TAG, "Bad GPS payload: %s", payload_str);
     }
 
     // show the notification overlay
@@ -410,12 +436,37 @@ esp_err_t common_sendLoraAlert(void)
     String msg_str;
     String msg_uid = String(millis());
     int type = MSG_TYPE_ALERT;
+    String payload = String(currentGPSData.latitude, 6) + "," + String(currentGPSData.longitude, 6);
 
     msg_str = String(chirpyName) + ":" + msg_uid + ":" +
               "0:" + // broadcast to all groups
-              String(globalUserData.userId) + ":" + String(type) + ":" + String(ALERT);
+              String(globalUserData.userId) + ":" + String(type) + ":" + payload;
 
     ESP_LOGI(TAG, "Sending alert msg: %s", msg_str.c_str());
+    return sendLoraMessage(msg_str);
+}
+
+esp_err_t common_sendLoraGPS(void)
+{
+    // Check if GPS data is valid (not 0,0)
+    if (currentGPSData.latitude == 0.0f && currentGPSData.longitude == 0.0f) {
+        ESP_LOGW(TAG, "GPS data is unavailable or invalid (0,0). Not sending.");
+        return ESP_FAIL;
+    }
+
+    String msg_str;
+    String msg_uid = String(millis());
+    int type = MSG_TYPE_GPS;
+
+    // gps payload should be "lat,lon"
+    String payload = String(currentGPSData.latitude, 6) + "," + String(currentGPSData.longitude, 6);
+
+    msg_str = String(chirpyName) + ":" + msg_uid + ":" +
+              String(globalUserData.groupId) + ":" +
+              String(globalUserData.userId) + ":" +
+              String(type) + ":" + payload;
+
+    ESP_LOGI(TAG, "Sending GPS msg: %s", msg_str.c_str());
     return sendLoraMessage(msg_str);
 }
 
@@ -433,8 +484,8 @@ void common_setBrightness(uint8_t level)
 void setup() {
 
     Serial.begin(115200);
-    Serial.setDebugOutput(true); 
-    esp_log_level_set("*", ESP_LOG_VERBOSE);
+    //Serial.setDebugOutput(true); 
+    //esp_log_level_set("*", ESP_LOG_VERBOSE);
 
     watch.begin();
     beginLvglHelper();

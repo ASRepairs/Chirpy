@@ -14,6 +14,7 @@ extern "C" {
 esp_err_t common_sendLoraMessage(const char *msg);
 esp_err_t common_sendLoraEmoji(int msg);
 esp_err_t common_sendLoraAlert(void);
+esp_err_t common_sendLoraGPS(void);
 void common_displayMessageUI(int msg_id, int usr_id);
 void common_setBrightness(uint8_t level);
 #ifdef __cplusplus
@@ -23,7 +24,6 @@ void common_setBrightness(uint8_t level);
 
 typedef enum
 {
-    ALERT = 5,
     THUMB_UP = 1,
     WAVE = 2,
     HEART = 3,
