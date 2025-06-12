@@ -6,10 +6,10 @@
 #include <BLEServer.h>
 #include <LilyGoLib.h>
 #include "structs.h"
-
+#include "common.h"
 bool bleClientConnected();
 void bleSendReqGpsNow();
 void startBLETask(const char *bleName, GPSData *gpsData);
-void bleSendGpsNotification(float lat, float lon);
+void bleSendNotificationWithGps(message_type_t type, int senderId, float lat, float lon);
 
 #endif // BLEFUNCS_H

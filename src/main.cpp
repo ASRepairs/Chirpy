@@ -188,7 +188,7 @@ void handleReceivedNotification(int user_id, int msg_type, const char *payload_s
         float lat = 0, lon = 0;
         if (sscanf(payload_str, "%f,%f", &lat, &lon) == 2 && lat != 0 && lon != 0)
         {
-            bleSendGpsNotification(lat, lon); // Send alert to phone
+            bleSendNotificationWithGps(MSG_TYPE_ALERT, user_id, lat, lon); // Send alert to phone
             lv_obj_add_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN);
             lv_obj_clear_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN);
             lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_emergencyemoji_png);
@@ -219,7 +219,7 @@ void handleReceivedNotification(int user_id, int msg_type, const char *payload_s
     {
         float lat = 0, lon = 0;
         if (sscanf(payload_str, "%f,%f", &lat, &lon) == 2) {
-            bleSendGpsNotification(lat, lon);
+            bleSendNotificationWithGps(MSG_TYPE_GPS, user_id, lat, lon);
             lv_obj_add_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN);     // hide emoji image
             lv_obj_clear_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN); // show text label
             // GPS as a message
@@ -485,7 +485,7 @@ void setup() {
 
     Serial.begin(115200);
     //Serial.setDebugOutput(true); 
-    //esp_log_level_set("*", ESP_LOG_VERBOSE);
+    //esp_log_level_set("*", ESP_LOG_INFO);
 
     watch.begin();
     beginLvglHelper();

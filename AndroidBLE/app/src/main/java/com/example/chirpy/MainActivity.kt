@@ -242,7 +242,7 @@ class MainActivity : ComponentActivity() {
                 if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.BLUETOOTH_CONNECT)
                     == PackageManager.PERMISSION_GRANTED
                 ) {
-                    gatt.discoverServices()
+                    gatt.requestMtu(100)
                 } else {
                     runOnUiThread {
                         statusText = "Missing permission: cannot discover services"
@@ -271,6 +271,16 @@ class MainActivity : ComponentActivity() {
                     isConnected = false
                     statusText  = "Disconnected"
                 }
+            }
+        }
+        override fun onMtuChanged(gatt: BluetoothGatt, mtu: Int, status: Int) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                Log.d("BLE", "MTU negotiated: $mtu bytes")
+                // Now it’s safe to discover services
+                gatt.discoverServices()
+            } else {
+                // Fallback to default MTU
+                gatt.discoverServices()
             }
         }
 
@@ -309,7 +319,7 @@ class MainActivity : ComponentActivity() {
         ) {
             if (characteristic.uuid.toString().equals(NOTIFY_UUID, ignoreCase = true)) {
                 val msg = characteristic.getStringValue(0)
-
+                Log.d("BLE_RAW", "Received: $msg")
                 when {
                     msg == "REQ:GPS" -> {
                         sendGps {
@@ -328,20 +338,37 @@ class MainActivity : ComponentActivity() {
                     }
 
                     msg.startsWith("GPS:") -> {
-                        val coords = msg.removePrefix("GPS:").split(',')
-                        if (coords.size == 2) {
-                            val lat = coords[0].trim()
-                            val lon = coords[1].trim()
+                        val gpsPayload = msg.removePrefix("GPS:")
+                        val parts = gpsPayload.split(':', ',')
+                        if (parts.size == 3) {
+                            val userId = parts[0].toIntOrNull()
+                            val lat = parts[1]
+                            val lon = parts[2]
                             runOnUiThread {
-                                showGpsNotification(lat, lon) // custom function defined earlier
+                                showGpsNotification(lat, lon, userId)
                                 statusText = "Received GPS!"
                             }
                         } else {
-                            runOnUiThread {
-                                statusText = "Bad GPS format :("
-                            }
+                            runOnUiThread { statusText = "Bad GPS format :(" }
                         }
                     }
+                    msg.startsWith("ALERT:") -> {
+                        val alertPayload = msg.removePrefix("ALERT:")
+                        val parts = alertPayload.split(':', ',')
+
+                        if (parts.size == 3) {
+                            val userId = parts[0].toIntOrNull()
+                            val lat = parts[1]
+                            val lon = parts[2]
+                            runOnUiThread {
+                                showAlertNotification(lat, lon, userId)
+                                statusText = "Received ALERT!"
+                            }
+                        } else {
+                            runOnUiThread { statusText = "Bad ALERT format :(" }
+                        }
+                    }
+
 
                     else -> {
                         runOnUiThread {
@@ -403,11 +430,20 @@ class MainActivity : ComponentActivity() {
         ch.setValue(payload.toByteArray(StandardCharsets.UTF_8))
         onDone(gatt.writeCharacteristic(ch))
     }
-    private fun showGpsNotification(lat: String, lon: String) {
+    private fun getSenderImage(userId: Int): Int {
+        return when (userId) {
+            0 -> R.drawable.froggy
+            1 -> R.drawable.piggy
+            2 -> R.drawable.horsy
+            3 -> R.drawable.pandy
+            else -> R.drawable.froggy
+        }
+    }
+
+    private fun showGpsNotification(lat: String, lon: String, userId: Int?) {
         val channelId = "gps_channel"
         val nm = getSystemService(NotificationManager::class.java)
 
-        // 1-time channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
             nm.getNotificationChannel(channelId) == null) {
             nm.createNotificationChannel(
@@ -419,20 +455,68 @@ class MainActivity : ComponentActivity() {
         val mapsIntent = Intent(Intent.ACTION_VIEW, geoUri).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
+
         val pi = PendingIntent.getActivity(
             this, 0, mapsIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val notif = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-            .setContentTitle("Chirpy location")
-            .setContentText("Tap to open in Maps")
+            .setSmallIcon(getSenderImage(userId ?: -1))
+            .setContentTitle("Chirpy ${getUserName(userId)}")
+            .setContentText("Sent GPS! Tap to open in Maps")
             .setContentIntent(pi)
             .setAutoCancel(true)
             .build()
 
         nm.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), notif)
     }
+
+    private fun showAlertNotification(lat: String, lon: String, userId: Int?) {
+        val channelId = "alert_channel"
+        val nm = getSystemService(NotificationManager::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+            nm.getNotificationChannel(channelId) == null) {
+            val chan = NotificationChannel(
+                channelId, "Alerts", NotificationManager.IMPORTANCE_HIGH
+            )
+            chan.enableLights(true)
+            chan.lightColor = android.graphics.Color.RED
+            chan.enableVibration(true)
+            nm.createNotificationChannel(chan)
+        }
+
+        val geoUri = Uri.parse("geo:$lat,$lon?q=$lat,$lon")
+        val mapsIntent = Intent(Intent.ACTION_VIEW, geoUri).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+
+        val pi = PendingIntent.getActivity(
+            this, 0, mapsIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notif = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(getSenderImage(userId ?: -1))
+            .setContentTitle("🚨 ${getUserName(userId)} HAS AN EMERGENCY!")
+            .setContentText("Tap to see their location!")
+            .setContentIntent(pi)
+            .setAutoCancel(true)
+            .setColor(android.graphics.Color.RED)
+            .setVibrate(longArrayOf(0, 2000)) // vibrate 2s
+            .build()
+
+        nm.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), notif)
+    }
+
+    private fun getUserName(userId: Int?): String = when (userId) {
+        0 -> "Froggy"
+        1 -> "Piggy"
+        2 -> "Horsy"
+        3 -> "Pandy"
+        else -> "Someone"
+    }
+
 
 }

@@ -46,13 +46,28 @@ static void sendReqGps()
     }
 }
 
-void bleSendGpsNotification(float lat, float lon)
+void bleSendNotificationWithGps(message_type_t type, int senderId, float lat, float lon)
 {
     if (!gConnected || !txChar)
         return;
 
-    char buf[48];
-    snprintf(buf, sizeof(buf), "GPS:%.6f,%.6f", lat, lon); // example "GPS:52.4069,16.9264"
+    const char *prefix = nullptr;
+    switch (type)
+    {
+    case MSG_TYPE_GPS:
+        prefix = "GPS";
+        break;
+    case MSG_TYPE_ALERT:
+        prefix = "ALERT";
+        break;
+    default:
+        ESP_LOGW(TAG, "Invalid message type for BLE notification: %d", type);
+        return;
+    }
+
+    char buf[100];
+    snprintf(buf, sizeof(buf), "%s:%d:%.6f,%.6f", prefix, senderId, lat, lon);
+    Serial.println("SENT TO PHONE:" + String(buf)); // for debugging
     txChar->setValue((uint8_t *)buf, strlen(buf));
     txChar->notify();
 
@@ -172,7 +187,7 @@ static void bleTask(void *arg)
 {
     char *devName = static_cast<char *>(arg);
     BLEDevice::init(devName);
-    BLEDevice::setMTU(23); // keep ATT payload short
+    BLEDevice::setMTU(32); // keep ATT payload short
 
     srv = BLEDevice::createServer();
     static SrvCb srvCb;
@@ -183,7 +198,7 @@ static void bleTask(void *arg)
     rxChar = svc->createCharacteristic(CHAR_RX_UUID, BLECharacteristic::PROPERTY_WRITE);
     static RxCallback rxCb;
     rxChar->setCallbacks(&rxCb);
-    rxChar->addDescriptor(new BLE2902()); // 2 × 3 bytes; fine
+    rxChar->addDescriptor(new BLE2902());
 
     txChar = svc->createCharacteristic(CHAR_TX_UUID, BLECharacteristic::PROPERTY_NOTIFY);
     txChar->addDescriptor(new BLE2902());
@@ -203,7 +218,6 @@ static void bleTask(void *arg)
     esp_timer_create_args_t ta{.callback = gpsTimerCb, .name = "gpsT"};
     esp_timer_create(&ta, &gpsTimer);
 
-    /* Idle loop: nothing heavy – 4 kB stack would already be enough */
     while (true)
         vTaskDelay(pdMS_TO_TICKS(1000));
 }
@@ -212,7 +226,7 @@ static void bleTask(void *arg)
 void startBLETask(const char *bleName, GPSData *gpsData)
 {
     extGpsData = gpsData;
-    xTaskCreatePinnedToCore(bleTask, "ble", 8192 * 3, (void *)bleName, 1, NULL, 0);
+    xTaskCreatePinnedToCore(bleTask, "ble", 8192 * 4, (void *)bleName, 1, NULL, 1);
 }
 
 /* optional helpers --------------------------------------------------*/
