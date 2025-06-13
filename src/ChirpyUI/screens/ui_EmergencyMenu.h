@@ -18,8 +18,10 @@ extern lv_obj_t * ui_EmergencyMenu;
 extern lv_obj_t * ui_Image4;
 extern void ui_event_EmergencyButton(lv_event_t * e);
 extern lv_obj_t * ui_EmergencyButton;
+extern lv_obj_t * ui_EmergencySuccessImage;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_EmergencyButton;
+extern lv_obj_t * uic_EmergencySuccessImage;
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -17,6 +17,7 @@ lv_obj_t * ui_Time;
 lv_obj_t * ui_Date;
 lv_obj_t * ui_GroupNr;
 lv_obj_t * ui_CurrentAvatarImage;
+lv_obj_t * ui_Button1;
 
 // event funtions
 void ui_event_MainScreen(lv_event_t * e)
@@ -48,6 +49,15 @@ void ui_event_HomeBG(lv_event_t * e)
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP) {
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_AvatarScreen, LV_SCR_LOAD_ANIM_MOVE_BOTTOM, 500, 0, &ui_AvatarScreen_screen_init);
+    }
+}
+
+void ui_event_Button1(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_CLICKED) {
+        _ui_screen_change(&ui_AvatarMenu, LV_SCR_LOAD_ANIM_FADE_ON, 200, 0, &ui_AvatarMenu_screen_init);
     }
 }
 
@@ -104,7 +114,19 @@ void ui_MainScreen_screen_init(void)
     lv_obj_add_flag(ui_CurrentAvatarImage, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_CurrentAvatarImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
+    ui_Button1 = lv_btn_create(ui_MainScreen);
+    lv_obj_set_width(ui_Button1, 50);
+    lv_obj_set_height(ui_Button1, 50);
+    lv_obj_set_x(ui_Button1, 84);
+    lv_obj_set_y(ui_Button1, -85);
+    lv_obj_set_align(ui_Button1, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Button1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_Button1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_Button1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_Button1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
     lv_obj_add_event_cb(ui_HomeBG, ui_event_HomeBG, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_Button1, ui_event_Button1, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MainScreen, ui_event_MainScreen, LV_EVENT_ALL, NULL);
     uic_MainScreen = ui_MainScreen;
     uic_HomeBG = ui_HomeBG;
@@ -132,5 +154,6 @@ void ui_MainScreen_screen_destroy(void)
     ui_GroupNr = NULL;
     uic_CurrentAvatarImage = NULL;
     ui_CurrentAvatarImage = NULL;
+    ui_Button1 = NULL;
 
 }

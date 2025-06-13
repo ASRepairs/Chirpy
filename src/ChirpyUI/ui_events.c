@@ -13,10 +13,10 @@
 
 void loraEmergency(lv_event_t * e)
 {
+	successAnimationFunc(ui_EmergencySuccessImage);
 	if (common_sendLoraAlert() == ESP_OK)
 	{
-		MessageSentSuccessStart_Animation(ui_MessageSendCheckMark, 0);
-		MessageSentSuccessEnd_Animation(ui_MessageSendCheckMark, 0);
+		//maybe do something here
 	}
 }
 
@@ -33,33 +33,37 @@ void successAnimationFunc(lv_obj_t *TargetObject)
 
 void loraSendLike(lv_event_t * e)
 {
+	successAnimationFunc(ui_MessageSendCheckMark);
 	if (common_sendLoraEmoji(THUMB_UP) == ESP_OK)
 	{
-		successAnimationFunc(ui_MessageSendCheckMark);
+		//maybe do something here
 	}
 }
 
 void loraSendWave(lv_event_t * e)
 {
+	successAnimationFunc(ui_MessageSendCheckMark);
 	if (common_sendLoraEmoji(WAVE) == ESP_OK)
 	{
-		successAnimationFunc(ui_MessageSendCheckMark);
+		//maybe do something here
 	}
 }
 
 void loraSendHeart(lv_event_t * e)
 {
+	successAnimationFunc(ui_MessageSendCheckMark);
 	if (common_sendLoraEmoji(HEART) == ESP_OK)
 	{
-		successAnimationFunc(ui_MessageSendCheckMark);
+		//maybe do something here
 	}
 }
 
 void loraSendParty(lv_event_t * e)
 {
+	successAnimationFunc(ui_MessageSendCheckMark);
 	if (common_sendLoraEmoji(PARTY) == ESP_OK)
 	{
-		successAnimationFunc(ui_MessageSendCheckMark);
+		//maybe do something here
 	}
 }
 
@@ -142,4 +146,32 @@ void ChangeBrightess(lv_event_t * e)
 void ChangeSoundMode(lv_event_t * e)
 {
 	// Your code here
+}
+
+void ChangeUserPhoeny(lv_event_t * e)
+{
+	globalUserData.userId = PHOENY;
+	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_phoeny_png);
+	successAnimationFunc(ui_AvatarUpdateSuccessImage);
+}
+
+void ChangeUserLizzy(lv_event_t * e)
+{
+	globalUserData.userId = LIZZY;
+	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_lizzy_png);
+	successAnimationFunc(ui_AvatarUpdateSuccessImage);
+}
+
+void ChangeUserPuppy(lv_event_t * e)
+{
+	globalUserData.userId = PUPPY;
+	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_puppy_png);
+	successAnimationFunc(ui_AvatarUpdateSuccessImage);
+}
+
+void ChangeUserKitty(lv_event_t * e)
+{
+	globalUserData.userId = KITTY;
+	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_kitty_png);
+	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }

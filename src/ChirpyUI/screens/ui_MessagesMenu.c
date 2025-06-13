@@ -243,7 +243,6 @@ void ui_MessagesMenu_screen_init(void)
     lv_obj_set_y(ui_LikeBtn, -36);
     lv_obj_set_align(ui_LikeBtn, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_LikeBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_LikeBtn, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(ui_LikeBtn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_LikeBtn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 

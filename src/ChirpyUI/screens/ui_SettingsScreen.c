@@ -8,6 +8,7 @@
 lv_obj_t * uic_SettingsScreen;
 lv_obj_t * ui_SettingsScreen;
 lv_obj_t * ui_Image16;
+lv_obj_t * ui_Image19;
 
 // event funtions
 void ui_event_SettingsScreen(lv_event_t * e)
@@ -43,6 +44,14 @@ void ui_SettingsScreen_screen_init(void)
     lv_obj_add_flag(ui_Image16, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_Image16, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
+    ui_Image19 = lv_img_create(ui_SettingsScreen);
+    lv_img_set_src(ui_Image19, &ui_img_phoeny_png);
+    lv_obj_set_width(ui_Image19, LV_SIZE_CONTENT);   /// 64
+    lv_obj_set_height(ui_Image19, LV_SIZE_CONTENT);    /// 64
+    lv_obj_set_align(ui_Image19, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Image19, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_Image19, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+
     lv_obj_add_event_cb(ui_SettingsScreen, ui_event_SettingsScreen, LV_EVENT_ALL, NULL);
     uic_SettingsScreen = ui_SettingsScreen;
 
@@ -56,5 +65,6 @@ void ui_SettingsScreen_screen_destroy(void)
     uic_SettingsScreen = NULL;
     ui_SettingsScreen = NULL;
     ui_Image16 = NULL;
+    ui_Image19 = NULL;
 
 }

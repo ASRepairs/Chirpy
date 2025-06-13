@@ -24,6 +24,7 @@ SET(SOURCES screens/ui_MainScreen.c
     images/ui_img_emojismsg_png.c
     images/ui_img_emergency_png.c
     images/ui_img_whitepanel_png.c
+    images/ui_img_profiles2_png.c
     images/ui_img_profiles_png.c
     images/ui_img_phoneconnect_png.c
     images/ui_img_celebrationemoji_png.c
@@ -33,6 +34,10 @@ SET(SOURCES screens/ui_MainScreen.c
     images/ui_img_piggy_png.c
     images/ui_img_horsy_png.c
     images/ui_img_pandy_png.c
+    images/ui_img_phoeny_png.c
+    images/ui_img_lizzy_png.c
+    images/ui_img_puppy_png.c
+    images/ui_img_kitty_png.c
     images/ui_img_emergencyemoji_png.c
     images/ui_img_settings_png.c)
 

@@ -21,6 +21,8 @@ extern lv_obj_t * ui_Time;
 extern lv_obj_t * ui_Date;
 extern lv_obj_t * ui_GroupNr;
 extern lv_obj_t * ui_CurrentAvatarImage;
+extern void ui_event_Button1(lv_event_t * e);
+extern lv_obj_t * ui_Button1;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_MainScreen;
 extern lv_obj_t * uic_HomeBG;

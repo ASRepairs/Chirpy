@@ -35,7 +35,11 @@ typedef enum
     FROGGY = 0,
     PIGGY = 1,
     HORSY = 2,
-    PANDY = 3
+    PANDY = 3,
+    LIZZY = 4,
+    PHOENY = 5,
+    PUPPY = 6,
+    KITTY = 7
 } user_emoji;
 
 typedef enum

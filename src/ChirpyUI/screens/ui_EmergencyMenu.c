@@ -5,10 +5,12 @@
 
 #include "../ui.h"
 
+lv_obj_t * uic_EmergencySuccessImage;
 lv_obj_t * uic_EmergencyButton;
 lv_obj_t * ui_EmergencyMenu;
 lv_obj_t * ui_Image4;
 lv_obj_t * ui_EmergencyButton;
+lv_obj_t * ui_EmergencySuccessImage;
 
 // event funtions
 void ui_event_EmergencyMenu(lv_event_t * e)
@@ -62,9 +64,21 @@ void ui_EmergencyMenu_screen_init(void)
     lv_obj_set_style_bg_color(ui_EmergencyButton, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_EmergencyButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    ui_EmergencySuccessImage = lv_img_create(ui_EmergencyMenu);
+    lv_img_set_src(ui_EmergencySuccessImage, &ui_img_checkmark_png);
+    lv_obj_set_width(ui_EmergencySuccessImage, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_EmergencySuccessImage, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_EmergencySuccessImage, 65);
+    lv_obj_set_y(ui_EmergencySuccessImage, -70);
+    lv_obj_set_align(ui_EmergencySuccessImage, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_EmergencySuccessImage, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_EmergencySuccessImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_zoom(ui_EmergencySuccessImage, 110);
+
     lv_obj_add_event_cb(ui_EmergencyButton, ui_event_EmergencyButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_EmergencyMenu, ui_event_EmergencyMenu, LV_EVENT_ALL, NULL);
     uic_EmergencyButton = ui_EmergencyButton;
+    uic_EmergencySuccessImage = ui_EmergencySuccessImage;
 
 }
 
@@ -77,5 +91,7 @@ void ui_EmergencyMenu_screen_destroy(void)
     ui_Image4 = NULL;
     uic_EmergencyButton = NULL;
     ui_EmergencyButton = NULL;
+    uic_EmergencySuccessImage = NULL;
+    ui_EmergencySuccessImage = NULL;
 
 }

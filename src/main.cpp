@@ -150,6 +150,18 @@ void handleReceivedNotification(int user_id, int msg_type, const char *payload_s
     case PANDY:
         lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_pandy_png);
         break;
+    case LIZZY:
+        lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_lizzy_png);
+        break;
+    case PUPPY:
+        lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_puppy_png);
+        break;
+    case KITTY:
+        lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_kitty_png);
+        break;
+    case PHOENY:
+        lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_phoeny_png);
+        break;
     default:
         lv_img_set_src(ui_SenderAvatarInNotificationImage, &ui_img_froggy_png); // default to Froggy
         break;

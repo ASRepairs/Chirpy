@@ -46,6 +46,7 @@ extern "C" {
 extern lv_anim_t * MessageSentSuccessStart_Animation(lv_obj_t * TargetObject, int delay);
 extern lv_anim_t * MessageSentSuccessEnd_Animation(lv_obj_t * TargetObject, int delay);
 extern lv_anim_t * DismissNotificationAnimation_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * MsgBtnExpand_Animation(lv_obj_t * TargetObject, int delay);
 
 // EVENTS
 
@@ -61,6 +62,7 @@ LV_IMG_DECLARE(ui_img_checkmark_png);    // assets/CheckMark.png
 LV_IMG_DECLARE(ui_img_emojismsg_png);    // assets/EmojisMSG.png
 LV_IMG_DECLARE(ui_img_emergency_png);    // assets/Emergency.png
 LV_IMG_DECLARE(ui_img_whitepanel_png);    // assets/WhitePanel.png
+LV_IMG_DECLARE(ui_img_profiles2_png);    // assets/profiles2.png
 LV_IMG_DECLARE(ui_img_profiles_png);    // assets/profiles.png
 LV_IMG_DECLARE(ui_img_phoneconnect_png);    // assets/PhoneConnect.png
 LV_IMG_DECLARE(ui_img_celebrationemoji_png);    // assets/celebrationEmoji.png
@@ -70,6 +72,10 @@ LV_IMG_DECLARE(ui_img_heartemoji_png);    // assets/HeartEmoji.png
 LV_IMG_DECLARE(ui_img_piggy_png);    // assets/piggy.png
 LV_IMG_DECLARE(ui_img_horsy_png);    // assets/horsy.png
 LV_IMG_DECLARE(ui_img_pandy_png);    // assets/pandy.png
+LV_IMG_DECLARE(ui_img_phoeny_png);    // assets/phoeny.png
+LV_IMG_DECLARE(ui_img_lizzy_png);    // assets/lizzy.png
+LV_IMG_DECLARE(ui_img_puppy_png);    // assets/puppy.png
+LV_IMG_DECLARE(ui_img_kitty_png);    // assets/kitty.png
 LV_IMG_DECLARE(ui_img_emergencyemoji_png);    // assets/emergencyEmoji.png
 LV_IMG_DECLARE(ui_img_settings_png);    // assets/Settings.png
 

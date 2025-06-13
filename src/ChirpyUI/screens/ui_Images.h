@@ -22,6 +22,10 @@ extern lv_obj_t * ui_FroggyImg;
 extern lv_obj_t * ui_PiggyImg;
 extern lv_obj_t * ui_HorsyImg;
 extern lv_obj_t * ui_PandyImg;
+extern lv_obj_t * ui_PhoenyImg;
+extern lv_obj_t * ui_LizzyImg;
+extern lv_obj_t * ui_PuppyImg;
+extern lv_obj_t * ui_KittyImg;
 extern lv_obj_t * ui_EmergencyEmojiImg;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_Images;
@@ -33,6 +37,10 @@ extern lv_obj_t * uic_FroggyImg;
 extern lv_obj_t * uic_PiggyImg;
 extern lv_obj_t * uic_HorsyImg;
 extern lv_obj_t * uic_PandyImg;
+extern lv_obj_t * uic_PhoenyImg;
+extern lv_obj_t * uic_LizzyImg;
+extern lv_obj_t * uic_PuppyImg;
+extern lv_obj_t * uic_KittyImg;
 extern lv_obj_t * uic_EmergencyEmojiImg;
 
 #ifdef __cplusplus

@@ -50,3 +50,19 @@ def ChangeBrightess(event_struct):
 def ChangeSoundMode(event_struct):
     return
 
+
+def ChangeUserPhoeny(event_struct):
+    return
+
+
+def ChangeUserLizzy(event_struct):
+    return
+
+
+def ChangeUserPuppy(event_struct):
+    return
+
+
+def ChangeUserKitty(event_struct):
+    return
+

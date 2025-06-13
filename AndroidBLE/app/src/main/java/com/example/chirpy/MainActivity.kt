@@ -439,6 +439,10 @@ class MainActivity : ComponentActivity() {
             1 -> R.drawable.piggy
             2 -> R.drawable.horsy
             3 -> R.drawable.pandy
+            4 -> R.drawable.lizzy
+            5 -> R.drawable.phoeny
+            6 -> R.drawable.puppy
+            7 -> R.drawable.kitty
             else -> R.drawable.froggy
         }
     }
@@ -539,6 +543,10 @@ class MainActivity : ComponentActivity() {
         1 -> "Piggy"
         2 -> "Horsy"
         3 -> "Pandy"
+        4 -> "LIZZY"
+        5 -> "Phoeny"
+        6 -> "Puppy"
+        7 -> "Kitty"
         else -> "Someone"
     }
 
