@@ -10,6 +10,9 @@ import android.bluetooth.*
 import android.bluetooth.le.*
 import android.content.Intent
 import android.content.pm.PackageManager
+import androidx.core.app.Person
+import androidx.core.graphics.drawable.IconCompat
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -461,11 +464,21 @@ class MainActivity : ComponentActivity() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+        val senderIcon = IconCompat.createWithResource(this, getSenderImage(userId ?: -1))
+        val person = Person.Builder()
+            .setName(getUserName(userId))
+            .setIcon(senderIcon)
+            .build()
+
+        val style = NotificationCompat.MessagingStyle(person)
+            .setConversationTitle("${getUserName(userId)} has sent a GPS location")
+            .addMessage("Tap to open in Maps!", System.currentTimeMillis(), person)
+
         val notif = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(getSenderImage(userId ?: -1))
-            .setContentTitle("Chirpy ${getUserName(userId)}")
-            .setContentText("Sent GPS! Tap to open in Maps")
+            .setSmallIcon(R.drawable.ic_stat_name)  // App icon in status bar
+            .setStyle(style)
             .setContentIntent(pi)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setAutoCancel(true)
             .build()
 
@@ -496,16 +509,27 @@ class MainActivity : ComponentActivity() {
             this, 0, mapsIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        val senderIcon = IconCompat.createWithResource(this, getSenderImage(userId ?: -1))
+
+        val person = Person.Builder()
+            .setName(getUserName(userId))
+            .setIcon(senderIcon)
+            .build()
+
+        val style = NotificationCompat.MessagingStyle(person)
+            .setConversationTitle("🚨 ${getUserName(userId)} HAS AN EMERGENCY!")
+            .addMessage("TAP TO SEE THEIR LOCATION!", System.currentTimeMillis(), person)
 
         val notif = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(getSenderImage(userId ?: -1))
-            .setContentTitle("🚨 ${getUserName(userId)} HAS AN EMERGENCY!")
-            .setContentText("Tap to see their location!")
+            .setSmallIcon(R.drawable.ic_stat_name)  // App icon for status bar
+            .setStyle(style)
             .setContentIntent(pi)
-            .setAutoCancel(true)
             .setColor(android.graphics.Color.RED)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setAutoCancel(true)
             .setVibrate(longArrayOf(0, 2000)) // vibrate 2s
             .build()
+
 
         nm.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), notif)
     }
