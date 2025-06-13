@@ -312,7 +312,7 @@ void ui_AvatarMenu_screen_init(void)
     lv_obj_set_x(ui_AvatarUpdateSuccessImage, 82);
     lv_obj_set_y(ui_AvatarUpdateSuccessImage, -64);
     lv_obj_set_align(ui_AvatarUpdateSuccessImage, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_AvatarUpdateSuccessImage, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_add_flag(ui_AvatarUpdateSuccessImage, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_AvatarUpdateSuccessImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_img_set_zoom(ui_AvatarUpdateSuccessImage, 110);
 
