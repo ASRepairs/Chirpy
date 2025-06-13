@@ -14,6 +14,12 @@ struct userData
     uint8_t userId;  // 0-9, 0 = no user
 };
 
+typedef struct
+{
+    uint8_t pct;
+    bool charging;
+} batt_info_t;
+
 extern struct userData globalUserData;
 
 #endif // STRUCTS_H

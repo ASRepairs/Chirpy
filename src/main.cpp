@@ -29,7 +29,7 @@ volatile bool receivedFlag = false;
 volatile bool isTransmitting = false;
 static char chirpyName[32];
 std::deque<String> recentMessages;
-
+XPowersAXP2101 pmu;
 struct userData globalUserData = {1, 0}; //start with first group and froggy
 
 GPSData currentGPSData;
@@ -334,6 +334,54 @@ void displayReceivedMessage() {
     vTaskDelay(pdMS_TO_TICKS(1000));
 }
 
+// ───────────────────────────── Battery Info ─────────────────────────────
+
+
+/* runs in LVGL thread context */
+static void _ui_set_battery(void *p)
+{
+    batt_info_t *info = (batt_info_t *)p;
+
+    const char *bat_sym;
+    if (info->pct >= 90)
+        bat_sym = LV_SYMBOL_BATTERY_FULL;
+    else if (info->pct >= 60)
+        bat_sym = LV_SYMBOL_BATTERY_3;
+    else if (info->pct >= 30)
+        bat_sym = LV_SYMBOL_BATTERY_2;
+    else if (info->pct >= 10)
+        bat_sym = LV_SYMBOL_BATTERY_1;
+    else
+        bat_sym = LV_SYMBOL_BATTERY_EMPTY;
+
+    /* optional charge bolt */
+    const char *bolt = info->charging ? LV_SYMBOL_CHARGE : "";
+
+    static char txt[32];
+    snprintf(txt, sizeof(txt), "%s%s %d%%", bat_sym, bolt, info->pct);
+
+    lv_label_set_text(ui_BatteryLabel, txt);
+    free(info);
+}
+static inline void triggerBatteryRefresh()
+{
+    batt_info_t *info = (batt_info_t *)malloc(sizeof(batt_info_t));
+    info->pct = pmu.getBatteryPercent();
+    info->charging = pmu.isCharging();
+    lv_async_call(_ui_set_battery, info); // thread-safe
+}
+void TaskBatteryUpdater(void *pv)
+{
+    for (;;)
+    {
+        batt_info_t *info = (batt_info_t *)malloc(sizeof(batt_info_t));
+        info->pct = pmu.getBatteryPercent(); // 0-100 (or -1)
+        info->charging = pmu.isCharging();
+        lv_async_call(_ui_set_battery, info);
+        vTaskDelay(pdMS_TO_TICKS(60 * 1000));
+    }
+}
+
 // ───────────────────────────── Tasks ─────────────────────────────
 void TaskLoraSender(void* pvParameters) {
     while (true) {
@@ -368,6 +416,9 @@ void TaskCheckShortButtonPressed(void *pvParameters)
         {
             isPmuIRQ = false;
             watch.readPMU();
+            uint32_t flags = pmu.getIrqStatus();
+
+            pmu.clearIrqStatus();
 
             // Long press = turn off display
             if (watch.isPekeyLongPressIrq())
@@ -408,6 +459,12 @@ void TaskCheckShortButtonPressed(void *pvParameters)
                 watch.setWaveform(1, 0);
                 watch.run();
             }
+            if (flags & (XPOWERS_AXP2101_VBUS_INSERT_IRQ |
+                         XPOWERS_AXP2101_VBUS_REMOVE_IRQ))
+            {
+                triggerBatteryRefresh(); // update label instantly
+            }
+            
             watch.clearPMU();
         }
         vTaskDelay(pdMS_TO_TICKS(20));
@@ -504,6 +561,15 @@ void setup() {
     watch.attachPMU([]() {
         isPmuIRQ = true;
     });
+
+    /* Enable the charge / VBUS IRQ sources we want                         */
+    pmu.enableIRQ(
+        XPOWERS_AXP2101_VBUS_INSERT_IRQ |
+        XPOWERS_AXP2101_VBUS_REMOVE_IRQ);
+
+    pmu.clearIrqStatus();
+
+
     uint64_t chip_id = ESP.getEfuseMac();
     char chip_id_str[13];
 
@@ -561,6 +627,7 @@ void setup() {
     //xTaskCreatePinnedToCore(TaskShowRecievedFrame, "TaskShowRecievedFrame",TASK_STACK_SIZE, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(TaskTimeUpdater,"TaskTimeUpdater", TASK_STACK_SIZE, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(TaskDateUpdater, "TaskDateUpdater", TASK_STACK_SIZE, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskBatteryUpdater, "TaskBatteryUpdater", 2048, nullptr, 1, nullptr, 1);
 }
 
 void loop() {

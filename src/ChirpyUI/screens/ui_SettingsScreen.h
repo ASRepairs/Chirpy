@@ -16,7 +16,6 @@ extern void ui_SettingsScreen_screen_destroy(void);
 extern void ui_event_SettingsScreen(lv_event_t * e);
 extern lv_obj_t * ui_SettingsScreen;
 extern lv_obj_t * ui_Image16;
-extern lv_obj_t * ui_Image19;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_SettingsScreen;
 

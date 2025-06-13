@@ -21,8 +21,9 @@ extern lv_obj_t * ui_Time;
 extern lv_obj_t * ui_Date;
 extern lv_obj_t * ui_GroupNr;
 extern lv_obj_t * ui_CurrentAvatarImage;
-extern void ui_event_Button1(lv_event_t * e);
-extern lv_obj_t * ui_Button1;
+extern void ui_event_goToAvatarMenuBtn(lv_event_t * e);
+extern lv_obj_t * ui_goToAvatarMenuBtn;
+extern lv_obj_t * ui_BatteryLabel;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_MainScreen;
 extern lv_obj_t * uic_HomeBG;
@@ -30,6 +31,8 @@ extern lv_obj_t * uic_Time;
 extern lv_obj_t * uic_Date;
 extern lv_obj_t * uic_GroupNr;
 extern lv_obj_t * uic_CurrentAvatarImage;
+extern lv_obj_t * uic_goToAvatarMenuBtn;
+extern lv_obj_t * uic_BatteryLabel;
 
 #ifdef __cplusplus
 } /*extern "C"*/
