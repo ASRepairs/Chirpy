@@ -23,18 +23,69 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import java.nio.charset.StandardCharsets
+import androidx.compose.ui.graphics.Color
 import java.util.*
+
+
+/* ---------- Chirpy colour palette ---------- */
+private val AmoledBlack  = Color(0xFF000000)
+private val ChirpyOrange = Color(0xFFFFA300)
+
+private val ChirpyDarkColors = darkColorScheme(
+    primary        = ChirpyOrange,      // used by buttons / bubbles
+    onPrimary      = Color.White,       // text on orange
+    background     = AmoledBlack,
+    surface        = AmoledBlack,
+    surfaceVariant = AmoledBlack,       // what we use for incoming bubbles
+    onSurface      = Color.White,
+    onBackground   = Color.White,
+    error          = Color(0xFFB00020),
+    onError        = Color.White
+)
+
+/* One-liner wrapper we’ll call from setContent */
+@Composable
+fun ChirpyTheme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colorScheme = ChirpyDarkColors,
+        typography  = Typography(),
+        shapes      = Shapes(),
+        content     = content
+    )
+}
+
+
+/* ───────────── Chat data class ───────────── */
+data class ChatMessage(
+    val type: Int,                  // 1-TEXT  2-EMOJI  3-GPS  4-ALERT
+    val content: String,            // text or emoji glyph
+    val fromMe: Boolean,
+    val userId: Int?,               // null for “me”
+    val lat: String? = null,        // only GPS / ALERT
+    val lon: String? = null,
+    val ts: Long = System.currentTimeMillis()
+)
+
+/* ───────────── Chat state ───────────── */
+private val chatMessages = mutableStateListOf<ChatMessage>()
+private var draftText    by mutableStateOf("")
+
 
 class MainActivity : ComponentActivity() {
 
@@ -56,6 +107,12 @@ class MainActivity : ComponentActivity() {
     private var isConnected   by mutableStateOf(false)
     private var statusText    by mutableStateOf("Idle")
 
+    private var inForeground by mutableStateOf(false)
+
+
+    private val chatMessages = mutableStateListOf<ChatMessage>()
+    private var currentInput by mutableStateOf("")
+
     /* ──────────────────────────── SET-UP UI & PERMS ─────────────────────────── */
 
     private val permissionLauncher =
@@ -65,6 +122,16 @@ class MainActivity : ComponentActivity() {
     private val qrLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val contents = result.data?.getStringExtra("SCAN_RESULT") ?: return@registerForActivityResult
         scanForDeviceWithAddress(contents)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        inForeground = true          // UI is visible
+    }
+
+    override fun onPause() {
+        super.onPause()
+        inForeground = false         // UI is hidden / background
     }
 
 
@@ -82,57 +149,42 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            MaterialTheme {
-                Column(
-                    Modifier.fillMaxSize().padding(24.dp),
-                    Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-                    Alignment.CenterHorizontally
+            ChirpyTheme {
+                /* <- this Surface gives the whole window an AMOLED-black coat */
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color    = MaterialTheme.colorScheme.background      // = AmoledBlack
                 ) {
-                    Text("Chirpy Client", style = MaterialTheme.typography.headlineSmall)
-
-                    Button(
-                        onClick = {
-                            val intent = Intent(this@MainActivity, QrScanActivity::class.java)
-                            qrLauncher.launch(intent)
-                        },
-                        enabled = !isConnected
-                    ) { Text("Connect to Watch") }
-
-                    Button(
-                        onClick = {
-                            statusText = "Sending GPS…"
-                            sendGps { ok ->
-                                statusText = if (ok) "Sent!" else "Failed"
+                    if (isConnected) {
+                        ChatScreen(
+                            onSend = { txt ->
+                                chatMessages += ChatMessage(1, txt, fromMe = true, userId = null)
+                                sendChat(txt)
+                            },
+                            onSendLocation = {
+                                statusText = "Sending GPS…"
+                                sendLocationMessage()
                             }
-                        },
-                        enabled = isConnected
-                    ) { Text("Send GPS to Watch") }
-
-                    Text(statusText)
-                }
-
-                if (showDialog) {
-                    AlertDialog(
-                        onDismissRequest = { showDialog = false },
-                        confirmButton = {},
-                        title = { Text("Select Watch") },
-                        text = {
-                            Column {
-                                devices.forEach { device ->
-                                    Text(
-                                        text = device.name ?: "Unknown",
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(8.dp)
-                                            .clickable {
-                                                connectToDevice(device)
-                                                showDialog = false
-                                            }
-                                    )
-                                }
-                            }
+                        )
+                    } else {
+                        /* ----- original connect screen ----- */
+                        Column(
+                            Modifier.fillMaxSize().padding(24.dp),
+                            Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                            Alignment.CenterHorizontally
+                        ) {
+                            Text("Chirpy Client", style = MaterialTheme.typography.headlineSmall)
+                            Button(
+                                onClick = {
+                                    val intent =
+                                        Intent(this@MainActivity, QrScanActivity::class.java)
+                                    qrLauncher.launch(intent)
+                                },
+                                enabled = !isConnected
+                            ) { Text("Connect to Watch") }
+                            Text(statusText)
                         }
-                    )
+                    }
                 }
             }
         }
@@ -350,19 +402,28 @@ class MainActivity : ComponentActivity() {
                             runOnUiThread {
                                 when (msgType) {
                                     1 -> {  // TEXT
+                                        chatMessages += ChatMessage(1, payload,
+                                            fromMe = false, userId = userId)
                                         statusText = "Text from ${getUserName(userId)}"
-                                        showSimpleTextNotification(payload, userId)
+                                        if (!inForeground) showSimpleTextNotification(payload, userId)
                                     }
 
                                     2 -> {  // EMOJI
                                         statusText = "Emoji from ${getUserName(userId)}"
-                                        showEmojiNotification(payload.toIntOrNull(), userId)
+                                        val glyph = emojiFromCode(payload.toIntOrNull())
+                                        chatMessages += ChatMessage(2, glyph,
+                                            fromMe = false, userId = userId)
+                                        if (!inForeground) showEmojiNotification(payload.toIntOrNull(), userId)
                                     }
 
                                     3 -> {  // GPS
                                         val coords = payload.split(",")
                                         if (coords.size == 2) {
-                                            showGpsNotification(coords[0], coords[1], userId)
+                                            chatMessages += ChatMessage(3, "",
+                                                fromMe = false, userId = userId,
+                                                lat = coords[0], lon = coords[1])
+
+                                            if (!inForeground) showGpsNotification(coords[0], coords[1], userId)
                                             statusText = "GPS from ${getUserName(userId)}"
                                         } else {
                                             statusText = "Bad GPS format"
@@ -372,7 +433,11 @@ class MainActivity : ComponentActivity() {
                                     4 -> {  // ALERT
                                         val coords = payload.split(",")
                                         if (coords.size == 2) {
-                                            showAlertNotification(coords[0], coords[1], userId)
+                                            chatMessages += ChatMessage(4, "",
+                                                fromMe = false, userId = userId,
+                                                lat = coords[0], lon = coords[1])
+
+                                            if (!inForeground) showAlertNotification(coords[0], coords[1], userId)
                                             statusText = "ALERT from ${getUserName(userId)}"
                                         } else {
                                             statusText = "Bad ALERT format"
@@ -632,6 +697,208 @@ class MainActivity : ComponentActivity() {
         6 -> "Puppy"
         7 -> "Kitty"
         else -> "Someone"
+    }
+    /* ---------- single bubble ---------- */
+    @Composable
+    private fun Bubble(msg: ChatMessage) {
+        val bg = when {
+            msg.type == 4   -> MaterialTheme.colorScheme.error
+            else            -> MaterialTheme.colorScheme.primary
+        }
+        val txtColor = when {
+            msg.fromMe      -> MaterialTheme.colorScheme.onPrimary
+            msg.type == 4   -> MaterialTheme.colorScheme.onError
+            else            -> MaterialTheme.colorScheme.onSurfaceVariant
+        }
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            horizontalArrangement = if (msg.fromMe) Arrangement.End else Arrangement.Start
+        ) {
+
+            /* avatar (incoming only) ── remove tint! */
+            if (!msg.fromMe) {
+                Image(
+                    painter = painterResource(id = getSenderImage(msg.userId ?: -1)),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .padding(end = 4.dp)
+                )
+            }
+
+            /* clickable bubble for GPS / ALERT */
+            Surface(
+                shape  = MaterialTheme.shapes.medium,
+                color  = bg,
+                modifier = Modifier
+                    .clickable(enabled = msg.type in 3..4 && msg.lat != null) {
+                        openMap(msg.lat!!, msg.lon!!)
+                    }
+            ) {
+                when (msg.type) {
+                    1 -> Text(                                   // TEXT
+                        text = if (msg.fromMe)
+                            msg.content
+                        else "${getUserName(msg.userId)}: ${msg.content}",
+                        modifier = Modifier.padding(10.dp),
+                        color = txtColor
+                    )
+                    2 -> Text(                                   // EMOJI glyph already stored
+                        text = msg.content,
+                        modifier = Modifier.padding(10.dp),
+                        color = txtColor,
+                        fontSize = MaterialTheme.typography.headlineLarge.fontSize
+                    )
+                    3 -> Text(                                    // GPS
+                        text = if (msg.fromMe)
+                            "Location shared! Tap to view."
+                        else
+                            "${getUserName(msg.userId)} shared their location! Tap to view.",
+                        modifier = Modifier.padding(10.dp),
+                        color = txtColor
+                    )
+                    4 -> Text(                                   // ALERT
+                        text = "${getUserName(msg.userId)} HAS AN EMERGENCY! TAP TO SEE THEIR LOCATION",
+                        modifier = Modifier.padding(10.dp),
+                        color = txtColor
+                    )
+                }
+            }
+        }
+    }
+
+    /* ---------- full chat screen ---------- */
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun ChatScreen(
+        onSend: (String) -> Unit,
+        onSendLocation: () -> Unit
+    ) {
+        /* remember list state */
+        val listState = rememberLazyListState()
+
+        /* whenever the size changes, scroll to newest
+           (with reverseLayout=true newest item lives at index 0) */
+        LaunchedEffect(chatMessages.size) {
+            listState.animateScrollToItem(0)
+        }
+
+        Column(Modifier.fillMaxSize()) {
+
+            TopAppBar(
+                title = { Text("Chirpy Chat") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor    = AmoledBlack,
+                    titleContentColor = Color.White
+                ),
+                actions = {
+                    TextButton(
+                        onClick = onSendLocation,
+                        colors  = ButtonDefaults.textButtonColors(
+                            contentColor = ChirpyOrange
+                        )
+                    ) {
+                        Text("Send Location")
+                    }
+                }
+            )
+            /* message history */
+            LazyColumn(
+                state = listState,          
+                modifier = Modifier.weight(1f),
+                reverseLayout = true           // newest at bottom
+            ) {
+                items(chatMessages.reversed(), key = { it.ts }) { msg ->
+                    Bubble(msg)
+                }
+            }
+
+            /* input row */
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextField(
+                    value = draftText,
+                    onValueChange = { draftText = it },
+                    modifier = Modifier.weight(1f),
+                    placeholder = { Text("Type…") }
+                )
+                Spacer(Modifier.width(8.dp))
+                Button(
+                    onClick = {
+                        val txt = draftText.trim()
+                        if (txt.isNotEmpty()) {
+                            onSend(txt)
+                            draftText = ""
+                        }
+                    }
+                ) { Text("Send") }
+            }
+        }
+    }
+
+
+    private fun sendChat(text: String) {
+        val ch   = writeCharacteristic ?: return
+        val gatt = bluetoothGatt       ?: return
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED) return
+
+        /* We prefix with "TXT:" so the watch can recognise it later */
+        ch.setValue("TXT:$text".toByteArray(StandardCharsets.UTF_8))
+        gatt.writeCharacteristic(ch)
+    }
+
+    private fun emojiFromCode(code: Int?) = when (code) {
+        1 -> "👍"; 2 -> "👋"; 3 -> "❤️"; 4 -> "🎉"; else -> "❓"
+    }
+
+    private fun openMap(lat: String, lon: String) {
+        val uri = Uri.parse("geo:$lat,$lon?q=$lat,$lon")   // show pin at coords
+
+        val i = Intent(Intent.ACTION_VIEW, uri).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        startActivity(i)
+    }
+
+    private fun sendLocationMessage() {
+        val ch   = writeCharacteristic ?: return
+        val gatt = bluetoothGatt       ?: return
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+            != PackageManager.PERMISSION_GRANTED
+        ) return
+
+        val fused = LocationServices.getFusedLocationProviderClient(this)
+        fused.lastLocation
+            .addOnSuccessListener { loc ->
+                if (loc == null) { statusText = "No GPS fix"; return@addOnSuccessListener }
+
+                val lat  = loc.latitude.toString()
+                val lon  = loc.longitude.toString()
+                val ble  = "LOC:$lat,$lon"
+
+                ch.setValue(ble.toByteArray(StandardCharsets.UTF_8))
+                if (gatt.writeCharacteristic(ch)) {
+                    /* add our own bubble */
+                    chatMessages += ChatMessage(
+                        type   = 3,               // treat as GPS
+                        content = "Location shared!",   // just label, not used in UI
+                        fromMe  = true,
+                        userId  = null,
+                        lat = lat,
+                        lon = lon
+                    )
+                    statusText = "Location sent!"
+                } else statusText = "Send location failed"
+            }
+            .addOnFailureListener { statusText = "Send location failed" }
     }
 
 

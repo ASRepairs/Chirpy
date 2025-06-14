@@ -91,6 +91,42 @@ class RxCallback : public BLECharacteristicCallbacks
         if (!extGpsData)
             return; // safety
 
+        /* ────────── NEW: plain chat text (TXT:…) ────────── */
+        if (v.rfind("TXT:", 0) == 0) // payload starts with "TXT:"
+        {
+            std::string msg = v.substr(4); // strip the prefix
+            if (!msg.empty())
+            {
+#ifdef BLELOG
+                ESP_LOGI(TAG, "RX ← TXT \"%s\"", msg.c_str());
+#endif
+                /* broadcast via LoRa */
+                common_sendLoraMessage(msg.c_str());
+            }
+            return; // nothing more to do
+        }
+
+        else if (v.rfind("LOC:", 0) == 0)
+        {
+            float lat, lon;
+            if (sscanf(v.c_str() + 4, "%f,%f", &lat, &lon) == 2)
+            {
+                extGpsData->latitude = lat;
+                extGpsData->longitude = lon;
+#ifdef BLELOG
+                ESP_LOGI(TAG, "RX ← LOC %.5f,%.5f", lat, lon);
+#endif
+                common_sendLoraGPS(); // broadcast as MSG_TYPE_GPS
+            }
+            else
+            {
+#ifdef BLELOG
+                ESP_LOGW(TAG, "Bad LOC payload: %s", v.c_str());
+#endif
+            }
+            return;
+        }
+
         /* Fast comma count to decide what we received */
         uint8_t comma = 0;
         for (char ch : v)
@@ -105,7 +141,6 @@ class RxCallback : public BLECharacteristicCallbacks
             {
                 extGpsData->latitude = lat;
                 extGpsData->longitude = lon;
-                /* leave date/time untouched */
 #ifdef BLELOG
                 ESP_LOGI(TAG, "RX ← GPS  %.5f,%.5f", lat, lon);
 #endif
@@ -127,7 +162,7 @@ class RxCallback : public BLECharacteristicCallbacks
                 ESP_LOGI(TAG, "RX ← TIME %04d-%02d-%02d %02d:%02d:%02d",
                          Y, M, D, h, m, s);
 #endif
-                struct tm t;
+                struct tm t{};
                 t.tm_year = Y - 1900;
                 t.tm_mon = M - 1;
                 t.tm_mday = D;
@@ -135,7 +170,6 @@ class RxCallback : public BLECharacteristicCallbacks
                 t.tm_min = m;
                 t.tm_sec = s;
 
-                // set system time first
                 time_t tt = mktime(&t);
                 struct timeval now = {.tv_sec = tt, .tv_usec = 0};
                 settimeofday(&now, nullptr);
@@ -162,7 +196,11 @@ class SrvCb : public BLEServerCallbacks
     {
         gConnected = true;
         vTaskDelay(pdMS_TO_TICKS(5000));
-        sendReqTime();                                           // once
+        sendReqTime(); // once
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        sendReqGps(); // once
+        adv->stop(); // stop adverts while connected
+        // start the timer to send GPS data every 5 minutes
         esp_timer_start_periodic(gpsTimer, 5ULL * 60 * 1000000); // five min
 #ifdef BLELOG
         ESP_LOGI(TAG, "Client connected");
