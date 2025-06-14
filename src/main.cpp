@@ -19,6 +19,12 @@
 #define RX_CHECK_INTERVAL_MS  50
 #define MAX_MSG_HISTORY 10
 
+#define SCREEN_TIMEOUT_MS 30000
+static uint8_t saved_brightness = 50;
+volatile bool screenOn = true;
+
+bool enableVibration = true;
+
 static const char* TAG = "MAIN";
 // global vars
 BLEServer *pServer = nullptr;
@@ -40,6 +46,47 @@ bool isPmuIRQ = false;
 ICACHE_RAM_ATTR void onLoraPacketReceived() {
     if (!isTransmitting) {
         receivedFlag = true;
+    }
+}
+
+
+// ──────────────────────── Notification effects ────────────────────────
+
+void common_setVibration(bool enable)
+{
+    enableVibration = enable;
+    if (enable) {
+        ESP_LOGI(TAG, "Vibration enabled");
+    } else {
+        ESP_LOGI(TAG, "Vibration disabled");
+    }
+}
+void vibrateNotification(message_type_t type)
+{
+    if (!enableVibration) {
+        return; // Vibration is disabled
+    }
+    // Trigger vibration based on message type
+    switch (type)
+    {
+        case MSG_TYPE_ALERT:
+            // Trigger a different vibration pattern for alert messages
+            watch.setWaveform(0, 15); // play effect
+            watch.setWaveform(1, 15);  // end waveform
+            watch.setWaveform(2, 15); // play effect
+            watch.setWaveform(3, 15);  // end waveform
+            watch.setWaveform(4, 15); // play effect
+            watch.setWaveform(5, 0);  // end waveform
+            watch.setWaveform(6, 15); // play effect
+            watch.setWaveform(7, 0);  // end waveform
+            watch.run();
+            break;
+        default:
+            watch.setWaveform(0, 15); // play effect
+            watch.setWaveform(1, 0);  // end waveform
+            watch.setWaveform(3, 15); // play effect
+            watch.setWaveform(4, 0);  // end waveform
+            watch.run();
     }
 }
 
@@ -316,11 +363,7 @@ void displayReceivedMessage() {
         if ((gr_id == globalUserData.groupId) || (gr_id == 0) || (globalUserData.groupId == 0)) {
             ESP_LOGI(TAG, "[SX1262] Displaying message for group %d", gr_id);
             handleReceivedNotification(usr_id, msg_type, payload_str.c_str());
-            watch.setWaveform(0, 15);  // play effect
-            watch.setWaveform(1, 0);  // end waveform
-            watch.setWaveform(3, 15);  // play effect
-            watch.setWaveform(4, 0);  // end waveform
-            watch.run();
+            vibrateNotification((message_type_t)msg_type);
         }
 
         // rebroadcast
@@ -441,7 +484,7 @@ void TaskCheckShortButtonPressed(void *pvParameters)
                     // lcd is off, turn it on
                     watch.powerIoctl(WATCH_POWER_TOUCH_DISP, true);
                     vTaskDelay(pdMS_TO_TICKS(50)); // wait for power to stabilize
-                    watch.setBrightness(50); // or restore previous brightness
+                    watch.setBrightness(saved_brightness);
                     ESP_LOGI(TAG, "[watch] Display turned ON");
                 }
                 else
@@ -468,6 +511,33 @@ void TaskCheckShortButtonPressed(void *pvParameters)
             watch.clearPMU();
         }
         vTaskDelay(pdMS_TO_TICKS(20));
+    }
+}
+
+void TaskScreenTimeout(void *pvParameters)
+{
+
+    constexpr uint32_t POLL_MS = 250; // check 4× a second
+
+    for (;;)
+    {
+        uint32_t idle = lv_disp_get_inactive_time(nullptr);
+
+
+        if (screenOn && idle > SCREEN_TIMEOUT_MS)
+        {
+            saved_brightness = watch.getBrightness(); // remember brightness
+            watch.setBrightness(0);                   // back-light off
+            screenOn = false;
+        }
+
+        if (!screenOn && idle < 200)
+        {
+            watch.setBrightness(saved_brightness == 0 ? 50 : saved_brightness);
+            screenOn = true;
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(POLL_MS));
     }
 }
 
@@ -543,6 +613,7 @@ void common_setBrightness(uint8_t level)
 {
     if (level > 0 && level <= 255) {
         watch.setBrightness(level);
+        saved_brightness = level; // save the new brightness level
     } else {
         ESP_LOGE(TAG, "[watch] Invalid brightness level: %d. Must be between 1 and 255.", level);
     }
@@ -561,7 +632,7 @@ void setup() {
     watch.attachPMU([]() {
         isPmuIRQ = true;
     });
-
+    saved_brightness = watch.getBrightness();
     /* Enable the charge / VBUS IRQ sources we want                         */
     pmu.enableIRQ(
         XPOWERS_AXP2101_VBUS_INSERT_IRQ |
@@ -627,7 +698,8 @@ void setup() {
     //xTaskCreatePinnedToCore(TaskShowRecievedFrame, "TaskShowRecievedFrame",TASK_STACK_SIZE, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(TaskTimeUpdater,"TaskTimeUpdater", TASK_STACK_SIZE, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(TaskDateUpdater, "TaskDateUpdater", TASK_STACK_SIZE, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(TaskBatteryUpdater, "TaskBatteryUpdater", 2048, nullptr, 1, nullptr, 1);
+    xTaskCreatePinnedToCore(TaskBatteryUpdater, "TaskBatteryUpdater", 2048, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskScreenTimeout, "TaskScreenTimeout", 2048, NULL, 1, NULL, 1);
 }
 
 void loop() {

@@ -173,12 +173,12 @@ void ChangeUserKitty(lv_event_t * e)
 
 void Vibration_Enable(lv_event_t * e)
 {
-	// Your code here
+	common_setVibration(true);
 }
 
 void Vibration_Disable(lv_event_t * e)
 {
-	// Your code here
+	common_setVibration(false);
 }
 
 void Sound_Enable(lv_event_t * e)

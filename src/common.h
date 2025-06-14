@@ -17,6 +17,7 @@ esp_err_t common_sendLoraAlert(void);
 esp_err_t common_sendLoraGPS(void);
 void common_displayMessageUI(int msg_id, int usr_id);
 void common_setBrightness(uint8_t level);
+void common_setVibration(bool enable);
 #ifdef __cplusplus
 } // extern "C"
 #endif
