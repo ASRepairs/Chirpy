@@ -134,7 +134,7 @@ void ui_MainScreen_screen_init(void)
     lv_obj_set_x(ui_BatteryLabel, 0);
     lv_obj_set_y(ui_BatteryLabel, -70);
     lv_obj_set_align(ui_BatteryLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_BatteryLabel, "");
+    lv_label_set_text(ui_BatteryLabel, "lol lmao");
     lv_obj_set_style_text_color(ui_BatteryLabel, lv_color_hex(0xFFA300), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_BatteryLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_BatteryLabel, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);

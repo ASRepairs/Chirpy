@@ -66,3 +66,19 @@ def ChangeUserPuppy(event_struct):
 def ChangeUserKitty(event_struct):
     return
 
+
+def Vibration_Enable(event_struct):
+    return
+
+
+def Vibration_Disable(event_struct):
+    return
+
+
+def Sound_Enable(event_struct):
+    return
+
+
+def Sound_Disable(event_struct):
+    return
+

@@ -143,11 +143,6 @@ void ChangeBrightess(lv_event_t * e)
 	common_setBrightness(lv_slider_get_value(ui_BrightnessSlider));
 }
 
-void ChangeSoundMode(lv_event_t * e)
-{
-	// Your code here
-}
-
 void ChangeUserPhoeny(lv_event_t * e)
 {
 	globalUserData.userId = PHOENY;
@@ -174,4 +169,24 @@ void ChangeUserKitty(lv_event_t * e)
 	globalUserData.userId = KITTY;
 	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_kitty_png);
 	successAnimationFunc(ui_AvatarUpdateSuccessImage);
+}
+
+void Vibration_Enable(lv_event_t * e)
+{
+	// Your code here
+}
+
+void Vibration_Disable(lv_event_t * e)
+{
+	// Your code here
+}
+
+void Sound_Enable(lv_event_t * e)
+{
+	// Your code here
+}
+
+void Sound_Disable(lv_event_t * e)
+{
+	// Your code here
 }

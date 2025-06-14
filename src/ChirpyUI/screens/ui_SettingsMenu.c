@@ -5,7 +5,8 @@
 
 #include "../ui.h"
 
-lv_obj_t * uic_SoundVibrationLabel;
+lv_obj_t * uic_SoundCheckBox;
+lv_obj_t * uic_VibrationCheckBox;
 lv_obj_t * uic_BrightnessSlider;
 lv_obj_t * uic_BrightnessLabel;
 lv_obj_t * uic_SettingsPanel;
@@ -16,8 +17,8 @@ lv_obj_t * ui_Label5;
 lv_obj_t * ui_SettingsPanel;
 lv_obj_t * ui_BrightnessLabel;
 lv_obj_t * ui_BrightnessSlider;
-lv_obj_t * ui_SoundVibrationLabel;
-lv_obj_t * ui_Dropdown1;
+lv_obj_t * ui_VibrationCheckBox;
+lv_obj_t * ui_SoundCheckBox;
 
 // event funtions
 void ui_event_SettingsMenu(lv_event_t * e)
@@ -39,12 +40,29 @@ void ui_event_BrightnessSlider(lv_event_t * e)
     }
 }
 
-void ui_event_Dropdown1(lv_event_t * e)
+void ui_event_VibrationCheckBox(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
 
-    if(event_code == LV_EVENT_VALUE_CHANGED) {
-        ChangeSoundMode(e);
+    if(event_code == LV_EVENT_VALUE_CHANGED &&  lv_obj_has_state(target, LV_STATE_CHECKED)) {
+        Vibration_Enable(e);
+    }
+    if(event_code == LV_EVENT_VALUE_CHANGED &&  !lv_obj_has_state(target, LV_STATE_CHECKED)) {
+        Vibration_Disable(e);
+    }
+}
+
+void ui_event_SoundCheckBox(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+    lv_obj_t * target = lv_event_get_target(e);
+
+    if(event_code == LV_EVENT_VALUE_CHANGED &&  lv_obj_has_state(target, LV_STATE_CHECKED)) {
+        Sound_Enable(e);
+    }
+    if(event_code == LV_EVENT_VALUE_CHANGED &&  !lv_obj_has_state(target, LV_STATE_CHECKED)) {
+        Sound_Disable(e);
     }
 }
 
@@ -112,43 +130,43 @@ void ui_SettingsMenu_screen_init(void)
     lv_obj_set_style_bg_color(ui_BrightnessSlider, lv_color_hex(0xFFA300), LV_PART_KNOB | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_BrightnessSlider, 255, LV_PART_KNOB | LV_STATE_DEFAULT);
 
-    ui_SoundVibrationLabel = lv_label_create(ui_SettingsPanel);
-    lv_obj_set_width(ui_SoundVibrationLabel, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_SoundVibrationLabel, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_SoundVibrationLabel, 0);
-    lv_obj_set_y(ui_SoundVibrationLabel, 20);
-    lv_obj_set_align(ui_SoundVibrationLabel, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_SoundVibrationLabel, "Sound & Vibration");
-    lv_obj_set_style_text_font(ui_SoundVibrationLabel, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_VibrationCheckBox = lv_checkbox_create(ui_SettingsPanel);
+    lv_checkbox_set_text(ui_VibrationCheckBox, "Vibration");
+    lv_obj_set_width(ui_VibrationCheckBox, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_VibrationCheckBox, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_VibrationCheckBox, -15);
+    lv_obj_set_y(ui_VibrationCheckBox, 10);
+    lv_obj_set_align(ui_VibrationCheckBox, LV_ALIGN_CENTER);
+    lv_obj_add_state(ui_VibrationCheckBox, LV_STATE_CHECKED);       /// States
+    lv_obj_add_flag(ui_VibrationCheckBox, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_set_style_text_font(ui_VibrationCheckBox, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Dropdown1 = lv_dropdown_create(ui_SettingsPanel);
-    lv_dropdown_set_options(ui_Dropdown1, "Vibration\nSilent\nSound/Vibration");
-    lv_obj_set_width(ui_Dropdown1, 150);
-    lv_obj_set_height(ui_Dropdown1, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Dropdown1, 0);
-    lv_obj_set_y(ui_Dropdown1, 55);
-    lv_obj_set_align(ui_Dropdown1, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Dropdown1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_set_style_bg_color(ui_Dropdown1, lv_color_hex(0x343434), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_Dropdown1, 100, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui_Dropdown1, lv_color_hex(0xFFA300), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_Dropdown1, 200, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_VibrationCheckBox, lv_color_hex(0xFFA300), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_VibrationCheckBox, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_bg_color(lv_dropdown_get_list(ui_Dropdown1), lv_color_hex(0x222222),  LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(lv_dropdown_get_list(ui_Dropdown1), 255,  LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_SoundCheckBox = lv_checkbox_create(ui_SettingsPanel);
+    lv_checkbox_set_text(ui_SoundCheckBox, "Sound");
+    lv_obj_set_width(ui_SoundCheckBox, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_SoundCheckBox, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_SoundCheckBox, -27);
+    lv_obj_set_y(ui_SoundCheckBox, 50);
+    lv_obj_set_align(ui_SoundCheckBox, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_SoundCheckBox, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_set_style_text_font(ui_SoundCheckBox, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_set_style_bg_color(lv_dropdown_get_list(ui_Dropdown1), lv_color_hex(0xFFA300),
-                              LV_PART_SELECTED | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(lv_dropdown_get_list(ui_Dropdown1), 255,  LV_PART_SELECTED | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_SoundCheckBox, lv_color_hex(0xFFA300), LV_PART_INDICATOR | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_SoundCheckBox, 255, LV_PART_INDICATOR | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_BrightnessSlider, ui_event_BrightnessSlider, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_Dropdown1, ui_event_Dropdown1, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_VibrationCheckBox, ui_event_VibrationCheckBox, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_SoundCheckBox, ui_event_SoundCheckBox, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SettingsMenu, ui_event_SettingsMenu, LV_EVENT_ALL, NULL);
     uic_SettingsMenu = ui_SettingsMenu;
     uic_SettingsPanel = ui_SettingsPanel;
     uic_BrightnessLabel = ui_BrightnessLabel;
     uic_BrightnessSlider = ui_BrightnessSlider;
-    uic_SoundVibrationLabel = ui_SoundVibrationLabel;
+    uic_VibrationCheckBox = ui_VibrationCheckBox;
+    uic_SoundCheckBox = ui_SoundCheckBox;
 
 }
 
@@ -167,8 +185,9 @@ void ui_SettingsMenu_screen_destroy(void)
     ui_BrightnessLabel = NULL;
     uic_BrightnessSlider = NULL;
     ui_BrightnessSlider = NULL;
-    uic_SoundVibrationLabel = NULL;
-    ui_SoundVibrationLabel = NULL;
-    ui_Dropdown1 = NULL;
+    uic_VibrationCheckBox = NULL;
+    ui_VibrationCheckBox = NULL;
+    uic_SoundCheckBox = NULL;
+    ui_SoundCheckBox = NULL;
 
 }

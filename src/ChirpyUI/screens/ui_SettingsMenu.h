@@ -21,15 +21,17 @@ extern lv_obj_t * ui_SettingsPanel;
 extern lv_obj_t * ui_BrightnessLabel;
 extern void ui_event_BrightnessSlider(lv_event_t * e);
 extern lv_obj_t * ui_BrightnessSlider;
-extern lv_obj_t * ui_SoundVibrationLabel;
-extern void ui_event_Dropdown1(lv_event_t * e);
-extern lv_obj_t * ui_Dropdown1;
+extern void ui_event_VibrationCheckBox(lv_event_t * e);
+extern lv_obj_t * ui_VibrationCheckBox;
+extern void ui_event_SoundCheckBox(lv_event_t * e);
+extern lv_obj_t * ui_SoundCheckBox;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_SettingsMenu;
 extern lv_obj_t * uic_SettingsPanel;
 extern lv_obj_t * uic_BrightnessLabel;
 extern lv_obj_t * uic_BrightnessSlider;
-extern lv_obj_t * uic_SoundVibrationLabel;
+extern lv_obj_t * uic_VibrationCheckBox;
+extern lv_obj_t * uic_SoundCheckBox;
 
 #ifdef __cplusplus
 } /*extern "C"*/

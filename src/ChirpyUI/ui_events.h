@@ -26,7 +26,10 @@ void ChangeUserHorsy(lv_event_t * e);
 void ChangeUserPandy(lv_event_t * e);
 void loraChangeGroup(lv_event_t * e);
 void ChangeBrightess(lv_event_t * e);
-void ChangeSoundMode(lv_event_t * e);
+void Vibration_Enable(lv_event_t * e);
+void Vibration_Disable(lv_event_t * e);
+void Sound_Enable(lv_event_t * e);
+void Sound_Disable(lv_event_t * e);
 
 #ifdef __cplusplus
 } /*extern "C"*/
