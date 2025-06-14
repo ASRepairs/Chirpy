@@ -46,34 +46,31 @@ static void sendReqGps()
     }
 }
 
-void bleSendNotificationWithGps(message_type_t type, int senderId, float lat, float lon)
+void bleSendNotification(message_type_t type, int senderId, const char *payload)
 {
     if (!gConnected || !txChar)
         return;
 
-    const char *prefix = nullptr;
-    switch (type)
+    // Estimate required buffer size based on message type
+    size_t payload_len = strlen(payload);
+    size_t overhead = 20;  // Rough: "NOTIF:%d:%d:" + null terminator
+    size_t total_len = overhead + payload_len + 10; // extra padding
+
+    char *buf = (char *)malloc(total_len);
+    if (!buf)
     {
-    case MSG_TYPE_GPS:
-        prefix = "GPS";
-        break;
-    case MSG_TYPE_ALERT:
-        prefix = "ALERT";
-        break;
-    default:
-        ESP_LOGW(TAG, "Invalid message type for BLE notification: %d", type);
+        ESP_LOGE(TAG, "Failed to allocate buffer for BLE message");
         return;
     }
 
-    char buf[100];
-    snprintf(buf, sizeof(buf), "%s:%d:%.6f,%.6f", prefix, senderId, lat, lon);
-    Serial.println("SENT TO PHONE:" + String(buf)); // for debugging
+    snprintf(buf, total_len, "NOTIF:%d:%d:%s", senderId, type, payload);
     txChar->setValue((uint8_t *)buf, strlen(buf));
     txChar->notify();
 
 #ifdef BLELOG
     ESP_LOGI(TAG, "TX → %s", buf);
 #endif
+    free(buf);
 }
 
 /* ─────────────  ESP-timer callback (runs in its own tiny task)  ───────────── */

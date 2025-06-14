@@ -214,7 +214,11 @@ void handleReceivedNotification(int user_id, int msg_type, const char *payload_s
         break;
     }
     bool auto_dismiss = true;
-    // Interpret the payload
+
+    // Always send BLE notification for all message types
+    bleSendNotification((message_type_t)msg_type, user_id, payload_str);
+
+    // Interpret the payload for UI
     if (msg_type == MSG_TYPE_EMOJI)
     {
         int emoji_code = atoi(payload_str);
@@ -247,7 +251,6 @@ void handleReceivedNotification(int user_id, int msg_type, const char *payload_s
         float lat = 0, lon = 0;
         if (sscanf(payload_str, "%f,%f", &lat, &lon) == 2 && lat != 0 && lon != 0)
         {
-            bleSendNotificationWithGps(MSG_TYPE_ALERT, user_id, lat, lon); // Send alert to phone
             lv_obj_add_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN);
             lv_obj_clear_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN);
             lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_emergencyemoji_png);
@@ -266,7 +269,6 @@ void handleReceivedNotification(int user_id, int msg_type, const char *payload_s
             ESP_LOGW(TAG, "Bad ALERT payload: %s", payload_str);
         }
     }
-
     else if (msg_type == MSG_TYPE_TEXT)
     {
         lv_obj_add_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN);     // hide emoji image
@@ -278,7 +280,6 @@ void handleReceivedNotification(int user_id, int msg_type, const char *payload_s
     {
         float lat = 0, lon = 0;
         if (sscanf(payload_str, "%f,%f", &lat, &lon) == 2) {
-            bleSendNotificationWithGps(MSG_TYPE_GPS, user_id, lat, lon);
             lv_obj_add_flag(ui_ReceivedEmojiImage, LV_OBJ_FLAG_HIDDEN);     // hide emoji image
             lv_obj_clear_flag(ui_ReceivedMessageLabel, LV_OBJ_FLAG_HIDDEN); // show text label
             // GPS as a message

@@ -340,38 +340,54 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    msg.startsWith("GPS:") -> {
-                        val gpsPayload = msg.removePrefix("GPS:")
-                        val parts = gpsPayload.split(':', ',')
+                    msg.startsWith("NOTIF:") -> {
+                        val parts = msg.removePrefix("NOTIF:").split(":", limit = 3)
                         if (parts.size == 3) {
                             val userId = parts[0].toIntOrNull()
-                            val lat = parts[1]
-                            val lon = parts[2]
+                            val msgType = parts[1].toIntOrNull()
+                            val payload = parts[2]
+
                             runOnUiThread {
-                                showGpsNotification(lat, lon, userId)
-                                statusText = "Received GPS!"
+                                when (msgType) {
+                                    1 -> {  // TEXT
+                                        statusText = "Text from ${getUserName(userId)}"
+                                        showSimpleTextNotification(payload, userId)
+                                    }
+
+                                    2 -> {  // EMOJI
+                                        statusText = "Emoji from ${getUserName(userId)}"
+                                        showEmojiNotification(payload.toIntOrNull(), userId)
+                                    }
+
+                                    3 -> {  // GPS
+                                        val coords = payload.split(",")
+                                        if (coords.size == 2) {
+                                            showGpsNotification(coords[0], coords[1], userId)
+                                            statusText = "GPS from ${getUserName(userId)}"
+                                        } else {
+                                            statusText = "Bad GPS format"
+                                        }
+                                    }
+
+                                    4 -> {  // ALERT
+                                        val coords = payload.split(",")
+                                        if (coords.size == 2) {
+                                            showAlertNotification(coords[0], coords[1], userId)
+                                            statusText = "ALERT from ${getUserName(userId)}"
+                                        } else {
+                                            statusText = "Bad ALERT format"
+                                        }
+                                    }
+
+                                    else -> {
+                                        statusText = "Unknown NOTIF type: $msgType"
+                                    }
+                                }
                             }
                         } else {
-                            runOnUiThread { statusText = "Bad GPS format :(" }
+                            runOnUiThread { statusText = "Bad NOTIF format" }
                         }
                     }
-                    msg.startsWith("ALERT:") -> {
-                        val alertPayload = msg.removePrefix("ALERT:")
-                        val parts = alertPayload.split(':', ',')
-
-                        if (parts.size == 3) {
-                            val userId = parts[0].toIntOrNull()
-                            val lat = parts[1]
-                            val lon = parts[2]
-                            runOnUiThread {
-                                showAlertNotification(lat, lon, userId)
-                                statusText = "Received ALERT!"
-                            }
-                        } else {
-                            runOnUiThread { statusText = "Bad ALERT format :(" }
-                        }
-                    }
-
 
                     else -> {
                         runOnUiThread {
@@ -534,6 +550,74 @@ class MainActivity : ComponentActivity() {
             .setVibrate(longArrayOf(0, 2000)) // vibrate 2s
             .build()
 
+
+        nm.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), notif)
+    }
+    private fun showSimpleTextNotification(text: String, userId: Int?) {
+        val channelId = "text_channel"
+        val nm = getSystemService(NotificationManager::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+            nm.getNotificationChannel(channelId) == null) {
+            nm.createNotificationChannel(
+                NotificationChannel(channelId, "Messages", NotificationManager.IMPORTANCE_DEFAULT)
+            )
+        }
+
+        val senderIcon = IconCompat.createWithResource(this, getSenderImage(userId ?: -1))
+        val person = Person.Builder()
+            .setName(getUserName(userId))
+            .setIcon(senderIcon)
+            .build()
+
+        val style = NotificationCompat.MessagingStyle(person)
+            .setConversationTitle("${getUserName(userId)} says:")
+            .addMessage(text, System.currentTimeMillis(), person)
+
+        val notif = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_stat_name)
+            .setStyle(style)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setAutoCancel(true)
+            .build()
+
+        nm.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), notif)
+    }
+    private fun showEmojiNotification(emojiCode: Int?, userId: Int?) {
+        val emojiName = when (emojiCode) {
+            1 -> "👍"
+            2 -> "👋"
+            3 -> "❤️"
+            4 -> "🎉"
+            else -> "❓"
+        }
+
+        val channelId = "emoji_channel"
+        val nm = getSystemService(NotificationManager::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+            nm.getNotificationChannel(channelId) == null) {
+            nm.createNotificationChannel(
+                NotificationChannel(channelId, "Emojis", NotificationManager.IMPORTANCE_DEFAULT)
+            )
+        }
+
+        val senderIcon = IconCompat.createWithResource(this, getSenderImage(userId ?: -1))
+        val person = Person.Builder()
+            .setName(getUserName(userId))
+            .setIcon(senderIcon)
+            .build()
+
+        val style = NotificationCompat.MessagingStyle(person)
+            .setConversationTitle("${getUserName(userId)} sent an emoji")
+            .addMessage(" $emojiName", System.currentTimeMillis(), person)
+
+        val notif = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_stat_name)
+            .setStyle(style)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .setAutoCancel(true)
+            .build()
 
         nm.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), notif)
     }

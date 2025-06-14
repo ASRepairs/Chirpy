@@ -10,6 +10,6 @@
 bool bleClientConnected();
 void bleSendReqGpsNow();
 void startBLETask(const char *bleName, GPSData *gpsData);
-void bleSendNotificationWithGps(message_type_t type, int senderId, float lat, float lon);
+void bleSendNotification(message_type_t type, int senderId, const char *payload);
 
 #endif // BLEFUNCS_H
