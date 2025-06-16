@@ -35,11 +35,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.geometry.Offset
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import java.nio.charset.StandardCharsets
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.unit.sp
 import java.util.*
 
 
@@ -716,7 +719,7 @@ class MainActivity : ComponentActivity() {
         val txtColor = when {
             msg.fromMe      -> MaterialTheme.colorScheme.onPrimary
             msg.type == 4   -> MaterialTheme.colorScheme.onError
-            else            -> Color.White
+            else            -> Color.Black
         }
 
         Row(
@@ -738,41 +741,56 @@ class MainActivity : ComponentActivity() {
             }
 
             /* clickable bubble for GPS / ALERT */
-            Surface(
-                shape  = MaterialTheme.shapes.medium,
-                color  = bg,
-                modifier = Modifier
-                    .clickable(enabled = msg.type in 3..4 && msg.lat != null) {
-                        openMap(msg.lat!!, msg.lon!!)
-                    }
-            ) {
-                when (msg.type) {
-                    1 -> Text(                                   // TEXT
-                        text = if (msg.fromMe)
-                            msg.content
-                        else "${getUserName(msg.userId)}: ${msg.content}",
-                        modifier = Modifier.padding(10.dp),
-                        color = txtColor
-                    )
-                    2 -> Text(                                   // EMOJI glyph already stored
-                        text = msg.content,
+            if (msg.type == 2) {
+                // EMOJI — no bubble
+                Text(
+                    text = msg.content,
+                    modifier = Modifier.padding(10.dp),
+                    color = txtColor,
+                    fontSize = 64.sp
+                )
+            } else {
+                // Wrap all other types in a bubble
+                Surface(
+                    shape = MaterialTheme.shapes.medium,
+                    color = bg,
+                    modifier = Modifier
+                        .clickable(enabled = msg.type in 3..4 && msg.lat != null) {
+                            openMap(msg.lat!!, msg.lon!!)
+                        }
+                ) {
+                    Text(
+                        text = when (msg.type) {
+                            1 -> if (msg.fromMe)
+                                msg.content
+                            else
+                                "${getUserName(msg.userId)}: ${msg.content}"
+
+                            3 -> if (msg.fromMe)
+                                "Location shared! Tap to view."
+                            else
+                                "${getUserName(msg.userId)} shared their location! Tap to view."
+
+                            4 -> "${getUserName(msg.userId)} HAS AN EMERGENCY! TAP TO SEE THEIR LOCATION"
+                            else -> "Unknown message"
+                        },
                         modifier = Modifier.padding(10.dp),
                         color = txtColor,
-                        fontSize = MaterialTheme.typography.headlineLarge.fontSize
+                        fontSize = 18.sp,
+                        style = if (msg.fromMe) {
+                            // Add drop shadow for outgoing (orange bubble) messages
+                            LocalTextStyle.current.copy(
+                                shadow = Shadow(
+                                    color = Color.Black,
+                                    offset = Offset(2f, 2f),
+                                    blurRadius = 4f
+                                )
+                            )
+                        } else {
+                            LocalTextStyle.current
+                        }
                     )
-                    3 -> Text(                                    // GPS
-                        text = if (msg.fromMe)
-                            "Location shared! Tap to view."
-                        else
-                            "${getUserName(msg.userId)} shared their location! Tap to view.",
-                        modifier = Modifier.padding(10.dp),
-                        color = txtColor
-                    )
-                    4 -> Text(                                   // ALERT
-                        text = "${getUserName(msg.userId)} HAS AN EMERGENCY! TAP TO SEE THEIR LOCATION",
-                        modifier = Modifier.padding(10.dp),
-                        color = txtColor
-                    )
+
                 }
             }
         }
