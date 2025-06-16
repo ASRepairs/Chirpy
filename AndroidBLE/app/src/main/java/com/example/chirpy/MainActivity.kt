@@ -735,7 +735,7 @@ class MainActivity : ComponentActivity() {
                     painter = painterResource(id = getSenderImage(msg.userId ?: -1)),
                     contentDescription = null,
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(48.dp)
                         .padding(end = 4.dp)
                 )
             }
