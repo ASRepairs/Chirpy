@@ -20502,6 +20502,12 @@
                     "InheritedType": 1
                   },
                   {
+                    "nid": 100,
+                    "strtype": "OBJECT/Hidden",
+                    "strval": "True",
+                    "InheritedType": 2
+                  },
+                  {
                     "nid": 225,
                     "flags": 1048576,
                     "strtype": "OBJECT/Scrolling",
@@ -20724,7 +20730,8 @@
                     "InheritedType": 4
                   }
                 ],
-                "saved_objtypeKey": "CHECKBOX"
+                "saved_objtypeKey": "CHECKBOX",
+                "tree_closed": true
               }
             ],
             "dont_export": false,
@@ -22076,7 +22083,7 @@
     "uiExportFolderPath": "C:\\Users\\user\\Desktop\\Projects\\Chirpy\\src\\ChirpyUI",
     "projectExportFolderPath": "C:\\Users\\user\\Desktop\\Projects\\Chirpy\\src\\ChirpyUI",
     "custom_variable_prefix": "uic",
-    "backup_cnt": 9,
+    "backup_cnt": 10,
     "autosave_cnt": 0,
     "group_color_cnt": 1,
     "lvgl_version": "8.3.11",

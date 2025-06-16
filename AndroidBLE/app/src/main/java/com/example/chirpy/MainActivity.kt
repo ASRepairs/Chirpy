@@ -105,7 +105,7 @@ class MainActivity : ComponentActivity() {
     private var devices       by mutableStateOf(listOf<BluetoothDevice>())
     private var showDialog    by mutableStateOf(false)
     private var isConnected   by mutableStateOf(false)
-    private var statusText    by mutableStateOf("Idle")
+    private var statusText    by mutableStateOf("")
 
     private var inForeground by mutableStateOf(false)
 
@@ -173,7 +173,15 @@ class MainActivity : ComponentActivity() {
                             Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
                             Alignment.CenterHorizontally
                         ) {
-                            Text("Chirpy Client", style = MaterialTheme.typography.headlineSmall)
+                            Image(
+                                painter = painterResource(id = R.drawable.logo),
+                                contentDescription = "App Logo",
+                                modifier = Modifier
+                                    .size(256.dp)              // You can adjust size as needed
+                                    .padding(bottom = 8.dp)
+                            )
+
+                            Text("Start Chirping", style = MaterialTheme.typography.headlineSmall)
                             Button(
                                 onClick = {
                                     val intent =
@@ -708,7 +716,7 @@ class MainActivity : ComponentActivity() {
         val txtColor = when {
             msg.fromMe      -> MaterialTheme.colorScheme.onPrimary
             msg.type == 4   -> MaterialTheme.colorScheme.onError
-            else            -> MaterialTheme.colorScheme.onSurfaceVariant
+            else            -> Color.White
         }
 
         Row(
@@ -826,8 +834,10 @@ class MainActivity : ComponentActivity() {
                 TextField(
                     value = draftText,
                     onValueChange = { draftText = it },
-                    modifier = Modifier.weight(1f),
-                    placeholder = { Text("Type…") }
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(55.dp),
+                    placeholder = { Text("Chirp a message…") }
                 )
                 Spacer(Modifier.width(8.dp))
                 Button(
@@ -837,7 +847,8 @@ class MainActivity : ComponentActivity() {
                             onSend(txt)
                             draftText = ""
                         }
-                    }
+                    },
+                    modifier = Modifier.height(55.dp),
                 ) { Text("Send") }
             }
         }
