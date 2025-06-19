@@ -118,7 +118,7 @@ void ui_NotificationScreen_screen_init(void)
     lv_obj_set_style_text_color(ui_ReceivedMessageLabel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_ReceivedMessageLabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_ReceivedMessageLabel, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_ReceivedMessageLabel, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_ReceivedMessageLabel, &lv_font_montserrat_18, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_ReceivedEmojiImage = lv_img_create(ui_NotificationContainer);
     lv_img_set_src(ui_ReceivedEmojiImage, &ui_img_celebrationemoji_png);

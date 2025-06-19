@@ -182,6 +182,17 @@ void handleReceivedNotification(int user_id, int msg_type, const char *payload_s
     ESP_LOGI(TAG, "UI Received notification from user %d: %s", user_id, payload_str);
     lv_obj_set_y(ui_NotificationContainer, 0); // Force Y to top
 
+    // If the screen is off, wake it up
+    if (!screenOn || watch.getBrightness() == 0)
+    {
+        watch.powerIoctl(WATCH_POWER_TOUCH_DISP, true);
+        vTaskDelay(pdMS_TO_TICKS(50)); // stabilize
+        watch.setBrightness(saved_brightness == 0 ? 50 : saved_brightness);
+        screenOn = true;
+        lv_disp_trig_activity(nullptr); // reset inactivity timer
+        ESP_LOGI(TAG, "[watch] Auto-woke screen for incoming message");
+    }
+
     // Set sender image
     switch (user_id)
     {
@@ -308,7 +319,7 @@ void handleReceivedNotification(int user_id, int msg_type, const char *payload_s
                     lv_obj_add_flag(ui_NotificationContainer, LV_OBJ_FLAG_HIDDEN);
                     lv_timer_del(t);
                 }, 500, NULL);
-            }, 5000, nullptr);
+            }, 7500, nullptr);
     }
 }
 
@@ -471,6 +482,8 @@ void TaskCheckShortButtonPressed(void *pvParameters)
                 {
                     watch.setBrightness(0); // this will also sleep the lcd
                     watch.powerIoctl(WATCH_POWER_TOUCH_DISP, false);
+                    watch.setBrightness(0);
+                    screenOn = false;
                     ESP_LOGI(TAG, "[watch] Display turned OFF (long press)");
                 }
             }
@@ -479,13 +492,15 @@ void TaskCheckShortButtonPressed(void *pvParameters)
             else if (watch.isPekeyShortPressIrq())
             {
                 ESP_LOGI(TAG, "[watch] Pekey short-press");
-
+                lv_disp_trig_activity(nullptr); // resets inactivity timer
                 if (watch.getBrightness() == 0)
                 {
                     // lcd is off, turn it on
                     watch.powerIoctl(WATCH_POWER_TOUCH_DISP, true);
                     vTaskDelay(pdMS_TO_TICKS(50)); // wait for power to stabilize
                     watch.setBrightness(saved_brightness);
+                    screenOn = true;
+                    
                     ESP_LOGI(TAG, "[watch] Display turned ON");
                 }
                 else
@@ -553,6 +568,12 @@ esp_err_t common_sendLoraMessage(const char *msg) // message structure is: "<nod
               ":" + String(globalUserData.userId) + ":" + String(MSG_TYPE_TEXT) + ":" + String(msg);
 
     ESP_LOGI(TAG, "Sending msg: %s", msg_str.c_str());
+    if (bleClientConnected())
+    {
+        bleSendNotification(MSG_TYPE_TEXT,
+                             8, // 8 = placeholder for "us"
+                             msg);
+    }
     return sendLoraMessage(msg_str);
 }
 
@@ -567,6 +588,14 @@ esp_err_t common_sendLoraEmoji(int emoji_code)
               String(globalUserData.userId) + ":" + String(type) + ":" + String(emoji_code);
 
     ESP_LOGI(TAG, "Sending emoji msg: %s", msg_str.c_str());
+    if (bleClientConnected())
+    {
+        char emoji_code_str[4];
+        snprintf(emoji_code_str, sizeof(emoji_code_str), "%d", emoji_code);
+        bleSendNotification(MSG_TYPE_EMOJI,
+                            8, // 8 = placeholder for "us"
+                            emoji_code_str);
+    }
     return sendLoraMessage(msg_str);
 }
 
@@ -583,6 +612,12 @@ esp_err_t common_sendLoraAlert(void)
               String(globalUserData.userId) + ":" + String(type) + ":" + payload;
 
     ESP_LOGI(TAG, "Sending alert msg: %s", msg_str.c_str());
+    if (bleClientConnected())
+    {
+        bleSendNotification(MSG_TYPE_ALERT,
+                            8, // 8 = placeholder for "us"
+                            payload.c_str());
+    }
     return sendLoraMessage(msg_str);
 }
 
@@ -607,6 +642,12 @@ esp_err_t common_sendLoraGPS(void)
               String(type) + ":" + payload;
 
     ESP_LOGI(TAG, "Sending GPS msg: %s", msg_str.c_str());
+    if (bleClientConnected())
+    {
+        bleSendNotification(MSG_TYPE_TEXT,
+                            8, // 8 = placeholder for "us"
+                            msg_str.c_str());
+    }
     return sendLoraMessage(msg_str);
 }
 

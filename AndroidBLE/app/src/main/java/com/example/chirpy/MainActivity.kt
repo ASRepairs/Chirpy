@@ -323,12 +323,18 @@ class MainActivity : ComponentActivity() {
                     sendTime { ok ->
                         runOnUiThread {
                             statusText = if (ok) "Time sent ✅" else "Time send ❌"
-                            Handler(mainLooper).postDelayed({
-                                statusText = "Connected!"
-                            }, 1500)
                         }
                     }
-                }, 1000)
+                    // After time is sent, schedule GPS 3 seconds later
+                    Handler(mainLooper).postDelayed({
+                        sendGps { ok ->
+                            runOnUiThread {
+                                statusText = if (ok) "GPS sent ✅" else "GPS send ❌"
+                            }
+                        }
+                    }, 3000)
+
+                }, 5000) // wait 5 seconds after BLE connection before starting
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 bluetoothGatt       = null
                 writeCharacteristic = null
@@ -413,25 +419,28 @@ class MainActivity : ComponentActivity() {
                             runOnUiThread {
                                 when (msgType) {
                                     1 -> {  // TEXT
+                                        val isMe = userId == 8
                                         chatMessages += ChatMessage(1, payload,
-                                            fromMe = false, userId = userId)
+                                            fromMe = isMe, userId = if (isMe) null else userId)
                                         statusText = "Text from ${getUserName(userId)}"
                                         if (!inForeground) showSimpleTextNotification(payload, userId)
                                     }
 
                                     2 -> {  // EMOJI
                                         statusText = "Emoji from ${getUserName(userId)}"
+                                        val isMe = userId == 8
                                         val glyph = emojiFromCode(payload.toIntOrNull())
                                         chatMessages += ChatMessage(2, glyph,
-                                            fromMe = false, userId = userId)
+                                            fromMe = isMe, userId = if (isMe) null else userId)
                                         if (!inForeground) showEmojiNotification(payload.toIntOrNull(), userId)
                                     }
 
                                     3 -> {  // GPS
                                         val coords = payload.split(",")
                                         if (coords.size == 2) {
+                                            val isMe = userId == 8
                                             chatMessages += ChatMessage(3, "",
-                                                fromMe = false, userId = userId,
+                                                fromMe = isMe, userId = if (isMe) null else userId,
                                                 lat = coords[0], lon = coords[1])
 
                                             if (!inForeground) showGpsNotification(coords[0], coords[1], userId)
@@ -444,8 +453,9 @@ class MainActivity : ComponentActivity() {
                                     4 -> {  // ALERT
                                         val coords = payload.split(",")
                                         if (coords.size == 2) {
+                                            val isMe = userId == 8
                                             chatMessages += ChatMessage(4, "",
-                                                fromMe = false, userId = userId,
+                                                fromMe = isMe, userId = if (isMe) null else userId,
                                                 lat = coords[0], lon = coords[1])
 
                                             if (!inForeground) showAlertNotification(coords[0], coords[1], userId)
@@ -703,10 +713,11 @@ class MainActivity : ComponentActivity() {
         1 -> "Piggy"
         2 -> "Horsy"
         3 -> "Pandy"
-        4 -> "LIZZY"
+        4 -> "Lizzy"
         5 -> "Phoeny"
         6 -> "Puppy"
         7 -> "Kitty"
+        8 -> "You"
         else -> "Someone"
     }
     /* ---------- single bubble ---------- */
@@ -771,7 +782,11 @@ class MainActivity : ComponentActivity() {
                             else
                                 "${getUserName(msg.userId)} shared their location! Tap to view."
 
-                            4 -> "${getUserName(msg.userId)} HAS AN EMERGENCY! TAP TO SEE THEIR LOCATION"
+                            4 -> if (msg.fromMe)
+                                "YOU HAD AN EMERGENCY! TAP TO SEE YOUR LOCATION"
+                            else
+                                "${getUserName(msg.userId)} HAS AN EMERGENCY! TAP TO SEE THEIR LOCATION"
+
                             else -> "Unknown message"
                         },
                         modifier = Modifier.padding(10.dp),

@@ -11,14 +11,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-void loraEmergency(lv_event_t * e)
-{
-	successAnimationFunc(ui_EmergencySuccessImage);
-	if (common_sendLoraAlert() == ESP_OK)
-	{
-		//maybe do something here
-	}
-}
 
 void successAnimationFunc(lv_obj_t *TargetObject)
 {
@@ -29,6 +21,15 @@ void successAnimationFunc(lv_obj_t *TargetObject)
 	// Start the animation
 	MessageSentSuccessStart_Animation(TargetObject, 0);
 
+}
+
+void loraEmergency(lv_event_t *e)
+{
+	successAnimationFunc(ui_EmergencySuccessImage);
+	if (common_sendLoraAlert() == ESP_OK)
+	{
+		// maybe do something here
+	}
 }
 
 void loraSendLike(lv_event_t * e)

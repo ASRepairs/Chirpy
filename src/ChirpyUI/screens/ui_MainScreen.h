@@ -24,6 +24,8 @@ extern lv_obj_t * ui_CurrentAvatarImage;
 extern void ui_event_goToAvatarMenuBtn(lv_event_t * e);
 extern lv_obj_t * ui_goToAvatarMenuBtn;
 extern lv_obj_t * ui_BatteryLabel;
+extern lv_obj_t * ui_Label2;
+extern lv_obj_t * ui_Label3;
 // CUSTOM VARIABLES
 extern lv_obj_t * uic_MainScreen;
 extern lv_obj_t * uic_HomeBG;

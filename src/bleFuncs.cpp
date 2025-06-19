@@ -195,10 +195,6 @@ class SrvCb : public BLEServerCallbacks
     void onConnect(BLEServer *) override
     {
         gConnected = true;
-        vTaskDelay(pdMS_TO_TICKS(5000));
-        sendReqTime(); // once
-        vTaskDelay(pdMS_TO_TICKS(5000));
-        sendReqGps(); // once
         adv->stop(); // stop adverts while connected
         // start the timer to send GPS data every 5 minutes
         esp_timer_start_periodic(gpsTimer, 5ULL * 60 * 1000000); // five min
