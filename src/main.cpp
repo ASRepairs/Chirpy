@@ -50,6 +50,41 @@ ICACHE_RAM_ATTR void onLoraPacketReceived() {
 }
 
 
+
+// ───────────────────────────── Sleep Management ─────────────────────────────
+
+// static void lightSleepIfIdle()
+// {
+//     //only when screen is off, LoRa isn’t transmitting
+//     if (screenOn || isTransmitting)
+//         return;
+
+//     // wake-up sources only once every time we go to sleep
+//     esp_sleep_enable_ext0_wakeup((gpio_num_t)BOARD_RADIO_DI01, 1); // rising edge
+//     uint64_t mask = (1ULL << BOARD_TOUCH_INT);
+//     esp_sleep_enable_ext1_wakeup(mask, ESP_EXT1_WAKEUP_ALL_LOW);
+
+//     // Gate high-draw blocks *before* sleeping
+//     watch.powerIoctl(WATCH_POWER_TOUCH_DISP, false);   // cut LCD + GT911 VDD
+//     watch.setBrightness(0);
+
+
+//     //Enter light-sleep – resumes at next line
+//     esp_light_sleep_start();
+
+//     /* ---- woke up here ---- */
+
+//     //Re-enable LCD power quickly so LVGL doesn’t time out
+//     watch.powerIoctl(WATCH_POWER_TOUCH_DISP, true);
+//     vTaskDelay(pdMS_TO_TICKS(50)); // settle
+//     watch.setBrightness(saved_brightness ? saved_brightness : 50);
+//     screenOn = true;
+//     lv_disp_trig_activity(nullptr); // zero the inactivity timer
+//     //Clear any interrupt sources we woke on
+//     if (esp_sleep_get_ext1_wakeup_status() & (1ULL << BOARD_PMU_INT))
+//         isPmuIRQ = true;
+// }
+
 // ──────────────────────── Notification effects ────────────────────────
 
 void common_setVibration(bool enable)
@@ -545,6 +580,7 @@ void TaskScreenTimeout(void *pvParameters)
             saved_brightness = watch.getBrightness(); // remember brightness
             watch.setBrightness(0);                   // back-light off
             screenOn = false;
+            //lightSleepIfIdle();
         }
 
         if (!screenOn && idle < 200)
@@ -559,17 +595,18 @@ void TaskScreenTimeout(void *pvParameters)
 
 // ─────────── Common functions definition (common.h) ──────────────
 
-esp_err_t common_sendLoraMessage(const char *msg) // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id>:<type>:<payload>"
-{ 
-        String msg_str;
+esp_err_t common_sendLoraMessage(const char *msg, bool from_ble) // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id>:<type>:<payload>"
+{
+    String msg_str;
     String msg_uid = String(millis()); // could also use timestamp
 
     msg_str = String(chirpyName) + ":" + msg_uid + ":" + String(globalUserData.groupId) +
               ":" + String(globalUserData.userId) + ":" + String(MSG_TYPE_TEXT) + ":" + String(msg);
 
     ESP_LOGI(TAG, "Sending msg: %s", msg_str.c_str());
-    if (bleClientConnected())
-    {
+    if (bleClientConnected() && !from_ble)
+    { // if we are connected to a BLE client, send notification
+        // 8 = placeholder for "us" (user_id), will be replaced by the actual user_id in the notification
         bleSendNotification(MSG_TYPE_TEXT,
                              8, // 8 = placeholder for "us"
                              msg);
@@ -577,7 +614,7 @@ esp_err_t common_sendLoraMessage(const char *msg) // message structure is: "<nod
     return sendLoraMessage(msg_str);
 }
 
-esp_err_t common_sendLoraEmoji(int emoji_code)
+esp_err_t common_sendLoraEmoji(int emoji_code, bool from_ble)
 { // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id>:<type>:<payload>"
     String msg_str;
     String msg_uid = String(millis());
@@ -588,7 +625,7 @@ esp_err_t common_sendLoraEmoji(int emoji_code)
               String(globalUserData.userId) + ":" + String(type) + ":" + String(emoji_code);
 
     ESP_LOGI(TAG, "Sending emoji msg: %s", msg_str.c_str());
-    if (bleClientConnected())
+    if (bleClientConnected() && !from_ble)
     {
         char emoji_code_str[4];
         snprintf(emoji_code_str, sizeof(emoji_code_str), "%d", emoji_code);
@@ -599,7 +636,7 @@ esp_err_t common_sendLoraEmoji(int emoji_code)
     return sendLoraMessage(msg_str);
 }
 
-esp_err_t common_sendLoraAlert(void)
+esp_err_t common_sendLoraAlert(bool from_ble)
 {
     // ALERT is always broadcast to all groups (groupId = 0)
     String msg_str;
@@ -612,7 +649,7 @@ esp_err_t common_sendLoraAlert(void)
               String(globalUserData.userId) + ":" + String(type) + ":" + payload;
 
     ESP_LOGI(TAG, "Sending alert msg: %s", msg_str.c_str());
-    if (bleClientConnected())
+    if (bleClientConnected() && !from_ble)
     {
         bleSendNotification(MSG_TYPE_ALERT,
                             8, // 8 = placeholder for "us"
@@ -621,7 +658,7 @@ esp_err_t common_sendLoraAlert(void)
     return sendLoraMessage(msg_str);
 }
 
-esp_err_t common_sendLoraGPS(void)
+esp_err_t common_sendLoraGPS(bool from_ble)
 {
     // Check if GPS data is valid (not 0,0)
     if (currentGPSData.latitude == 0.0f && currentGPSData.longitude == 0.0f) {
@@ -642,7 +679,7 @@ esp_err_t common_sendLoraGPS(void)
               String(type) + ":" + payload;
 
     ESP_LOGI(TAG, "Sending GPS msg: %s", msg_str.c_str());
-    if (bleClientConnected())
+    if (bleClientConnected() && !from_ble)
     {
         bleSendNotification(MSG_TYPE_TEXT,
                             8, // 8 = placeholder for "us"

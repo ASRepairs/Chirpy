@@ -26,7 +26,7 @@ void successAnimationFunc(lv_obj_t *TargetObject)
 void loraEmergency(lv_event_t *e)
 {
 	successAnimationFunc(ui_EmergencySuccessImage);
-	if (common_sendLoraAlert() == ESP_OK)
+	if (common_sendLoraAlert(false) == ESP_OK)
 	{
 		// maybe do something here
 	}
@@ -35,7 +35,7 @@ void loraEmergency(lv_event_t *e)
 void loraSendLike(lv_event_t * e)
 {
 	successAnimationFunc(ui_MessageSendCheckMark);
-	if (common_sendLoraEmoji(THUMB_UP) == ESP_OK)
+	if (common_sendLoraEmoji(THUMB_UP, false) == ESP_OK)
 	{
 		//maybe do something here
 	}
@@ -44,7 +44,7 @@ void loraSendLike(lv_event_t * e)
 void loraSendWave(lv_event_t * e)
 {
 	successAnimationFunc(ui_MessageSendCheckMark);
-	if (common_sendLoraEmoji(WAVE) == ESP_OK)
+	if (common_sendLoraEmoji(WAVE, false) == ESP_OK)
 	{
 		//maybe do something here
 	}
@@ -53,7 +53,7 @@ void loraSendWave(lv_event_t * e)
 void loraSendHeart(lv_event_t * e)
 {
 	successAnimationFunc(ui_MessageSendCheckMark);
-	if (common_sendLoraEmoji(HEART) == ESP_OK)
+	if (common_sendLoraEmoji(HEART, false) == ESP_OK)
 	{
 		//maybe do something here
 	}
@@ -62,7 +62,7 @@ void loraSendHeart(lv_event_t * e)
 void loraSendParty(lv_event_t * e)
 {
 	successAnimationFunc(ui_MessageSendCheckMark);
-	if (common_sendLoraEmoji(PARTY) == ESP_OK)
+	if (common_sendLoraEmoji(PARTY, false) == ESP_OK)
 	{
 		//maybe do something here
 	}
@@ -71,7 +71,7 @@ void loraSendParty(lv_event_t * e)
 void loraSendMessageFromBox(lv_event_t * e)
 {
 	const char *text = lv_textarea_get_text(ui_MessageInputBox);
-	if (common_sendLoraMessage(text) == ESP_OK)
+	if (common_sendLoraMessage(text, false) == ESP_OK)
 	{
 		lv_obj_clear_flag(ui_MessageSendCheckMark, LV_OBJ_FLAG_HIDDEN);
 		lv_obj_set_style_opa(ui_MessageSendCheckMark, LV_OPA_0, LV_PART_MAIN | LV_STATE_DEFAULT);

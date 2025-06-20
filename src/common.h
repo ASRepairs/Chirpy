@@ -11,10 +11,10 @@ extern "C" {
 #endif
 // declare as C-compatible if compiled as C++
 
-esp_err_t common_sendLoraMessage(const char *msg);
-esp_err_t common_sendLoraEmoji(int msg);
-esp_err_t common_sendLoraAlert(void);
-esp_err_t common_sendLoraGPS(void);
+esp_err_t common_sendLoraMessage(const char *msg, bool from_ble); // message structure is: "<node_id>:<msg_uid>:<group_id>:<user_id>:<type>:<payload>"
+esp_err_t common_sendLoraEmoji(int msg, bool from_ble);
+esp_err_t common_sendLoraAlert(bool from_ble);
+esp_err_t common_sendLoraGPS(bool from_ble);
 void common_displayMessageUI(int msg_id, int usr_id);
 void common_setBrightness(uint8_t level);
 void common_setVibration(bool enable);

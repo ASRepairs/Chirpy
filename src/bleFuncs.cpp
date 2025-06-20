@@ -91,7 +91,7 @@ class RxCallback : public BLECharacteristicCallbacks
         if (!extGpsData)
             return; // safety
 
-        /* ────────── NEW: plain chat text (TXT:…) ────────── */
+        /* ────────── plain chat text (TXT:…) ────────── */
         if (v.rfind("TXT:", 0) == 0) // payload starts with "TXT:"
         {
             std::string msg = v.substr(4); // strip the prefix
@@ -101,7 +101,7 @@ class RxCallback : public BLECharacteristicCallbacks
                 ESP_LOGI(TAG, "RX ← TXT \"%s\"", msg.c_str());
 #endif
                 /* broadcast via LoRa */
-                common_sendLoraMessage(msg.c_str());
+                common_sendLoraMessage(msg.c_str(), true); // from BLE
             }
             return; // nothing more to do
         }
@@ -116,7 +116,7 @@ class RxCallback : public BLECharacteristicCallbacks
 #ifdef BLELOG
                 ESP_LOGI(TAG, "RX ← LOC %.5f,%.5f", lat, lon);
 #endif
-                common_sendLoraGPS(); // broadcast as MSG_TYPE_GPS
+                common_sendLoraGPS(true); // broadcast as MSG_TYPE_GPS
             }
             else
             {
