@@ -28,18 +28,14 @@ extern "C" {
 ///////////////////// SCREENS ////////////////////
 
 #include "screens/ui_MainScreen.h"
-#include "screens/ui_AvatarScreen.h"
-#include "screens/ui_GroupsScreen.h"
-#include "screens/ui_MessagesMenu.h"
-#include "screens/ui_EmergencyMenu.h"
-#include "screens/ui_AvatarMenu.h"
-#include "screens/ui_GroupsMenu.h"
-#include "screens/ui_PhoneConnectScreen.h"
-#include "screens/ui_PhoneQRMenu.h"
 #include "screens/ui_NotificationScreen.h"
 #include "screens/ui_Images.h"
-#include "screens/ui_SettingsScreen.h"
+#include "screens/ui_EmergencyMenu.h"
+#include "screens/ui_MessagesMenu.h"
+#include "screens/ui_GroupsMenu.h"
+#include "screens/ui_AvatarMenu.h"
 #include "screens/ui_SettingsMenu.h"
+#include "screens/ui_PhoneQRMenu.h"
 
 ///////////////////// VARIABLES ////////////////////
 
@@ -47,24 +43,23 @@ extern lv_anim_t * MessageSentSuccessStart_Animation(lv_obj_t * TargetObject, in
 extern lv_anim_t * MessageSentSuccessEnd_Animation(lv_obj_t * TargetObject, int delay);
 extern lv_anim_t * DismissNotificationAnimation_Animation(lv_obj_t * TargetObject, int delay);
 extern lv_anim_t * MsgBtnExpand_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * ScrollUP_Animation(lv_obj_t * TargetObject, int delay);
+extern lv_anim_t * ScrollDown_Animation(lv_obj_t * TargetObject, int delay);
 
 // EVENTS
 
 extern lv_obj_t * ui____initial_actions0;
 
 // IMAGES AND IMAGE SETS
-LV_IMG_DECLARE(ui_img_ui_png);    // assets/UI.png
+LV_IMG_DECLARE(ui_img_mainpanel_png);    // assets/MainPanel.png
+LV_IMG_DECLARE(ui_img_phoneconnectselection_png);    // assets/PhoneConnectSelection.png
+LV_IMG_DECLARE(ui_img_settingsselection_png);    // assets/SettingsSelection.png
+LV_IMG_DECLARE(ui_img_grselection_png);    // assets/GrSelection.png
+LV_IMG_DECLARE(ui_img_avatarselection_png);    // assets/AvatarSelection.png
+LV_IMG_DECLARE(ui_img_scroller_png);    // assets/Scroller.png
+LV_IMG_DECLARE(ui_img_selected_png);    // assets/Selected.png
 LV_IMG_DECLARE(ui_img_froggy_png);    // assets/froggy.png
-LV_IMG_DECLARE(ui_img_avatar_png);    // assets/Avatar.png
-LV_IMG_DECLARE(ui_img_groups_png);    // assets/Groups.png
-LV_IMG_DECLARE(ui_img_messagepanel_png);    // assets/MessagePanel.png
-LV_IMG_DECLARE(ui_img_checkmark_png);    // assets/CheckMark.png
-LV_IMG_DECLARE(ui_img_emojismsg_png);    // assets/EmojisMSG.png
-LV_IMG_DECLARE(ui_img_emergency_png);    // assets/Emergency.png
-LV_IMG_DECLARE(ui_img_whitepanel_png);    // assets/WhitePanel.png
-LV_IMG_DECLARE(ui_img_profiles2_png);    // assets/profiles2.png
-LV_IMG_DECLARE(ui_img_profiles_png);    // assets/profiles.png
-LV_IMG_DECLARE(ui_img_phoneconnect_png);    // assets/PhoneConnect.png
+LV_IMG_DECLARE(ui_img_horizontalnav_png);    // assets/HorizontalNav.png
 LV_IMG_DECLARE(ui_img_celebrationemoji_png);    // assets/celebrationEmoji.png
 LV_IMG_DECLARE(ui_img_waveemoji_png);    // assets/waveEmoji.png
 LV_IMG_DECLARE(ui_img_likeemoji_png);    // assets/likeEmoji.png
@@ -77,7 +72,14 @@ LV_IMG_DECLARE(ui_img_lizzy_png);    // assets/lizzy.png
 LV_IMG_DECLARE(ui_img_puppy_png);    // assets/puppy.png
 LV_IMG_DECLARE(ui_img_kitty_png);    // assets/kitty.png
 LV_IMG_DECLARE(ui_img_emergencyemoji_png);    // assets/emergencyEmoji.png
-LV_IMG_DECLARE(ui_img_settings_png);    // assets/Settings.png
+LV_IMG_DECLARE(ui_img_emicon_png);    // assets/EmIcon.png
+LV_IMG_DECLARE(ui_img_checkmark_png);    // assets/CheckMark.png
+LV_IMG_DECLARE(ui_img_horizontalnnavother_png);    // assets/HorizontalnNavOther.png
+LV_IMG_DECLARE(ui_img_messagepanel_png);    // assets/MessagePanel.png
+LV_IMG_DECLARE(ui_img_emojismsg_png);    // assets/EmojisMSG.png
+LV_IMG_DECLARE(ui_img_whitepanel_png);    // assets/WhitePanel.png
+LV_IMG_DECLARE(ui_img_profiles2_png);    // assets/profiles2.png
+LV_IMG_DECLARE(ui_img_profiles_png);    // assets/profiles.png
 
 // UI INIT
 void ui_init(void);

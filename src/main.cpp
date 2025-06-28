@@ -142,7 +142,7 @@ esp_err_t sendLoraMessage(String& msg) {
         state = radio.startReceive();
         if (state == RADIOLIB_ERR_NONE) {
             ESP_LOGI(TAG, "[SX1262] Listening...");
-            vTaskDelay(pdMS_TO_TICKS(1000));
+            //vTaskDelay(pdMS_TO_TICKS(1000));
             //lv_label_set_text(label1, "Waiting for message...");
             return ESP_OK;
         }
@@ -421,7 +421,7 @@ void displayReceivedMessage() {
     {
         ESP_LOGE(TAG, "[SX1262] Failed to read message, code: %d", state);
     }
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    //vTaskDelay(pdMS_TO_TICKS(1000));
 }
 
 // ───────────────────────────── Battery Info ─────────────────────────────
@@ -498,6 +498,15 @@ void TaskLvglUpdate(void* pvParameters) {
     }
 }
 
+static void centre_scrollpanel_cb(void *)
+{
+    /* 0-offset = middle item because the ScrollPanel is laid out with
+       LV_SCROLL_SNAP_CENTER and its height (180 px) equals one child.   */
+    lv_obj_scroll_to_y(ui_ScrollPanel, 0, LV_ANIM_OFF); // no animation, instant
+    lv_obj_set_y(ui_navBallImg, 0);                     // ball back to mid-track
+}
+
+
 void TaskCheckShortButtonPressed(void *pvParameters)
 {
     while (true)
@@ -535,7 +544,13 @@ void TaskCheckShortButtonPressed(void *pvParameters)
                     vTaskDelay(pdMS_TO_TICKS(50)); // wait for power to stabilize
                     watch.setBrightness(saved_brightness);
                     screenOn = true;
-                    
+                    // Display is on, switch to home screen if not already there
+                    if (lv_scr_act() != ui_MainScreen)
+                    {
+                        lv_scr_load_anim(ui_MainScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
+                        ESP_LOGI(TAG, "[watch] Switched to Home Screen");
+                    }
+                    lv_async_call(centre_scrollpanel_cb, nullptr);
                     ESP_LOGI(TAG, "[watch] Display turned ON");
                 }
                 else
@@ -546,6 +561,7 @@ void TaskCheckShortButtonPressed(void *pvParameters)
                         lv_scr_load_anim(ui_MainScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, false);
                         ESP_LOGI(TAG, "[watch] Switched to Home Screen");
                     }
+                    lv_async_call(centre_scrollpanel_cb, nullptr);
                 }
 
                 //vibrator feedback
@@ -585,6 +601,12 @@ void TaskScreenTimeout(void *pvParameters)
 
         if (!screenOn && idle < 200)
         {
+            // Display is on, switch to home screen if not already there
+            if (lv_scr_act() != ui_MainScreen)
+            {
+                lv_scr_load_anim(ui_MainScreen, LV_SCR_LOAD_ANIM_FADE_IN, 100, 0, false);
+                lv_async_call(centre_scrollpanel_cb, nullptr);
+            }
             watch.setBrightness(saved_brightness == 0 ? 50 : saved_brightness);
             screenOn = true;
         }
@@ -642,7 +664,14 @@ esp_err_t common_sendLoraAlert(bool from_ble)
     String msg_str;
     String msg_uid = String(millis());
     int type = MSG_TYPE_ALERT;
-    String payload = String(currentGPSData.latitude, 6) + "," + String(currentGPSData.longitude, 6);
+    String payload;
+
+    // Only include GPS if not (0,0)
+    if (currentGPSData.latitude != 0.0f || currentGPSData.longitude != 0.0f) {
+        payload = String(currentGPSData.latitude, 6) + "," + String(currentGPSData.longitude, 6);
+    } else {
+        payload = ""; // No GPS data
+    }
 
     msg_str = String(chirpyName) + ":" + msg_uid + ":" +
               "0:" + // broadcast to all groups
@@ -696,6 +725,26 @@ void common_setBrightness(uint8_t level)
     } else {
         ESP_LOGE(TAG, "[watch] Invalid brightness level: %d. Must be between 1 and 255.", level);
     }
+}
+
+static void scroll_sync_cb(lv_event_t *e)
+{
+    lv_obj_t *panel = lv_event_get_target(e);         // ui_ScrollPanel
+    lv_coord_t scroll_y = lv_obj_get_scroll_y(panel); // LVGL: negative = scrolled “down”
+
+    /* Convert 180 px of panel scroll to 13 px of nav-ball travel.
+       The minus sign keeps directions intuitive:
+         –180 → +13  (user swipes up → list goes up → ball goes down)
+         +180 → –13  (user swipes down → list goes down → ball goes up)   */
+    lv_coord_t nav_y = (scroll_y * 13) / 180;
+
+    /* Clamp so the ball can never outrun the printed track (±26 px = two steps). */
+    if (nav_y > 26)
+        nav_y = 26;
+    if (nav_y < -26)
+        nav_y = -26;
+
+    lv_obj_set_y(ui_navBallImg, nav_y);
 }
 
 
@@ -768,17 +817,19 @@ void setup() {
     // Set QR code data (Chirpy_<MAC>)
     lv_qrcode_update(qr, chirpyName, strlen(chirpyName));
 
+    /* keep the ball in lock-step with scrolling */
+    lv_obj_add_event_cb(ui_ScrollPanel, scroll_sync_cb, LV_EVENT_SCROLL, NULL);
 
     //FreeRTOS tasks
     //xTaskCreatePinnedToCore(TaskLoraSender, "TaskLoraSender", TASK_STACK_SIZE, NULL, 1, NULL, 0);
     xTaskCreatePinnedToCore(TaskLoraReceiver, "TaskLoraReceiver", TASK_STACK_SIZE, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(TaskLvglUpdate, "TaskLvglUpdate", TASK_STACK_SIZE, NULL, 100, NULL, 0);
+    xTaskCreatePinnedToCore(TaskLvglUpdate, "TaskLvglUpdate", TASK_STACK_SIZE, NULL, 120, NULL, 0);
     xTaskCreatePinnedToCore(TaskCheckShortButtonPressed, "TaskCheckShortButtonPressed",TASK_STACK_SIZE, NULL, 1, NULL, 1);
     //xTaskCreatePinnedToCore(TaskShowRecievedFrame, "TaskShowRecievedFrame",TASK_STACK_SIZE, NULL, 1, NULL, 0);
-    xTaskCreatePinnedToCore(TaskTimeUpdater,"TaskTimeUpdater", TASK_STACK_SIZE, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(TaskDateUpdater, "TaskDateUpdater", TASK_STACK_SIZE, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(TaskBatteryUpdater, "TaskBatteryUpdater", 2048, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(TaskScreenTimeout, "TaskScreenTimeout", 2048, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskTimeUpdater,"TaskTimeUpdater", TASK_STACK_SIZE / 2, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskDateUpdater, "TaskDateUpdater", TASK_STACK_SIZE / 2, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskBatteryUpdater, "TaskBatteryUpdater", TASK_STACK_SIZE / 2, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskScreenTimeout, "TaskScreenTimeout", TASK_STACK_SIZE / 2, NULL, 1, NULL, 1);
 }
 
 void loop() {

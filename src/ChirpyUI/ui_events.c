@@ -98,7 +98,7 @@ void loraChangeGroup(lv_event_t * e)
 		{
 			globalUserData.groupId = group;
 			ESP_LOGI("UI", "Updated globalUserData.groupId to %d", group);
-			lv_label_set_text_fmt(ui_GroupNr, "Group: %d", group);
+			ui_request_sync(globalUserData.userId, globalUserData.groupId);
 		}
 		else
 		{
@@ -114,28 +114,28 @@ void loraChangeGroup(lv_event_t * e)
 void ChangeUserPiggy(lv_event_t * e)
 {
 	globalUserData.userId = PIGGY;
-	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_piggy_png);
+	ui_request_sync(globalUserData.userId, globalUserData.groupId);
 	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
 
 void ChangeUserFroggy(lv_event_t * e)
 {
 	globalUserData.userId = FROGGY;
-	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_froggy_png);	
+	ui_request_sync(globalUserData.userId, globalUserData.groupId);
 	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
 
 void ChangeUserHorsy(lv_event_t * e)
 {
 	globalUserData.userId = HORSY;
-	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_horsy_png);
+	ui_request_sync(globalUserData.userId, globalUserData.groupId);
 	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
 
 void ChangeUserPandy(lv_event_t * e)
 {
 	globalUserData.userId = PANDY;
-	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_pandy_png);
+	ui_request_sync(globalUserData.userId, globalUserData.groupId);
 	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
 
@@ -147,28 +147,28 @@ void ChangeBrightess(lv_event_t * e)
 void ChangeUserPhoeny(lv_event_t * e)
 {
 	globalUserData.userId = PHOENY;
-	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_phoeny_png);
+	ui_request_sync(globalUserData.userId, globalUserData.groupId);
 	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
 
 void ChangeUserLizzy(lv_event_t * e)
 {
 	globalUserData.userId = LIZZY;
-	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_lizzy_png);
+	ui_request_sync(globalUserData.userId, globalUserData.groupId);
 	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
 
 void ChangeUserPuppy(lv_event_t * e)
 {
 	globalUserData.userId = PUPPY;
-	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_puppy_png);
+	ui_request_sync(globalUserData.userId, globalUserData.groupId);
 	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
 
 void ChangeUserKitty(lv_event_t * e)
 {
 	globalUserData.userId = KITTY;
-	lv_img_set_src(ui_CurrentAvatarImage, &ui_img_kitty_png);
+	ui_request_sync(globalUserData.userId, globalUserData.groupId);
 	successAnimationFunc(ui_AvatarUpdateSuccessImage);
 }
 

@@ -10,12 +10,13 @@
 extern "C" {
 #endif
 
+void loraEmergency(lv_event_t * e);
 void loraSendLike(lv_event_t * e);
 void loraSendWave(lv_event_t * e);
 void loraSendHeart(lv_event_t * e);
 void loraSendParty(lv_event_t * e);
 void loraSendMessageFromBox(lv_event_t * e);
-void loraEmergency(lv_event_t * e);
+void loraChangeGroup(lv_event_t * e);
 void ChangeUserPhoeny(lv_event_t * e);
 void ChangeUserLizzy(lv_event_t * e);
 void ChangeUserPuppy(lv_event_t * e);
@@ -24,7 +25,6 @@ void ChangeUserPiggy(lv_event_t * e);
 void ChangeUserFroggy(lv_event_t * e);
 void ChangeUserHorsy(lv_event_t * e);
 void ChangeUserPandy(lv_event_t * e);
-void loraChangeGroup(lv_event_t * e);
 void ChangeBrightess(lv_event_t * e);
 void Vibration_Enable(lv_event_t * e);
 void Vibration_Disable(lv_event_t * e);

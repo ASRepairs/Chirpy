@@ -5,15 +5,13 @@
 
 #include "../ui.h"
 
+lv_obj_t * uic_SendAMessageLabel;
 lv_obj_t * uic_SendBtnLabel;
 lv_obj_t * uic_SendMessageButton;
 lv_obj_t * uic_MessageInputBox;
 lv_obj_t * uic_Click_To_Cancel;
 lv_obj_t * uic_DisableMsgBoxBtn;
-lv_obj_t * uic_PartyBtn;
-lv_obj_t * uic_HeartBtn;
-lv_obj_t * uic_WaveBtn;
-lv_obj_t * uic_LikeBtn;
+lv_obj_t * uic_Keyboard;
 lv_obj_t * uic_ShowMessageBoxBtn;
 lv_obj_t * uic_EmojiWheel;
 lv_obj_t * uic_MessagesContainer;
@@ -25,11 +23,11 @@ lv_obj_t * ui_MessageSendCheckMark;
 lv_obj_t * ui_MessagesContainer;
 lv_obj_t * ui_EmojiWheel;
 lv_obj_t * ui_ShowMessageBoxBtn;
-lv_obj_t * ui_LikeBtn;
-lv_obj_t * ui_WaveBtn;
-lv_obj_t * ui_HeartBtn;
-lv_obj_t * ui_PartyBtn;
-lv_obj_t * ui_Keyboard2;
+lv_obj_t * ui_LikeBtn1;
+lv_obj_t * ui_WaveBtn1;
+lv_obj_t * ui_HeartBtn1;
+lv_obj_t * ui_PartyBtn1;
+lv_obj_t * ui_Keyboard;
 lv_obj_t * ui_DisableMsgBoxBtn;
 lv_obj_t * ui_Click_To_Cancel;
 lv_obj_t * ui_MessageInputBox;
@@ -53,11 +51,11 @@ void ui_event_ShowMessageBoxBtn(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_CLICKED) {
-        _ui_flag_modify(ui_Keyboard2, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
+        _ui_flag_modify(ui_Keyboard, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
         _ui_flag_modify(ui_Click_To_Cancel, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
         _ui_flag_modify(ui_SendMessageButton, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
         _ui_flag_modify(ui_MessageInputBox, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
-        _ui_keyboard_set_target(ui_Keyboard2,  ui_MessageInputBox);
+        _ui_keyboard_set_target(ui_Keyboard,  ui_MessageInputBox);
         _ui_flag_modify(ui_DisableMsgBoxBtn, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
         _ui_flag_modify(ui_MessagesContainer, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
         _ui_textarea_move_cursor(ui_MessageInputBox, UI_MOVE_CURSOR_UP);
@@ -68,7 +66,7 @@ void ui_event_ShowMessageBoxBtn(lv_event_t * e)
     }
 }
 
-void ui_event_LikeBtn(lv_event_t * e)
+void ui_event_LikeBtn1(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
@@ -81,7 +79,7 @@ void ui_event_LikeBtn(lv_event_t * e)
     }
 }
 
-void ui_event_WaveBtn(lv_event_t * e)
+void ui_event_WaveBtn1(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
@@ -95,7 +93,7 @@ void ui_event_WaveBtn(lv_event_t * e)
     }
 }
 
-void ui_event_HeartBtn(lv_event_t * e)
+void ui_event_HeartBtn1(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
@@ -108,7 +106,7 @@ void ui_event_HeartBtn(lv_event_t * e)
     }
 }
 
-void ui_event_PartyBtn(lv_event_t * e)
+void ui_event_PartyBtn1(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
@@ -128,15 +126,11 @@ void ui_event_DisableMsgBoxBtn(lv_event_t * e)
     if(event_code == LV_EVENT_CLICKED) {
         _ui_flag_modify(ui_Click_To_Cancel, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
         _ui_flag_modify(ui_ShowMessageBoxBtn, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
-        _ui_flag_modify(ui_Keyboard2, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
+        _ui_flag_modify(ui_Keyboard, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
         _ui_flag_modify(ui_MessageInputBox, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
         _ui_flag_modify(ui_SendMessageButton, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
         _ui_flag_modify(ui_DisableMsgBoxBtn, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
         _ui_flag_modify(ui_MessagesContainer, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
-    }
-    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
-        lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_MainScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_MainScreen_screen_init);
     }
 }
 
@@ -145,14 +139,14 @@ void ui_event_MessageInputBox(lv_event_t * e)
     lv_event_code_t event_code = lv_event_get_code(e);
 
     if(event_code == LV_EVENT_FOCUSED) {
-        _ui_flag_modify(ui_Keyboard2, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
-        _ui_keyboard_set_target(ui_Keyboard2,  ui_MessageInputBox);
+        _ui_flag_modify(ui_Keyboard, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
+        _ui_keyboard_set_target(ui_Keyboard,  ui_MessageInputBox);
         _ui_basic_set_property(ui_MessagesContainer, _UI_BASIC_PROPERTY_POSITION_Y,  -100);
         _ui_flag_modify(ui_Click_To_Cancel, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_REMOVE);
     }
     if(event_code == LV_EVENT_DEFOCUSED) {
         _ui_basic_set_property(ui_MessagesContainer, _UI_BASIC_PROPERTY_POSITION_Y,  0);
-        _ui_flag_modify(ui_Keyboard2, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
+        _ui_flag_modify(ui_Keyboard, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
         _ui_state_modify(ui_SendMessageButton, LV_STATE_DISABLED, _UI_MODIFY_STATE_ADD);
         _ui_flag_modify(ui_Click_To_Cancel, LV_OBJ_FLAG_HIDDEN, _UI_MODIFY_FLAG_ADD);
     }
@@ -236,56 +230,73 @@ void ui_MessagesMenu_screen_init(void)
     lv_obj_set_style_bg_color(ui_ShowMessageBoxBtn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_ShowMessageBoxBtn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_LikeBtn = lv_btn_create(ui_MessagesContainer);
-    lv_obj_set_width(ui_LikeBtn, 52);
-    lv_obj_set_height(ui_LikeBtn, 50);
-    lv_obj_set_x(ui_LikeBtn, -42);
-    lv_obj_set_y(ui_LikeBtn, -36);
-    lv_obj_set_align(ui_LikeBtn, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_LikeBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_set_style_bg_color(ui_LikeBtn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_LikeBtn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_LikeBtn1 = lv_btn_create(ui_MessagesContainer);
+    lv_obj_set_width(ui_LikeBtn1, 65);
+    lv_obj_set_height(ui_LikeBtn1, 65);
+    lv_obj_set_x(ui_LikeBtn1, -44);
+    lv_obj_set_y(ui_LikeBtn1, -37);
+    lv_obj_set_align(ui_LikeBtn1, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_LikeBtn1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_set_style_radius(ui_LikeBtn1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui_LikeBtn1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_LikeBtn1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_LikeBtn1, 40, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_color(ui_LikeBtn1, lv_color_hex(0xFFA300), LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_opa(ui_LikeBtn1, 255, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_width(ui_LikeBtn1, 5, LV_PART_MAIN | LV_STATE_PRESSED);
 
-    ui_WaveBtn = lv_btn_create(ui_MessagesContainer);
-    lv_obj_set_width(ui_WaveBtn, 52);
-    lv_obj_set_height(ui_WaveBtn, 50);
-    lv_obj_set_x(ui_WaveBtn, 45);
-    lv_obj_set_y(ui_WaveBtn, -36);
-    lv_obj_set_align(ui_WaveBtn, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_WaveBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_WaveBtn, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_WaveBtn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_WaveBtn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_WaveBtn1 = lv_btn_create(ui_MessagesContainer);
+    lv_obj_set_width(ui_WaveBtn1, 65);
+    lv_obj_set_height(ui_WaveBtn1, 65);
+    lv_obj_set_x(ui_WaveBtn1, 42);
+    lv_obj_set_y(ui_WaveBtn1, -37);
+    lv_obj_set_align(ui_WaveBtn1, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_WaveBtn1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_WaveBtn1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_WaveBtn1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_WaveBtn1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_WaveBtn1, 40, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_color(ui_WaveBtn1, lv_color_hex(0xFFA300), LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_opa(ui_WaveBtn1, 255, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_width(ui_WaveBtn1, 5, LV_PART_MAIN | LV_STATE_PRESSED);
 
-    ui_HeartBtn = lv_btn_create(ui_MessagesContainer);
-    lv_obj_set_width(ui_HeartBtn, 52);
-    lv_obj_set_height(ui_HeartBtn, 50);
-    lv_obj_set_x(ui_HeartBtn, -70);
-    lv_obj_set_y(ui_HeartBtn, 36);
-    lv_obj_set_align(ui_HeartBtn, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_HeartBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_HeartBtn, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_HeartBtn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_HeartBtn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_HeartBtn1 = lv_btn_create(ui_MessagesContainer);
+    lv_obj_set_width(ui_HeartBtn1, 65);
+    lv_obj_set_height(ui_HeartBtn1, 65);
+    lv_obj_set_x(ui_HeartBtn1, -71);
+    lv_obj_set_y(ui_HeartBtn1, 33);
+    lv_obj_set_align(ui_HeartBtn1, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_HeartBtn1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_HeartBtn1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_HeartBtn1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_HeartBtn1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_HeartBtn1, 40, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_color(ui_HeartBtn1, lv_color_hex(0xFFA300), LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_opa(ui_HeartBtn1, 255, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_width(ui_HeartBtn1, 5, LV_PART_MAIN | LV_STATE_PRESSED);
 
-    ui_PartyBtn = lv_btn_create(ui_MessagesContainer);
-    lv_obj_set_width(ui_PartyBtn, 52);
-    lv_obj_set_height(ui_PartyBtn, 50);
-    lv_obj_set_x(ui_PartyBtn, 70);
-    lv_obj_set_y(ui_PartyBtn, 36);
-    lv_obj_set_align(ui_PartyBtn, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_PartyBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_PartyBtn, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_PartyBtn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_PartyBtn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_PartyBtn1 = lv_btn_create(ui_MessagesContainer);
+    lv_obj_set_width(ui_PartyBtn1, 65);
+    lv_obj_set_height(ui_PartyBtn1, 65);
+    lv_obj_set_x(ui_PartyBtn1, 69);
+    lv_obj_set_y(ui_PartyBtn1, 33);
+    lv_obj_set_align(ui_PartyBtn1, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_PartyBtn1, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_PartyBtn1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_PartyBtn1, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_PartyBtn1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_PartyBtn1, 40, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_color(ui_PartyBtn1, lv_color_hex(0xFFA300), LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_opa(ui_PartyBtn1, 255, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_width(ui_PartyBtn1, 5, LV_PART_MAIN | LV_STATE_PRESSED);
 
-    ui_Keyboard2 = lv_keyboard_create(ui_MessagesMenu);
-    lv_obj_set_width(ui_Keyboard2, 240);
-    lv_obj_set_height(ui_Keyboard2, 120);
-    lv_obj_set_x(ui_Keyboard2, 0);
-    lv_obj_set_y(ui_Keyboard2, 60);
-    lv_obj_set_align(ui_Keyboard2, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Keyboard2, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    ui_Keyboard = lv_keyboard_create(ui_MessagesMenu);
+    lv_obj_set_width(ui_Keyboard, 240);
+    lv_obj_set_height(ui_Keyboard, 120);
+    lv_obj_set_x(ui_Keyboard, 0);
+    lv_obj_set_y(ui_Keyboard, 60);
+    lv_obj_set_align(ui_Keyboard, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Keyboard, LV_OBJ_FLAG_HIDDEN);     /// Flags
 
     ui_DisableMsgBoxBtn = lv_btn_create(ui_MessagesMenu);
     lv_obj_set_width(ui_DisableMsgBoxBtn, 230);
@@ -293,7 +304,7 @@ void ui_MessagesMenu_screen_init(void)
     lv_obj_set_x(ui_DisableMsgBoxBtn, 0);
     lv_obj_set_y(ui_DisableMsgBoxBtn, -82);
     lv_obj_set_align(ui_DisableMsgBoxBtn, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_DisableMsgBoxBtn, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_add_flag(ui_DisableMsgBoxBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
     lv_obj_clear_flag(ui_DisableMsgBoxBtn, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(ui_DisableMsgBoxBtn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_DisableMsgBoxBtn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -302,11 +313,11 @@ void ui_MessagesMenu_screen_init(void)
     lv_obj_set_width(ui_Click_To_Cancel, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_Click_To_Cancel, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_Click_To_Cancel, 0);
-    lv_obj_set_y(ui_Click_To_Cancel, -60);
+    lv_obj_set_y(ui_Click_To_Cancel, -71);
     lv_obj_set_align(ui_Click_To_Cancel, LV_ALIGN_CENTER);
     lv_label_set_text(ui_Click_To_Cancel, "Click here to cancel");
     lv_obj_add_flag(ui_Click_To_Cancel, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    lv_obj_set_style_text_color(ui_Click_To_Cancel, lv_color_hex(0x020000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui_Click_To_Cancel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_Click_To_Cancel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_decor(ui_Click_To_Cancel, LV_TEXT_DECOR_NONE, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_Click_To_Cancel, &lv_font_montserrat_20, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -358,10 +369,10 @@ void ui_MessagesMenu_screen_init(void)
     lv_obj_set_style_text_font(ui_SendAMessageLabel, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_ShowMessageBoxBtn, ui_event_ShowMessageBoxBtn, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_LikeBtn, ui_event_LikeBtn, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_WaveBtn, ui_event_WaveBtn, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_HeartBtn, ui_event_HeartBtn, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_PartyBtn, ui_event_PartyBtn, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_LikeBtn1, ui_event_LikeBtn1, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_WaveBtn1, ui_event_WaveBtn1, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_HeartBtn1, ui_event_HeartBtn1, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_PartyBtn1, ui_event_PartyBtn1, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_DisableMsgBoxBtn, ui_event_DisableMsgBoxBtn, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_MessageInputBox, ui_event_MessageInputBox, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_SendBtnLabel, ui_event_SendBtnLabel, LV_EVENT_ALL, NULL);
@@ -372,15 +383,13 @@ void ui_MessagesMenu_screen_init(void)
     uic_MessagesContainer = ui_MessagesContainer;
     uic_EmojiWheel = ui_EmojiWheel;
     uic_ShowMessageBoxBtn = ui_ShowMessageBoxBtn;
-    uic_LikeBtn = ui_LikeBtn;
-    uic_WaveBtn = ui_WaveBtn;
-    uic_HeartBtn = ui_HeartBtn;
-    uic_PartyBtn = ui_PartyBtn;
+    uic_Keyboard = ui_Keyboard;
     uic_DisableMsgBoxBtn = ui_DisableMsgBoxBtn;
     uic_Click_To_Cancel = ui_Click_To_Cancel;
     uic_MessageInputBox = ui_MessageInputBox;
     uic_SendMessageButton = ui_SendMessageButton;
     uic_SendBtnLabel = ui_SendBtnLabel;
+    uic_SendAMessageLabel = ui_SendAMessageLabel;
 
 }
 
@@ -400,15 +409,12 @@ void ui_MessagesMenu_screen_destroy(void)
     ui_EmojiWheel = NULL;
     uic_ShowMessageBoxBtn = NULL;
     ui_ShowMessageBoxBtn = NULL;
-    uic_LikeBtn = NULL;
-    ui_LikeBtn = NULL;
-    uic_WaveBtn = NULL;
-    ui_WaveBtn = NULL;
-    uic_HeartBtn = NULL;
-    ui_HeartBtn = NULL;
-    uic_PartyBtn = NULL;
-    ui_PartyBtn = NULL;
-    ui_Keyboard2 = NULL;
+    ui_LikeBtn1 = NULL;
+    ui_WaveBtn1 = NULL;
+    ui_HeartBtn1 = NULL;
+    ui_PartyBtn1 = NULL;
+    uic_Keyboard = NULL;
+    ui_Keyboard = NULL;
     uic_DisableMsgBoxBtn = NULL;
     ui_DisableMsgBoxBtn = NULL;
     uic_Click_To_Cancel = NULL;
@@ -419,6 +425,7 @@ void ui_MessagesMenu_screen_destroy(void)
     ui_SendMessageButton = NULL;
     uic_SendBtnLabel = NULL;
     ui_SendBtnLabel = NULL;
+    uic_SendAMessageLabel = NULL;
     ui_SendAMessageLabel = NULL;
 
 }

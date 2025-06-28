@@ -5,12 +5,17 @@
 
 #include "../ui.h"
 
-lv_obj_t * uic_EmergencySuccessImage;
-lv_obj_t * uic_EmergencyButton;
+lv_obj_t * uic_navimg;
+lv_obj_t * uic_Holdlabel;
+lv_obj_t * uic_sendEmergencyButton;
+lv_obj_t * uic_EmergencyIconImg;
+lv_obj_t * uic_EmergencyMenu;
 lv_obj_t * ui_EmergencyMenu;
-lv_obj_t * ui_Image4;
-lv_obj_t * ui_EmergencyButton;
+lv_obj_t * ui_EmergencyIconImg;
+lv_obj_t * ui_sendEmergencyButton;
 lv_obj_t * ui_EmergencySuccessImage;
+lv_obj_t * ui_Holdlabel;
+lv_obj_t * ui_navimg;
 
 // event funtions
 void ui_event_EmergencyMenu(lv_event_t * e)
@@ -21,21 +26,22 @@ void ui_event_EmergencyMenu(lv_event_t * e)
         lv_indev_wait_release(lv_indev_get_act());
         _ui_screen_change(&ui_MainScreen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, &ui_MainScreen_screen_init);
     }
-    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_TOP) {
-        lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_AvatarScreen, LV_SCR_LOAD_ANIM_MOVE_TOP, 200, 0, &ui_AvatarScreen_screen_init);
-    }
 }
 
-void ui_event_EmergencyButton(lv_event_t * e)
+void ui_event_EmergencyIconImg(lv_event_t * e)
 {
     lv_event_code_t event_code = lv_event_get_code(e);
 
-    if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_LEFT) {
-        lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_MainScreen, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 0, &ui_MainScreen_screen_init);
-    }
     if(event_code == LV_EVENT_SHORT_CLICKED) {
+        loraEmergency(e);
+    }
+}
+
+void ui_event_sendEmergencyButton(lv_event_t * e)
+{
+    lv_event_code_t event_code = lv_event_get_code(e);
+
+    if(event_code == LV_EVENT_LONG_PRESSED) {
         loraEmergency(e);
     }
 }
@@ -46,39 +52,76 @@ void ui_EmergencyMenu_screen_init(void)
 {
     ui_EmergencyMenu = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_EmergencyMenu, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_color(ui_EmergencyMenu, lv_color_hex(0xFFA300), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui_EmergencyMenu, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Image4 = lv_img_create(ui_EmergencyMenu);
-    lv_img_set_src(ui_Image4, &ui_img_emergency_png);
-    lv_obj_set_width(ui_Image4, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Image4, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_Image4, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Image4, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
-    lv_obj_clear_flag(ui_Image4, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_EmergencyIconImg = lv_img_create(ui_EmergencyMenu);
+    lv_img_set_src(ui_EmergencyIconImg, &ui_img_emicon_png);
+    lv_obj_set_width(ui_EmergencyIconImg, LV_SIZE_CONTENT);   /// 182
+    lv_obj_set_height(ui_EmergencyIconImg, LV_SIZE_CONTENT);    /// 180
+    lv_obj_set_align(ui_EmergencyIconImg, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_EmergencyIconImg, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_EmergencyIconImg, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_border_width(ui_EmergencyIconImg, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui_EmergencyIconImg, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_opa(ui_EmergencyIconImg, 255, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_width(ui_EmergencyIconImg, 10, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_side(ui_EmergencyIconImg, LV_BORDER_SIDE_FULL, LV_PART_MAIN | LV_STATE_PRESSED);
 
-    ui_EmergencyButton = lv_btn_create(ui_EmergencyMenu);
-    lv_obj_set_width(ui_EmergencyButton, 152);
-    lv_obj_set_height(ui_EmergencyButton, 149);
-    lv_obj_set_align(ui_EmergencyButton, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_EmergencyButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
-    lv_obj_clear_flag(ui_EmergencyButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_obj_set_style_bg_color(ui_EmergencyButton, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_EmergencyButton, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_sendEmergencyButton = lv_btn_create(ui_EmergencyMenu);
+    lv_obj_set_width(ui_sendEmergencyButton, 180);
+    lv_obj_set_height(ui_sendEmergencyButton, 180);
+    lv_obj_set_align(ui_sendEmergencyButton, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_sendEmergencyButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);     /// Flags
+    lv_obj_clear_flag(ui_sendEmergencyButton, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_bg_img_src(ui_sendEmergencyButton, &ui_img_emicon_png, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui_sendEmergencyButton, 0, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_color(ui_sendEmergencyButton, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_opa(ui_sendEmergencyButton, 255, LV_PART_MAIN | LV_STATE_PRESSED);
+    lv_obj_set_style_border_width(ui_sendEmergencyButton, 5, LV_PART_MAIN | LV_STATE_PRESSED);
 
     ui_EmergencySuccessImage = lv_img_create(ui_EmergencyMenu);
     lv_img_set_src(ui_EmergencySuccessImage, &ui_img_checkmark_png);
     lv_obj_set_width(ui_EmergencySuccessImage, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(ui_EmergencySuccessImage, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_x(ui_EmergencySuccessImage, 65);
-    lv_obj_set_y(ui_EmergencySuccessImage, -70);
+    lv_obj_set_y(ui_EmergencySuccessImage, -65);
     lv_obj_set_align(ui_EmergencySuccessImage, LV_ALIGN_CENTER);
     lv_obj_add_flag(ui_EmergencySuccessImage, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(ui_EmergencySuccessImage, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
-    lv_img_set_zoom(ui_EmergencySuccessImage, 110);
+    lv_img_set_zoom(ui_EmergencySuccessImage, 200);
 
-    lv_obj_add_event_cb(ui_EmergencyButton, ui_event_EmergencyButton, LV_EVENT_ALL, NULL);
+    ui_Holdlabel = lv_label_create(ui_EmergencyMenu);
+    lv_obj_set_width(ui_Holdlabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Holdlabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Holdlabel, 0);
+    lv_obj_set_y(ui_Holdlabel, 77);
+    lv_obj_set_align(ui_Holdlabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_Holdlabel, "HOLD TO SEND!");
+    lv_obj_set_style_text_color(ui_Holdlabel, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui_Holdlabel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_decor(ui_Holdlabel, LV_TEXT_DECOR_NONE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_Holdlabel, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    ui_navimg = lv_img_create(ui_EmergencyMenu);
+    lv_img_set_src(ui_navimg, &ui_img_horizontalnnavother_png);
+    lv_obj_set_width(ui_navimg, LV_SIZE_CONTENT);   /// 40
+    lv_obj_set_height(ui_navimg, LV_SIZE_CONTENT);    /// 12
+    lv_obj_set_x(ui_navimg, 0);
+    lv_obj_set_y(ui_navimg, 110);
+    lv_obj_set_align(ui_navimg, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_navimg, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_navimg, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_img_set_angle(ui_navimg, 1800);
+
+    lv_obj_add_event_cb(ui_EmergencyIconImg, ui_event_EmergencyIconImg, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_sendEmergencyButton, ui_event_sendEmergencyButton, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_EmergencyMenu, ui_event_EmergencyMenu, LV_EVENT_ALL, NULL);
-    uic_EmergencyButton = ui_EmergencyButton;
-    uic_EmergencySuccessImage = ui_EmergencySuccessImage;
+    uic_EmergencyMenu = ui_EmergencyMenu;
+    uic_EmergencyIconImg = ui_EmergencyIconImg;
+    uic_sendEmergencyButton = ui_sendEmergencyButton;
+    uic_Holdlabel = ui_Holdlabel;
+    uic_navimg = ui_navimg;
 
 }
 
@@ -87,11 +130,16 @@ void ui_EmergencyMenu_screen_destroy(void)
     if(ui_EmergencyMenu) lv_obj_del(ui_EmergencyMenu);
 
     // NULL screen variables
+    uic_EmergencyMenu = NULL;
     ui_EmergencyMenu = NULL;
-    ui_Image4 = NULL;
-    uic_EmergencyButton = NULL;
-    ui_EmergencyButton = NULL;
-    uic_EmergencySuccessImage = NULL;
+    uic_EmergencyIconImg = NULL;
+    ui_EmergencyIconImg = NULL;
+    uic_sendEmergencyButton = NULL;
+    ui_sendEmergencyButton = NULL;
     ui_EmergencySuccessImage = NULL;
+    uic_Holdlabel = NULL;
+    ui_Holdlabel = NULL;
+    uic_navimg = NULL;
+    ui_navimg = NULL;
 
 }

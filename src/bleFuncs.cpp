@@ -46,6 +46,23 @@ static void sendReqGps()
     }
 }
 
+static void sendCurrentUser()
+{
+    if (!gConnected || !txChar)
+        return;
+
+    char buf[24];
+    snprintf(buf, sizeof(buf), "CURR:%d,%d",
+             globalUserData.userId,
+             globalUserData.groupId
+    );
+    txChar->setValue((uint8_t *)buf, strlen(buf));
+    txChar->notify();
+#ifdef BLELOG
+    ESP_LOGI(TAG, "TX → %s", buf);
+#endif
+}
+
 void bleSendNotification(message_type_t type, int senderId, const char *payload)
 {
     if (!gConnected || !txChar)
@@ -126,7 +143,33 @@ class RxCallback : public BLECharacteristicCallbacks
             }
             return;
         }
-
+        else if (v.rfind("SET_AVA:", 0) == 0)
+        {
+            int uid = atoi(v.c_str() + 8);
+            if (uid >= 0 && uid <= 7)
+            {
+                globalUserData.userId = uid;
+                sendCurrentUser(); // confirm back
+                ui_request_sync(globalUserData.userId, globalUserData.groupId);
+            }
+            return;
+        }
+        else if (v.rfind("SET_GRP:", 0) == 0)
+        {
+            int gid = atoi(v.c_str() + 8);
+            if (gid >= 1 && gid <= 10)
+            {
+                globalUserData.groupId = gid;
+                sendCurrentUser(); // confirm back
+                ui_request_sync(globalUserData.userId, globalUserData.groupId);
+            }
+            return;
+        }
+        else if (v == "REQ:USER")
+        { // ask explicitly
+            sendCurrentUser();
+            return;
+        }
         /* Fast comma count to decide what we received */
         uint8_t comma = 0;
         for (char ch : v)
@@ -201,6 +244,8 @@ class SrvCb : public BLEServerCallbacks
 #ifdef BLELOG
         ESP_LOGI(TAG, "Client connected");
 #endif
+        ui_request_sync(globalUserData.userId, globalUserData.groupId);
+        //sendCurrentUser();
     }
     void onDisconnect(BLEServer *) override
     {

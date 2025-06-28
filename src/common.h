@@ -7,6 +7,8 @@
 #include <esp_err.h>
 #ifdef __cplusplus
 #include <Arduino.h>
+#include "ChirpyUI/ui.h"
+
 extern "C" {
 #endif
 // declare as C-compatible if compiled as C++
@@ -50,3 +52,50 @@ typedef enum
     MSG_TYPE_GPS = 3,
     MSG_TYPE_ALERT = 4
 } message_type_t;
+
+static void _ui_apply_avatar(void *p)
+{
+    int uid = (intptr_t)p;
+
+    switch (uid)
+    {
+    case PIGGY:
+        lv_img_set_src(ui_CurrentAvatarImage, &ui_img_piggy_png);
+        break;
+    case FROGGY:
+        lv_img_set_src(ui_CurrentAvatarImage, &ui_img_froggy_png);
+        break;
+    case HORSY:
+        lv_img_set_src(ui_CurrentAvatarImage, &ui_img_horsy_png);
+        break;
+    case PANDY:
+        lv_img_set_src(ui_CurrentAvatarImage, &ui_img_pandy_png);
+        break;
+    case LIZZY:
+        lv_img_set_src(ui_CurrentAvatarImage, &ui_img_lizzy_png);
+        break;
+    case PHOENY:
+        lv_img_set_src(ui_CurrentAvatarImage, &ui_img_phoeny_png);
+        break;
+    case PUPPY:
+        lv_img_set_src(ui_CurrentAvatarImage, &ui_img_puppy_png);
+        break;
+    case KITTY:
+        lv_img_set_src(ui_CurrentAvatarImage, &ui_img_kitty_png);
+        break;
+    default:
+        lv_img_set_src(ui_CurrentAvatarImage, &ui_img_froggy_png);
+    }
+}
+
+static void _ui_apply_group(void *p)
+{
+    int gid = (intptr_t)p; // 0 = broadcast, 1–10 normal
+    lv_label_set_text_fmt(ui_GroupNr, "Group: %d", gid);
+}
+
+static inline void ui_request_sync(int uid, int gid)
+{
+    lv_async_call(_ui_apply_avatar, (void *)(intptr_t)uid);
+    lv_async_call(_ui_apply_group, (void *)(intptr_t)gid);
+}

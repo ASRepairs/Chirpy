@@ -86,7 +86,6 @@ data class ChatMessage(
 )
 
 /* ───────────── Chat state ───────────── */
-private val chatMessages = mutableStateListOf<ChatMessage>()
 private var draftText    by mutableStateOf("")
 
 
@@ -114,7 +113,10 @@ class MainActivity : ComponentActivity() {
 
 
     private val chatMessages = mutableStateListOf<ChatMessage>()
-    private var currentInput by mutableStateOf("")
+    private var myAvatar by mutableStateOf(0)
+    private var myGroup  by mutableStateOf(1)
+    private var userInfoReady by mutableStateOf(false)
+
 
     /* ──────────────────────────── SET-UP UI & PERMS ─────────────────────────── */
 
@@ -320,21 +322,19 @@ class MainActivity : ComponentActivity() {
                     statusText  = "Connected!"
                 }
                 Handler(mainLooper).postDelayed({
-                    sendTime { ok ->
-                        runOnUiThread {
-                            statusText = if (ok) "Time sent ✅" else "Time send ❌"
-                        }
-                    }
-                    // After time is sent, schedule GPS 3 seconds later
+                    reqUser()
+                    statusText = "Requesting user/group…"
                     Handler(mainLooper).postDelayed({
-                        sendGps { ok ->
-                            runOnUiThread {
-                                statusText = if (ok) "GPS sent ✅" else "GPS send ❌"
-                            }
+                        sendTime { ok ->
+                            runOnUiThread { statusText = if (ok) "Time sent ✅" else "Time send ❌" }
                         }
-                    }, 3000)
-
-                }, 5000) // wait 5 seconds after BLE connection before starting
+                        Handler(mainLooper).postDelayed({
+                            sendGps { ok ->
+                                runOnUiThread { statusText = if (ok) "GPS sent ✅" else "GPS send ❌" }
+                            }
+                        }, 2000)
+                    }, 2000)
+                }, 2000)
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 bluetoothGatt       = null
                 writeCharacteristic = null
@@ -382,6 +382,7 @@ class MainActivity : ComponentActivity() {
                 statusText =
                     if (writeCharacteristic != null) "Ready" else "Characteristic missing"
             }
+            reqUser() // get current user/gr
         }
 
         /* ──────────────  HANDLE INCOMING NOTIFICATIONS  ────────────── */
@@ -392,6 +393,16 @@ class MainActivity : ComponentActivity() {
             if (characteristic.uuid.toString().equals(NOTIFY_UUID, ignoreCase = true)) {
                 val msg = characteristic.getStringValue(0)
                 Log.d("BLE_RAW", "Received: $msg")
+                if (msg.startsWith("CURR:")) {
+                    val parts = msg.removePrefix("CURR:").split(",")
+                    if (parts.size == 2) {
+                        parts[0].toIntOrNull()?.let { myAvatar = it }
+                        parts[1].toIntOrNull()?.let { myGroup  = it }
+                        userInfoReady = true
+                        runOnUiThread { statusText = "Avatar=$myAvatar  Group=$myGroup" }
+                    }
+                    return                      // nothing else to do
+                }
                 when {
                     msg == "REQ:GPS" -> {
                         sendGps {
@@ -450,19 +461,27 @@ class MainActivity : ComponentActivity() {
                                         }
                                     }
 
-                                    4 -> {  // ALERT
-                                        val coords = payload.split(",")
-                                        if (coords.size == 2) {
-                                            val isMe = userId == 8
-                                            chatMessages += ChatMessage(4, "",
-                                                fromMe = isMe, userId = if (isMe) null else userId,
-                                                lat = coords[0], lon = coords[1])
+                                    4 -> {
+                                        val coords  = payload.split(",")
+                                        val haveGps = coords.size == 2 &&             // two parts
+                                                coords[0].isNotBlank() &&       // both non-empty
+                                                coords[1].isNotBlank()
 
-                                            if (!inForeground) showAlertNotification(coords[0], coords[1], userId)
-                                            statusText = "ALERT from ${getUserName(userId)}"
-                                        } else {
-                                            statusText = "Bad ALERT format"
-                                        }
+                                        val isMe = userId == 8
+                                        /* lat/lon are nullable; pass them only if we really have GPS */
+                                        chatMessages += ChatMessage(
+                                            type    = 4,
+                                            content = "",               // we decide the bubble text later
+                                            fromMe  = isMe,
+                                            userId  = if (isMe) null else userId,
+                                            lat     = if (haveGps) coords[0] else null,
+                                            lon     = if (haveGps) coords[1] else null
+                                        )
+
+                                        if (haveGps && !inForeground)
+                                            showAlertNotification(coords[0], coords[1], userId)
+
+                                        statusText = "ALERT from ${getUserName(userId)}"
                                     }
 
                                     else -> {
@@ -782,11 +801,20 @@ class MainActivity : ComponentActivity() {
                             else
                                 "${getUserName(msg.userId)} shared their location! Tap to view."
 
-                            4 -> if (msg.fromMe)
-                                "YOU HAD AN EMERGENCY! TAP TO SEE YOUR LOCATION"
-                            else
-                                "${getUserName(msg.userId)} HAS AN EMERGENCY! TAP TO SEE THEIR LOCATION"
-
+                            4 -> {
+                                val hasGps = msg.lat != null && msg.lon != null
+                                if (msg.fromMe) {
+                                    if (hasGps)
+                                        "YOU HAD AN EMERGENCY! TAP TO SEE YOUR LOCATION"
+                                    else
+                                        "YOU HAD AN EMERGENCY!"
+                                } else {
+                                    if (hasGps)
+                                        "${getUserName(msg.userId)} HAS AN EMERGENCY! TAP TO SEE THEIR LOCATION"
+                                    else
+                                        "${getUserName(msg.userId)} HAS AN EMERGENCY!"
+                                }
+                            }
                             else -> "Unknown message"
                         },
                         modifier = Modifier.padding(10.dp),
@@ -818,75 +846,99 @@ class MainActivity : ComponentActivity() {
         onSend: (String) -> Unit,
         onSendLocation: () -> Unit
     ) {
-        /* remember list state */
+        /* list state for chat scrolling */
         val listState = rememberLazyListState()
 
-        /* whenever the size changes, scroll to newest
-           (with reverseLayout=true newest item lives at index 0) */
+        Scaffold(
+            /* 1 ─ TOP BAR stays outside the scrolling content -------------------- */
+            topBar = {
+                TopAppBar(
+                    title  = { Text("Chirpy Chat") },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor    = AmoledBlack,
+                        titleContentColor = Color.White
+                    ),
+                    actions = {
+                        if (userInfoReady) {
+                            IconButton(
+                                onClick = { setAvatar((myAvatar + 1) % 8) },
+                                modifier = Modifier.size(56.dp)          // outer button
+                            ) {
+                                Image(
+                                    painter = painterResource(id = getSenderImage(myAvatar)),
+                                    contentDescription = "Change avatar",
+                                    modifier = Modifier.size(48.dp),     // actual picture
+                                    alignment = Alignment.Center         // (default) keep centred
+                                )
+                            }
+
+                            IconButton(onClick = {
+                                val next = (myGroup % 10) + 1    // 1‥10 cycling
+                                setGroup(next)
+                                myGroup = next
+                            }) { Text("G$myGroup") }
+                        }
+                        TextButton(
+                            onClick = onSendLocation,
+                            colors  = ButtonDefaults.textButtonColors(contentColor = ChirpyOrange)
+                        ) { Text("Send Location") }
+                    }
+                )
+            },
+
+            /* 2 ─ CONTENT automatically receives padding equal to top-bar height */
+            content = { innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)   // avoid drawing under bar
+                        .imePadding()            // lift everything over the keyboard
+                ) {
+                    /* ---- message history ---- */
+                    LazyColumn(
+                        state         = listState,
+                        modifier      = Modifier.weight(1f),
+                        reverseLayout = true
+                    ) {
+                        items(chatMessages.reversed(), key = { it.ts }) { Bubble(it) }
+                    }
+
+                    /* ---- input row ---- */
+                    Row(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextField(
+                            value = draftText,
+                            onValueChange = { draftText = it },
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(55.dp),
+                            placeholder = { Text("Chirp a message…") }
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Button(
+                            onClick = {
+                                val txt = draftText.trim()
+                                if (txt.isNotEmpty()) {
+                                    onSend(txt)
+                                    draftText = ""
+                                }
+                            },
+                            modifier = Modifier.height(55.dp)
+                        ) { Text("Send") }
+                    }
+                }
+            }
+        )
+
+        /* 3 ─ auto-scroll to newest message ------------------------------ */
         LaunchedEffect(chatMessages.size) {
             listState.animateScrollToItem(0)
         }
-
-        Column(Modifier.fillMaxSize()) {
-
-            TopAppBar(
-                title = { Text("Chirpy Chat") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor    = AmoledBlack,
-                    titleContentColor = Color.White
-                ),
-                actions = {
-                    TextButton(
-                        onClick = onSendLocation,
-                        colors  = ButtonDefaults.textButtonColors(
-                            contentColor = ChirpyOrange
-                        )
-                    ) {
-                        Text("Send Location")
-                    }
-                }
-            )
-            /* message history */
-            LazyColumn(
-                state = listState,          
-                modifier = Modifier.weight(1f),
-                reverseLayout = true           // newest at bottom
-            ) {
-                items(chatMessages.reversed(), key = { it.ts }) { msg ->
-                    Bubble(msg)
-                }
-            }
-
-            /* input row */
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextField(
-                    value = draftText,
-                    onValueChange = { draftText = it },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(55.dp),
-                    placeholder = { Text("Chirp a message…") }
-                )
-                Spacer(Modifier.width(8.dp))
-                Button(
-                    onClick = {
-                        val txt = draftText.trim()
-                        if (txt.isNotEmpty()) {
-                            onSend(txt)
-                            draftText = ""
-                        }
-                    },
-                    modifier = Modifier.height(55.dp),
-                ) { Text("Send") }
-            }
-        }
     }
-
 
     private fun sendChat(text: String) {
         val ch   = writeCharacteristic ?: return
@@ -944,6 +996,28 @@ class MainActivity : ComponentActivity() {
             }
             .addOnFailureListener { statusText = "Send location failed" }
     }
+    private fun setAvatar(uid: Int) {
+        val ch = writeCharacteristic ?: return
+        if (!hasConnectPerm()) return
+        ch.setValue("SET_AVA:$uid".toByteArray(StandardCharsets.UTF_8))
+        bluetoothGatt?.writeCharacteristic(ch)
+    }
+    private fun setGroup(gid: Int) {
+        if (gid !in 1..10) return          // ignore bad values
+        val ch = writeCharacteristic ?: return
+        if (!hasConnectPerm()) return
+        ch.setValue("SET_GRP:$gid".toByteArray(StandardCharsets.UTF_8))
+        bluetoothGatt?.writeCharacteristic(ch)
+    }
 
+    private fun reqUser() {
+        val ch = writeCharacteristic ?: return
+        if (!hasConnectPerm()) return
+        ch.setValue("REQ:USER".toByteArray(StandardCharsets.UTF_8))
+        bluetoothGatt?.writeCharacteristic(ch)
+    }
+    private fun hasConnectPerm() =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) ==
+                PackageManager.PERMISSION_GRANTED
 
 }

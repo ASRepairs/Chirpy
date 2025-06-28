@@ -6,10 +6,12 @@
 #include "../ui.h"
 
 lv_obj_t * uic_QRContainer;
+lv_obj_t * uic_scanlabel;
+lv_obj_t * uic_qrbackimg;
 lv_obj_t * uic_PhoneQRMenu;
 lv_obj_t * ui_PhoneQRMenu;
-lv_obj_t * ui_Image7;
-lv_obj_t * ui_Label4;
+lv_obj_t * ui_qrbackimg;
+lv_obj_t * ui_scanlabel;
 lv_obj_t * ui_QRContainer;
 
 // event funtions
@@ -19,7 +21,7 @@ void ui_event_PhoneQRMenu(lv_event_t * e)
 
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
         lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_PhoneConnectScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_PhoneConnectScreen_screen_init);
+        _ui_screen_change(&ui_MainScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_MainScreen_screen_init);
     }
 }
 
@@ -30,22 +32,22 @@ void ui_PhoneQRMenu_screen_init(void)
     ui_PhoneQRMenu = lv_obj_create(NULL);
     lv_obj_clear_flag(ui_PhoneQRMenu, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_Image7 = lv_img_create(ui_PhoneQRMenu);
-    lv_img_set_src(ui_Image7, &ui_img_whitepanel_png);
-    lv_obj_set_width(ui_Image7, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Image7, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_Image7, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Image7, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
-    lv_obj_clear_flag(ui_Image7, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_qrbackimg = lv_img_create(ui_PhoneQRMenu);
+    lv_img_set_src(ui_qrbackimg, &ui_img_whitepanel_png);
+    lv_obj_set_width(ui_qrbackimg, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_qrbackimg, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_qrbackimg, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_qrbackimg, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_qrbackimg, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
-    ui_Label4 = lv_label_create(ui_PhoneQRMenu);
-    lv_obj_set_width(ui_Label4, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Label4, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Label4, 0);
-    lv_obj_set_y(ui_Label4, -95);
-    lv_obj_set_align(ui_Label4, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label4, "Scan With App");
-    lv_obj_set_style_text_font(ui_Label4, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_scanlabel = lv_label_create(ui_PhoneQRMenu);
+    lv_obj_set_width(ui_scanlabel, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_scanlabel, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_scanlabel, 0);
+    lv_obj_set_y(ui_scanlabel, -95);
+    lv_obj_set_align(ui_scanlabel, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_scanlabel, "Scan With App");
+    lv_obj_set_style_text_font(ui_scanlabel, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_QRContainer = lv_obj_create(ui_PhoneQRMenu);
     lv_obj_remove_style_all(ui_QRContainer);
@@ -58,6 +60,8 @@ void ui_PhoneQRMenu_screen_init(void)
 
     lv_obj_add_event_cb(ui_PhoneQRMenu, ui_event_PhoneQRMenu, LV_EVENT_ALL, NULL);
     uic_PhoneQRMenu = ui_PhoneQRMenu;
+    uic_qrbackimg = ui_qrbackimg;
+    uic_scanlabel = ui_scanlabel;
     uic_QRContainer = ui_QRContainer;
 
 }
@@ -69,8 +73,10 @@ void ui_PhoneQRMenu_screen_destroy(void)
     // NULL screen variables
     uic_PhoneQRMenu = NULL;
     ui_PhoneQRMenu = NULL;
-    ui_Image7 = NULL;
-    ui_Label4 = NULL;
+    uic_qrbackimg = NULL;
+    ui_qrbackimg = NULL;
+    uic_scanlabel = NULL;
+    ui_scanlabel = NULL;
     uic_QRContainer = NULL;
     ui_QRContainer = NULL;
 

@@ -15,13 +15,19 @@ extern void ui_EmergencyMenu_screen_init(void);
 extern void ui_EmergencyMenu_screen_destroy(void);
 extern void ui_event_EmergencyMenu(lv_event_t * e);
 extern lv_obj_t * ui_EmergencyMenu;
-extern lv_obj_t * ui_Image4;
-extern void ui_event_EmergencyButton(lv_event_t * e);
-extern lv_obj_t * ui_EmergencyButton;
+extern void ui_event_EmergencyIconImg(lv_event_t * e);
+extern lv_obj_t * ui_EmergencyIconImg;
+extern void ui_event_sendEmergencyButton(lv_event_t * e);
+extern lv_obj_t * ui_sendEmergencyButton;
 extern lv_obj_t * ui_EmergencySuccessImage;
+extern lv_obj_t * ui_Holdlabel;
+extern lv_obj_t * ui_navimg;
 // CUSTOM VARIABLES
-extern lv_obj_t * uic_EmergencyButton;
-extern lv_obj_t * uic_EmergencySuccessImage;
+extern lv_obj_t * uic_EmergencyMenu;
+extern lv_obj_t * uic_EmergencyIconImg;
+extern lv_obj_t * uic_sendEmergencyButton;
+extern lv_obj_t * uic_Holdlabel;
+extern lv_obj_t * uic_navimg;
 
 #ifdef __cplusplus
 } /*extern "C"*/

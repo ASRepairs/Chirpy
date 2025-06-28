@@ -15,12 +15,12 @@ extern void ui_GroupsMenu_screen_init(void);
 extern void ui_GroupsMenu_screen_destroy(void);
 extern void ui_event_GroupsMenu(lv_event_t * e);
 extern lv_obj_t * ui_GroupsMenu;
-extern lv_obj_t * ui_Image1;
+extern lv_obj_t * ui_Image5;
 extern void ui_event_GroupSelector(lv_event_t * e);
 extern lv_obj_t * ui_GroupSelector;
-extern lv_obj_t * ui_Label1;
+extern lv_obj_t * ui_Label6;
 // CUSTOM VARIABLES
-extern lv_obj_t * uic_GroupSelector;
+extern lv_obj_t * uic_GroupsMenu;
 
 #ifdef __cplusplus
 } /*extern "C"*/

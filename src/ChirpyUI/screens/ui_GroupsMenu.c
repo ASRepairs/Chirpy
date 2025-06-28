@@ -5,11 +5,11 @@
 
 #include "../ui.h"
 
-lv_obj_t * uic_GroupSelector;
+lv_obj_t * uic_GroupsMenu;
 lv_obj_t * ui_GroupsMenu;
-lv_obj_t * ui_Image1;
+lv_obj_t * ui_Image5;
 lv_obj_t * ui_GroupSelector;
-lv_obj_t * ui_Label1;
+lv_obj_t * ui_Label6;
 
 // event funtions
 void ui_event_GroupsMenu(lv_event_t * e)
@@ -18,7 +18,7 @@ void ui_event_GroupsMenu(lv_event_t * e)
 
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
         lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_GroupsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_GroupsScreen_screen_init);
+        _ui_screen_change(&ui_MainScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_MainScreen_screen_init);
     }
 }
 
@@ -28,7 +28,7 @@ void ui_event_GroupSelector(lv_event_t * e)
 
     if(event_code == LV_EVENT_GESTURE &&  lv_indev_get_gesture_dir(lv_indev_get_act()) == LV_DIR_RIGHT) {
         lv_indev_wait_release(lv_indev_get_act());
-        _ui_screen_change(&ui_GroupsScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_GroupsScreen_screen_init);
+        _ui_screen_change(&ui_MainScreen, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 0, &ui_MainScreen_screen_init);
     }
     if(event_code == LV_EVENT_VALUE_CHANGED) {
         loraChangeGroup(e);
@@ -44,13 +44,13 @@ void ui_GroupsMenu_screen_init(void)
     lv_obj_set_style_bg_color(ui_GroupsMenu, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_GroupsMenu, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Image1 = lv_img_create(ui_GroupsMenu);
-    lv_img_set_src(ui_Image1, &ui_img_whitepanel_png);
-    lv_obj_set_width(ui_Image1, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Image1, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_align(ui_Image1, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_Image1, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
-    lv_obj_clear_flag(ui_Image1, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    ui_Image5 = lv_img_create(ui_GroupsMenu);
+    lv_img_set_src(ui_Image5, &ui_img_whitepanel_png);
+    lv_obj_set_width(ui_Image5, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Image5, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_align(ui_Image5, LV_ALIGN_CENTER);
+    lv_obj_add_flag(ui_Image5, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
+    lv_obj_clear_flag(ui_Image5, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     ui_GroupSelector = lv_roller_create(ui_GroupsMenu);
     lv_roller_set_options(ui_GroupSelector, "Gr. 1\nGr. 2\nGr. 3\nGr. 4\nGr. 5\nGr. 6\nGr. 7\nGr. 8\nGr. 9\nGr. 10",
@@ -71,18 +71,18 @@ void ui_GroupsMenu_screen_init(void)
     lv_obj_set_style_bg_color(ui_GroupSelector, lv_color_hex(0xECA21A), LV_PART_SELECTED | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_GroupSelector, 255, LV_PART_SELECTED | LV_STATE_DEFAULT);
 
-    ui_Label1 = lv_label_create(ui_GroupsMenu);
-    lv_obj_set_width(ui_Label1, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(ui_Label1, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(ui_Label1, 0);
-    lv_obj_set_y(ui_Label1, -95);
-    lv_obj_set_align(ui_Label1, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_Label1, "Pick a Group");
-    lv_obj_set_style_text_font(ui_Label1, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_Label6 = lv_label_create(ui_GroupsMenu);
+    lv_obj_set_width(ui_Label6, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(ui_Label6, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(ui_Label6, 0);
+    lv_obj_set_y(ui_Label6, -95);
+    lv_obj_set_align(ui_Label6, LV_ALIGN_CENTER);
+    lv_label_set_text(ui_Label6, "Pick a Group");
+    lv_obj_set_style_text_font(ui_Label6, &lv_font_montserrat_24, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_add_event_cb(ui_GroupSelector, ui_event_GroupSelector, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui_GroupsMenu, ui_event_GroupsMenu, LV_EVENT_ALL, NULL);
-    uic_GroupSelector = ui_GroupSelector;
+    uic_GroupsMenu = ui_GroupsMenu;
 
 }
 
@@ -91,10 +91,10 @@ void ui_GroupsMenu_screen_destroy(void)
     if(ui_GroupsMenu) lv_obj_del(ui_GroupsMenu);
 
     // NULL screen variables
+    uic_GroupsMenu = NULL;
     ui_GroupsMenu = NULL;
-    ui_Image1 = NULL;
-    uic_GroupSelector = NULL;
+    ui_Image5 = NULL;
     ui_GroupSelector = NULL;
-    ui_Label1 = NULL;
+    ui_Label6 = NULL;
 
 }
