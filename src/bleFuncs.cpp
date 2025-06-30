@@ -263,7 +263,7 @@ static void bleTask(void *arg)
 {
     char *devName = static_cast<char *>(arg);
     BLEDevice::init(devName);
-    BLEDevice::setMTU(32); // keep ATT payload short
+    BLEDevice::setMTU(128);
 
     srv = BLEDevice::createServer();
     static SrvCb srvCb;

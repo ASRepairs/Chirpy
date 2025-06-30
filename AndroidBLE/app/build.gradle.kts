@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.play.services.location)
     implementation("com.google.accompanist:accompanist-permissions:0.37.3")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+    implementation(libs.androidx.lifecycle.service)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

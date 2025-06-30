@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.bluetooth.*
 import android.bluetooth.le.*
 import android.content.Intent
@@ -306,6 +307,7 @@ class MainActivity : ComponentActivity() {
 
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
+                startBleService()
                 bluetoothGatt = gatt
                 if (ContextCompat.checkSelfPermission(this@MainActivity, Manifest.permission.BLUETOOTH_CONNECT)
                     == PackageManager.PERMISSION_GRANTED
@@ -336,6 +338,7 @@ class MainActivity : ComponentActivity() {
                     }, 2000)
                 }, 2000)
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                stopBleService()
                 bluetoothGatt       = null
                 writeCharacteristic = null
                 notifyCharacteristic = null
@@ -684,6 +687,7 @@ class MainActivity : ComponentActivity() {
             .setStyle(style)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setAutoCancel(true)
+            .setContentIntent(launchAppPendingIntent())
             .build()
 
         nm.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), notif)
@@ -722,6 +726,7 @@ class MainActivity : ComponentActivity() {
             .setStyle(style)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setAutoCancel(true)
+            .setContentIntent(launchAppPendingIntent())
             .build()
 
         nm.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), notif)
@@ -1019,5 +1024,34 @@ class MainActivity : ComponentActivity() {
     private fun hasConnectPerm() =
         ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) ==
                 PackageManager.PERMISSION_GRANTED
+
+    private fun launchAppPendingIntent(): PendingIntent {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            // make it look exactly like the launcher intent -------------
+            action = Intent.ACTION_MAIN
+            addCategory(Intent.CATEGORY_LAUNCHER)
+
+            // re-use the existing singleTask instance if it’s already on top
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+
+        return PendingIntent.getActivity(
+            this,
+            /* requestCode  */ 0,
+            /* intent       */ intent,
+            /* flags        */ PendingIntent.FLAG_UPDATE_CURRENT or
+                    PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+    private fun startBleService() {
+        val intent = Intent(this, BleService::class.java)
+        ContextCompat.startForegroundService(this, intent)
+    }
+
+    private fun stopBleService() {
+        stopService(Intent(this, BleService::class.java))
+    }
+
 
 }
