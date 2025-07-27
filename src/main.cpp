@@ -51,7 +51,7 @@ ICACHE_RAM_ATTR void onLoraPacketReceived() {
 
 
 
-// ───────────────────────────── Sleep Management ─────────────────────────────
+// ───────────────────────────── Sleep Management (crashes) ─────────────────────────────
 
 // static void lightSleepIfIdle()
 // {
@@ -580,7 +580,20 @@ void TaskCheckShortButtonPressed(void *pvParameters)
         vTaskDelay(pdMS_TO_TICKS(20));
     }
 }
-
+void TaskUserDataMonitor(void *pvParameters)
+{
+    static struct userData lastUserData = {0, 0};
+    for (;;)
+    {
+        if (lastUserData.groupId != globalUserData.groupId ||
+            lastUserData.userId != globalUserData.userId)
+        {
+            lastUserData = globalUserData;
+            sendCurrentUser();
+        }
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
 void TaskScreenTimeout(void *pvParameters)
 {
 
@@ -830,6 +843,7 @@ void setup() {
     xTaskCreatePinnedToCore(TaskDateUpdater, "TaskDateUpdater", TASK_STACK_SIZE / 2, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(TaskBatteryUpdater, "TaskBatteryUpdater", TASK_STACK_SIZE / 2, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(TaskScreenTimeout, "TaskScreenTimeout", TASK_STACK_SIZE / 2, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(TaskUserDataMonitor, "TaskUserDataMonitor", TASK_STACK_SIZE / 2, NULL, 1, NULL, 1);
 }
 
 void loop() {

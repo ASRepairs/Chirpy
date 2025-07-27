@@ -11,6 +11,6 @@ bool bleClientConnected();
 void bleSendReqGpsNow();
 void startBLETask(const char *bleName, GPSData *gpsData);
 void bleSendNotification(message_type_t type, int senderId, const char *payload);
-static void sendCurrentUser();
+void sendCurrentUser();
 
 #endif // BLEFUNCS_H

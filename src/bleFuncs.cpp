@@ -46,7 +46,7 @@ static void sendReqGps()
     }
 }
 
-static void sendCurrentUser()
+void sendCurrentUser()
 {
     if (!gConnected || !txChar)
         return;
